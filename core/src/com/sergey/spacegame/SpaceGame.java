@@ -4,6 +4,7 @@ import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.sergey.spacegame.client.ui.screen.LoadingScreen;
 import com.sergey.spacegame.client.ui.screen.MainMenuScreen;
 import com.sergey.spacegame.common.ecs.ECSManager;
@@ -15,6 +16,7 @@ public class SpaceGame extends Game {
 	private static SpaceGame instance;
 
 	private ECSManager ecsManager;
+	private TextureAtlas atlas;
 	private boolean loaded;
 
 	@Override
@@ -22,6 +24,7 @@ public class SpaceGame extends Game {
 		instance = this;
 
 		setScreen(new LoadingScreen());
+		atlas = new TextureAtlas(Gdx.files.internal("atlas.atlas"));
 		Thread loadingThread = new Thread(()->{
 			load();
 			setScreenAndDisposeOld(new MainMenuScreen());
@@ -80,5 +83,9 @@ public class SpaceGame extends Game {
 
 	public ECSManager getECSManager() {
 		return ecsManager;
+	}
+	
+	public TextureAtlas getAtlas() {
+		return atlas;
 	}
 }
