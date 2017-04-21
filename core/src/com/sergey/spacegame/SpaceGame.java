@@ -9,6 +9,7 @@ import com.sergey.spacegame.client.ui.screen.LoadingScreen;
 import com.sergey.spacegame.client.ui.screen.MainMenuScreen;
 import com.sergey.spacegame.common.ecs.ECSManager;
 import com.sergey.spacegame.common.ecs.system.MovementSystem;
+import com.sergey.spacegame.common.ecs.system.OrderSystem;
 import com.sergey.spacegame.common.ecs.system.RotationSystem;
 
 public class SpaceGame extends Game {
@@ -24,7 +25,9 @@ public class SpaceGame extends Game {
 		instance = this;
 
 		setScreen(new LoadingScreen());
+		
 		atlas = new TextureAtlas(Gdx.files.internal("atlas.atlas"));
+		
 		Thread loadingThread = new Thread(()->{
 			load();
 			setScreenAndDisposeOld(new MainMenuScreen());
@@ -38,6 +41,7 @@ public class SpaceGame extends Game {
 		ecsManager = new ECSManager();
 		ecsManager.getEngine().addSystem(new MovementSystem());
 		ecsManager.getEngine().addSystem(new RotationSystem());
+		ecsManager.getEngine().addSystem(new OrderSystem());
 	}
 
 	@Override

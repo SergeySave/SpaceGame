@@ -1,6 +1,5 @@
 package com.sergey.spacegame.client.ecs.system;
 
-import com.badlogic.ashley.core.ComponentMapper;
 import com.badlogic.ashley.core.Engine;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.EntitySystem;
@@ -14,20 +13,15 @@ import com.sergey.spacegame.common.ecs.component.PositionComponent;
 import com.sergey.spacegame.common.ecs.component.RotationComponent;
 import com.sergey.spacegame.common.ecs.component.SizeComponent;
 
-public class RenderSystem extends EntitySystem {
-
-	private static ComponentMapper<PositionComponent> positionMapper = ComponentMapper.getFor(PositionComponent.class);
-	private static ComponentMapper<SizeComponent> sizeMapper = ComponentMapper.getFor(SizeComponent.class);
-	private static ComponentMapper<VisualComponent> visualMapper = ComponentMapper.getFor(VisualComponent.class);
-	private static ComponentMapper<RotationComponent> rotationMapper = ComponentMapper.getFor(RotationComponent.class);
+public class MainRenderSystem extends EntitySystem {
 
 	private SpriteBatch batch;
 	private OrthographicCamera camera;
 
 	private ImmutableArray<Entity> entities;
 
-	public RenderSystem(OrthographicCamera camera) {
-		super(0);
+	public MainRenderSystem(OrthographicCamera camera) {
+		super(2);
 		this.camera = camera;
 		batch = new SpriteBatch();
 	}
@@ -57,13 +51,15 @@ public class RenderSystem extends EntitySystem {
 		RotationComponent rotVar;
 
 		for (Entity entity : entities) {
-			posVar = positionMapper.get(entity);
-			sizeVar = sizeMapper.get(entity);
-			visVar = visualMapper.get(entity);
+			posVar = PositionComponent.MAPPER.get(entity);
+			sizeVar = SizeComponent.MAPPER.get(entity);
+			visVar = VisualComponent.MAPPER.get(entity);
 			
-			if (rotationMapper.has(entity)) {
-				rotVar = rotationMapper.get(entity); 
-				batch.draw(visVar.region, posVar.x-rotVar.originX, posVar.y-rotVar.originY, rotVar.originX, rotVar.originY, sizeVar.w, sizeVar.h, 1, 1, rotVar.r);
+			if (RotationComponent.MAPPER.has(entity)) {
+				rotVar = RotationComponent.MAPPER.get(entity); 
+				float oX = rotVar.originX * sizeVar.w;
+				float oY = rotVar.originY * sizeVar.h;
+				batch.draw(visVar.region, posVar.x-oX, posVar.y-oY, oX, oY, sizeVar.w, sizeVar.h, 1, 1, rotVar.r);
 			} else {
 				batch.draw(visVar.region, posVar.x, posVar.y, sizeVar.w, sizeVar.h);
 			}
