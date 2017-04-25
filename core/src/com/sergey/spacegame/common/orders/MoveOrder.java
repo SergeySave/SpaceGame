@@ -8,11 +8,18 @@ import com.sergey.spacegame.common.ecs.component.VelocityComponent;
 public class MoveOrder implements IOrder {
 	private double x;
 	private double y;
+	private float speed;
 	private boolean done;
 
 	public MoveOrder(double x, double y) {
 		this.x = x;
 		this.y = y;
+	}
+	
+	public MoveOrder(double x, double y, float speed) {
+		this.x = x;
+		this.y = y;
+		this.speed = speed;
 	}
 
 	@Override
@@ -25,20 +32,20 @@ public class MoveOrder implements IOrder {
 			vel = new VelocityComponent();
 			e.add(vel);
 		}
-		ShipComponent ship = ShipComponent.MAPPER.get(e);
+		//ShipComponent ship = ShipComponent.MAPPER.get(e);
 
 		double dx = x-pos.x;
 		double dy = y-pos.y;
 		double dist = Math.hypot(dx, dy);
-		if (dist < ship.moveSpeed*deltaTime) {
+		if (dist < speed*deltaTime) {
 			done = true;
 			pos.x = (float)x;
 			vel.vx = 0;
 			pos.y = (float)y;
 			vel.vy = 0;
 		} else {
-			vel.vx = (float) (ship.moveSpeed*dx/dist);
-			vel.vy = (float) (ship.moveSpeed*dy/dist);
+			vel.vx = (float) (speed*dx/dist);
+			vel.vy = (float) (speed*dy/dist);
 		}
 	}
 

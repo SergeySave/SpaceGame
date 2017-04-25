@@ -52,7 +52,6 @@ public class SelectedRenderSystem extends EntitySystem {
 		batch.setBlendFunction(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
 		batch.setShader(program);
 		batch.begin();
-		System.out.println(program.getLog());
 
 		PositionComponent posVar;
 		SizeComponent sizeVar;
