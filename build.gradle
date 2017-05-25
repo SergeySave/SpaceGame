@@ -20,6 +20,7 @@ allprojects {
         box2DLightsVersion = '1.4'
         ashleyVersion = '1.7.0'
         aiVersion = '1.8.0'
+        kotlin_version = '1.1.2'
     }
 
     repositories {
@@ -33,6 +34,7 @@ allprojects {
 buildscript {
     dependencies {
     	classpath "com.badlogicgames.gdx:gdx-tools:1.9.6"
+    	classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:1.1.2"
     }
 }
 
@@ -51,6 +53,7 @@ texturePacker
 
 project(":desktop") {
     apply plugin: "java"
+    apply plugin: "kotlin"
 
     dependencies {
         compile project(":core")
@@ -63,12 +66,14 @@ project(":desktop") {
 
 project(":core") {
     apply plugin: "java"
+    apply plugin: "kotlin"
 
     dependencies {
         compile "com.badlogicgames.gdx:gdx:$gdxVersion"
         compile "com.badlogicgames.gdx:gdx-box2d:$gdxVersion"
         compile "com.badlogicgames.gdx:gdx-freetype:$gdxVersion"
         compile "com.badlogicgames.ashley:ashley:$ashleyVersion"
+        compile "org.jetbrains.kotlin:kotlin-stdlib-jre8"
     }
 }
 
