@@ -48,10 +48,11 @@ public class GameScreen implements Screen {
 		e.add(new PositionComponent(50, 50));
 		e.add(new VelocityComponent());
 		e.add(new SizeComponent(25, 25));
-		e.add(new RotationComponent(0, 0.5f, 0.5f));
+		e.add(new RotationComponent(90, 0.5f, 0.5f));
 		{
 			ShipComponent ship = new ShipComponent();
 			ship.moveSpeed = 200;
+			ship.rotateSpeed = 22.5f;
 			e.add(ship);
 		}
 		e.add(new ControllableComponent());
@@ -63,10 +64,11 @@ public class GameScreen implements Screen {
 		e.add(new PositionComponent(100, 50));
 		e.add(new VelocityComponent());
 		e.add(new SizeComponent(25, 25));
-		e.add(new RotationComponent(0, 0.5f, 0.5f));
+		e.add(new RotationComponent(90, 0.5f, 0.5f));
 		{
 			ShipComponent ship = new ShipComponent();
 			ship.moveSpeed = 100;
+			ship.rotateSpeed = 45;
 			e.add(ship);
 		}
 		e.add(new ControllableComponent());

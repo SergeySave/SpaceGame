@@ -7,4 +7,5 @@ public class ShipComponent implements Component {
 	public static final ComponentMapper<ShipComponent> MAPPER = ComponentMapper.getFor(ShipComponent.class);
 	
 	public float moveSpeed;
+	public float rotateSpeed;
 }
