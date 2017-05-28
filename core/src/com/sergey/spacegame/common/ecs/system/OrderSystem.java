@@ -14,11 +14,20 @@ public class OrderSystem extends IteratingSystem {
 	@Override
 	protected void processEntity(Entity entity, float deltaTime) {
 		OrderComponent order = OrderComponent.MAPPER.get(entity);
-		while (!order.orders.get(0).isValidFor(entity) && order.orders.size()>0) {
+		
+		if (order.orders.size() == 0) {
+			entity.remove(OrderComponent.class);
+			return;
+		}
+		
+		while (order.orders.size()>0 && !order.orders.get(0).isValidFor(entity)) {
 			order.orders.remove(0);
 		}
 		
-		if (order.orders.size() == 0) return;
+		if (order.orders.size() == 0) {
+			entity.remove(OrderComponent.class);
+			return;
+		}
 		
 		order.orders.get(0).update(entity, deltaTime);
 		if (order.orders.get(0).completed()) {
