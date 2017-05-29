@@ -81,8 +81,17 @@ public class SelectionControlSystem extends EntitySystem {
 					PositionComponent pos = PositionComponent.MAPPER.get(e);
 					if (SizeComponent.MAPPER.has(e)) {
 						SizeComponent size = SizeComponent.MAPPER.get(e);
-						if (rect.overlaps(new Rectangle(pos.x, pos.y, size.w, size.h))) {
-							e.add(new SelectedComponent());
+						if (RotationComponent.MAPPER.has(e)) {
+							RotationComponent rot = RotationComponent.MAPPER.get(e);
+							float oX = rot.originX * size.w;
+							float oY = rot.originY * size.h;
+							if (rect.overlaps(new Rectangle(pos.x-oX, pos.y-oY, size.w, size.h))) {
+								e.add(new SelectedComponent());
+							}
+						} else {
+							if (rect.overlaps(new Rectangle(pos.x-size.w/2, pos.y-size.h, size.w, size.h))) {
+								e.add(new SelectedComponent());
+							}
 						}
 					} else {
 						if (rect.contains(new Vector2(pos.x, pos.y))) {
@@ -115,13 +124,13 @@ public class SelectionControlSystem extends EntitySystem {
 					boolean fleetOrder = selectedEntities.size()>1;
 					if (fleetOrder) {
 						Vector2 farCenter = center.cpy().add(dx, dy);
-						
+
 						//Average Angle
 						float fleetDir = StreamSupport.stream(selectedEntities.spliterator(), true).filter(RotationComponent.MAPPER::has).map((e)->new Vector2(1,0).rotate(RotationComponent.MAPPER.get(e).r)).collect(Vector2::new, (v1,v2)->v1.add(v2), (v1,v2)->v1.add(v2)).angle();
 						//float movementDir = orderCenter.cpy().sub(center).angle();
 						float dr1 = desiredFleetDir-fleetDir;
 						float dr2 = dr-desiredFleetDir;
-						
+
 						//Time to rotate fleet, move fleet, and rotate the fleet again
 						double[] maxTimes = StreamSupport.stream(selectedEntities.spliterator(), true).map((e)->{
 							boolean doesTurn = RotationComponent.MAPPER.has(e);
@@ -129,46 +138,46 @@ public class SelectionControlSystem extends EntitySystem {
 							ShipComponent ship = ShipComponent.MAPPER.get(e);
 							Vector2 startPos, endPos, deltaPos;
 							double[] times = new double[3];
-							
+
 							startPos = PositionComponent.MAPPER.get(e).createVector();
 							endPos = startPos.cpy().sub(center).rotate(dr1).add(center);
 							deltaPos = endPos.cpy().sub(startPos);
 							ang = deltaPos.angle();
 							//Turn time 1
 							times[0] = (doesTurn ? getThroughRotateDistance(ang,RotationComponent.MAPPER.get(e).r)/ship.rotateSpeed : 0) + deltaPos.len()/ship.moveSpeed + (doesTurn ? getThroughRotateDistance(desiredFleetDir,ang)/ship.rotateSpeed : 0);
-							
+
 							//startPos = endPos;
 							//endPos = startPos.cpy().add(dx, dy);
 							//deltaPos = endPos.cpy().sub(startPos);
 							startPos.add(dx, dy);
 							//Move time
 							times[1] = ds/ship.moveSpeed;
-							
+
 							startPos = endPos;
 							endPos = startPos.cpy().sub(center).rotate(dr2).add(center);
 							deltaPos = endPos.cpy().sub(startPos);
 							ang = deltaPos.angle();
 							//Turn time 2
 							times[2] = (doesTurn ? getThroughRotateDistance(ang,desiredFleetDir)/ship.rotateSpeed : 0) + deltaPos.len()/ship.moveSpeed + (doesTurn ? getThroughRotateDistance(dr,ang)/ship.rotateSpeed : 0);
-							
+
 							return times;
 						}).reduce(new double[3], (r,e)->new double[]{Math.max(r[0], e[0]),Math.max(r[1], e[1]),Math.max(r[2], e[2])});
-						
+
 						float time = (float) (maxTimes[1]);
-						
+
 						selectedEntities.forEach((e)->{
 							boolean doesTurn = RotationComponent.MAPPER.has(e);
 							ShipComponent ship = ShipComponent.MAPPER.get(e);
 							float ang;
 							OrderComponent ord = new OrderComponent();
 							Vector2 startPos, endPos, deltaPos;
-							
+
 							if (doesTurn) {
 								startPos = PositionComponent.MAPPER.get(e).createVector();
 								endPos = startPos.cpy().sub(center).rotate(dr1).add(center);
 								deltaPos = endPos.cpy().sub(startPos);
 								ang = deltaPos.angle();
-								
+
 								//Fleet rotate 1
 								ord.orders.add(new FaceOrder(ang, ship.rotateSpeed));
 								double maxTime = maxTimes[0];
@@ -197,14 +206,14 @@ public class SelectionControlSystem extends EntitySystem {
 								startPos = PositionComponent.MAPPER.get(e).createVector();
 								endPos = startPos.cpy().sub(center).rotate(dr1).add(center);
 								deltaPos = endPos.cpy().sub(startPos);
-								
+
 								ord.orders.add(new TimeMoveOrder(endPos.x, endPos.y, (float) (maxTimes[0])));
 								ord.orders.add(new TimeMoveOrder(endPos.x+dx, endPos.y+dy, time));
-								
+
 								startPos = endPos.add(dx, dy);
 								endPos = startPos.cpy().sub(farCenter).rotate(dr2).add(farCenter);
 								deltaPos = endPos.cpy().sub(startPos);
-								
+
 								ord.orders.add(new TimeMoveOrder(endPos.x, endPos.y, (float) (maxTimes[2])));
 							}
 
@@ -227,7 +236,7 @@ public class SelectionControlSystem extends EntitySystem {
 		}
 		Gdx.gl.glDisable(GL20.GL_BLEND);
 	}
-	
+
 	private static float getThroughRotateDistance(float angle1, float angle2) {
 		float dr = Math.abs(angle1 - angle2)%360;
 		if (dr > 180) return 360-dr;

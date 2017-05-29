@@ -63,7 +63,7 @@ public class MainRenderSystem extends EntitySystem {
 				float oY = rotVar.originY * sizeVar.h;
 				batch.draw(visVar.region, posVar.x-oX, posVar.y-oY, oX, oY, sizeVar.w, sizeVar.h, 1, 1, rotVar.r);
 			} else {
-				batch.draw(visVar.region, posVar.x, posVar.y, sizeVar.w, sizeVar.h);
+				batch.draw(visVar.region, posVar.x-sizeVar.w/2, posVar.y-sizeVar.h/2, sizeVar.w, sizeVar.h);
 			}
 
 		}
