@@ -2,8 +2,10 @@ package com.sergey.spacegame.client.ui.screen;
 
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.sergey.spacegame.SpaceGame;
 import com.sergey.spacegame.client.ecs.component.VisualComponent;
 import com.sergey.spacegame.client.ecs.system.MainRenderSystem;
@@ -11,14 +13,13 @@ import com.sergey.spacegame.client.ecs.system.OrderRenderSystem;
 import com.sergey.spacegame.client.ecs.system.SelectedRenderSystem;
 import com.sergey.spacegame.client.ecs.system.SelectionControlSystem;
 import com.sergey.spacegame.common.ecs.ECSManager;
+import com.sergey.spacegame.common.ecs.component.BuildingComponent;
 import com.sergey.spacegame.common.ecs.component.ControllableComponent;
 import com.sergey.spacegame.common.ecs.component.PositionComponent;
 import com.sergey.spacegame.common.ecs.component.RotationComponent;
-import com.sergey.spacegame.common.ecs.component.ShipComponent;
 import com.sergey.spacegame.common.ecs.component.SizeComponent;
-import com.sergey.spacegame.common.ecs.component.VelocityComponent;
 
-public class GameScreen implements Screen {
+public class GameScreen extends BaseScreen {
 
 	private OrthographicCamera camera;
 
@@ -30,17 +31,39 @@ public class GameScreen implements Screen {
 	private ECSManager ecsManager;
 
 	private Entity e;
+	
+	private BuildingComponent building;
 
 	@Override
 	public void show() {
 		camera = new OrthographicCamera(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-
+		
 		ecsManager = SpaceGame.getInstance().getECSManager();
 		ecsManager.getEngine().addSystem(mainRenderSystem = new MainRenderSystem(camera));
 		ecsManager.getEngine().addSystem(orderRenderSystem = new OrderRenderSystem(camera));
 		ecsManager.getEngine().addSystem(selectedRenderSystem = new SelectedRenderSystem(camera));
 		ecsManager.getEngine().addSystem(selectionControlSystem = new SelectionControlSystem(camera));
 
+		{
+			Entity planet;
+			e = new Entity();
+			ecsManager.getEngine().addEntity(e);
+			e.add(new VisualComponent(SpaceGame.getInstance().getAtlas().findRegion("planets/1")));
+			e.add(new PositionComponent(250, 250));
+			e.add(new SizeComponent(200, 200));
+			planet = e;
+			
+			e = new Entity();
+			ecsManager.getEngine().addEntity(e);
+			e.add(new VisualComponent(SpaceGame.getInstance().getAtlas().findRegion("building/factory")));
+			e.add(new PositionComponent());
+			e.add(new SizeComponent(100,100));
+			e.add(new RotationComponent(0, 0.5f, 0.5f));
+			e.add(new BuildingComponent(planet, 0));
+			e.add(new ControllableComponent());
+		}
+
+		/*
 		e = new Entity();
 		ecsManager.getEngine().addEntity(e);
 
@@ -72,11 +95,13 @@ public class GameScreen implements Screen {
 			e.add(ship);
 		}
 		e.add(new ControllableComponent());
-
+		 */
 	}
 
 	@Override
 	public void render(float delta) {
+		if (Gdx.input.isKeyPressed(Keys.W)) building.setPosition(building.getPosition()+1);
+		if (Gdx.input.isKeyPressed(Keys.S)) building.setPosition(building.getPosition()-1);
 	}
 
 	@Override

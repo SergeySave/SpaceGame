@@ -16,6 +16,7 @@ import com.sergey.spacegame.client.ui.BitmapFontWrapper;
 import com.sergey.spacegame.client.ui.screen.LoadingScreen;
 import com.sergey.spacegame.client.ui.screen.MainMenuScreen;
 import com.sergey.spacegame.common.ecs.ECSManager;
+import com.sergey.spacegame.common.ecs.system.BuildingSystem;
 import com.sergey.spacegame.common.ecs.system.MovementSystem;
 import com.sergey.spacegame.common.ecs.system.OrderSystem;
 import com.sergey.spacegame.common.ecs.system.RotationSystem;
@@ -56,6 +57,7 @@ public class SpaceGame extends Game {
 		ecsManager.getEngine().addSystem(new MovementSystem());
 		ecsManager.getEngine().addSystem(new RotationSystem());
 		ecsManager.getEngine().addSystem(new OrderSystem());
+		ecsManager.getEngine().addSystem(new BuildingSystem());
 
 		inputMultiplexer = new InputMultiplexer();
 		Gdx.input.setInputProcessor(inputMultiplexer);

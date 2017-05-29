@@ -20,4 +20,9 @@ public class PositionComponent implements Component {
 	public Vector2 createVector() {
 		return new Vector2(x, y);
 	}
+	
+	public void setFrom(Vector2 v) {
+		x = v.x;
+		y = v.y;
+	}
 }
