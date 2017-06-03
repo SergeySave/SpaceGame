@@ -4,20 +4,23 @@ import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.sergey.spacegame.SpaceGame;
 import com.sergey.spacegame.client.ecs.component.VisualComponent;
+import com.sergey.spacegame.client.ecs.system.CommandUISystem;
 import com.sergey.spacegame.client.ecs.system.MainRenderSystem;
 import com.sergey.spacegame.client.ecs.system.OrderRenderSystem;
 import com.sergey.spacegame.client.ecs.system.SelectedRenderSystem;
-import com.sergey.spacegame.client.ecs.system.SelectionControlSystem;
+import com.sergey.spacegame.client.ecs.system.SelectionSystem;
 import com.sergey.spacegame.common.ecs.ECSManager;
 import com.sergey.spacegame.common.ecs.component.BuildingComponent;
 import com.sergey.spacegame.common.ecs.component.ControllableComponent;
 import com.sergey.spacegame.common.ecs.component.PositionComponent;
 import com.sergey.spacegame.common.ecs.component.RotationComponent;
+import com.sergey.spacegame.common.ecs.component.ShipComponent;
 import com.sergey.spacegame.common.ecs.component.SizeComponent;
+import com.sergey.spacegame.common.ecs.component.VelocityComponent;
+import com.sergey.spacegame.common.game.command.Command;
+import com.sergey.spacegame.common.game.command.MoveCommand;
 
 public class GameScreen extends BaseScreen {
 
@@ -26,7 +29,8 @@ public class GameScreen extends BaseScreen {
 	private MainRenderSystem mainRenderSystem;
 	private OrderRenderSystem orderRenderSystem;
 	private SelectedRenderSystem selectedRenderSystem;
-	private SelectionControlSystem selectionControlSystem;
+	private SelectionSystem selectionControlSystem;
+	private CommandUISystem commandUISystem;
 
 	private ECSManager ecsManager;
 
@@ -42,9 +46,10 @@ public class GameScreen extends BaseScreen {
 		ecsManager.getEngine().addSystem(mainRenderSystem = new MainRenderSystem(camera));
 		ecsManager.getEngine().addSystem(orderRenderSystem = new OrderRenderSystem(camera));
 		ecsManager.getEngine().addSystem(selectedRenderSystem = new SelectedRenderSystem(camera));
-		ecsManager.getEngine().addSystem(selectionControlSystem = new SelectionControlSystem(camera));
+		ecsManager.getEngine().addSystem(selectionControlSystem = new SelectionSystem(camera));
+		ecsManager.getEngine().addSystem(commandUISystem = new CommandUISystem(camera));
 
-		{
+		/*{
 			Entity planet;
 			e = new Entity();
 			ecsManager.getEngine().addEntity(e);
@@ -61,9 +66,10 @@ public class GameScreen extends BaseScreen {
 			e.add(new RotationComponent(0, 0.5f, 0.5f));
 			e.add(new BuildingComponent(planet, 0));
 			e.add(new ControllableComponent());
-		}
-
-		/*
+		}*/
+		
+		Command moveCommand = new Command(new MoveCommand(), true, true);
+		
 		e = new Entity();
 		ecsManager.getEngine().addEntity(e);
 
@@ -78,7 +84,7 @@ public class GameScreen extends BaseScreen {
 			ship.rotateSpeed = 22.5f;
 			e.add(ship);
 		}
-		e.add(new ControllableComponent());
+		e.add(new ControllableComponent(moveCommand));
 
 		e = new Entity();
 		ecsManager.getEngine().addEntity(e);
@@ -94,8 +100,8 @@ public class GameScreen extends BaseScreen {
 			ship.rotateSpeed = 45;
 			e.add(ship);
 		}
-		e.add(new ControllableComponent());
-		 */
+		e.add(new ControllableComponent(moveCommand));
+		
 	}
 
 	@Override
@@ -123,6 +129,7 @@ public class GameScreen extends BaseScreen {
 		ecsManager.getEngine().removeSystem(orderRenderSystem);
 		ecsManager.getEngine().removeSystem(selectedRenderSystem);
 		ecsManager.getEngine().removeSystem(selectionControlSystem);
+		ecsManager.getEngine().removeSystem(commandUISystem);
 	}
 
 	@Override

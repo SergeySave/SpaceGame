@@ -1,4 +1,4 @@
-package com.sergey.spacegame.common.orders;
+package com.sergey.spacegame.common.game.orders;
 
 import com.badlogic.ashley.core.Entity;
 

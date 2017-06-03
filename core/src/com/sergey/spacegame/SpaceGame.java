@@ -20,12 +20,14 @@ import com.sergey.spacegame.common.ecs.system.BuildingSystem;
 import com.sergey.spacegame.common.ecs.system.MovementSystem;
 import com.sergey.spacegame.common.ecs.system.OrderSystem;
 import com.sergey.spacegame.common.ecs.system.RotationSystem;
+import com.sergey.spacegame.common.game.command.CommandExecutorService;
 
 public class SpaceGame extends Game {
 
 	private static SpaceGame instance;
 	private static final int MIN_FONT_SIZE = 3;
 
+	private CommandExecutorService commandExecutor;
 	private InputMultiplexer inputMultiplexer;
 	private ECSManager ecsManager;
 	private TextureAtlas atlas;
@@ -68,6 +70,8 @@ public class SpaceGame extends Game {
 		generateFonts();
 
 		Gdx.app.postRunnable(()->skin.load(Gdx.files.internal("scene2d/uiskin.json")));
+		
+		commandExecutor = new CommandExecutorService();
 	}
 
 	@Override
@@ -205,5 +209,9 @@ public class SpaceGame extends Game {
 
 	public Skin getSkin() {
 		return skin;
+	}
+	
+	public CommandExecutorService getCommandExecutor() {
+		return commandExecutor;
 	}
 }

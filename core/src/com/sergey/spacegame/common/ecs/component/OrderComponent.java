@@ -6,7 +6,7 @@ import java.util.List;
 
 import com.badlogic.ashley.core.Component;
 import com.badlogic.ashley.core.ComponentMapper;
-import com.sergey.spacegame.common.orders.IOrder;
+import com.sergey.spacegame.common.game.orders.IOrder;
 
 public class OrderComponent implements Component {
 	public static final ComponentMapper<OrderComponent> MAPPER = ComponentMapper.getFor(OrderComponent.class);

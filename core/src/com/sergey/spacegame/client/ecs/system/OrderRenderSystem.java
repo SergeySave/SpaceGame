@@ -12,9 +12,9 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.badlogic.gdx.math.Vector2;
 import com.sergey.spacegame.common.ecs.component.OrderComponent;
 import com.sergey.spacegame.common.ecs.component.PositionComponent;
-import com.sergey.spacegame.common.orders.IOrder;
-import com.sergey.spacegame.common.orders.MoveOrder;
-import com.sergey.spacegame.common.orders.TimeMoveOrder;
+import com.sergey.spacegame.common.game.orders.IOrder;
+import com.sergey.spacegame.common.game.orders.MoveOrder;
+import com.sergey.spacegame.common.game.orders.TimeMoveOrder;
 
 public class OrderRenderSystem extends EntitySystem {
 
