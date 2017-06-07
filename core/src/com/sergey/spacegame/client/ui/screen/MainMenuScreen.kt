@@ -51,7 +51,7 @@ class MainMenuScreen : BaseScreen() {
 		textButtons.add(play)
 		play.addListener(object : ChangeListener() {
 			override fun changed(event:ChangeEvent, actor:Actor) {
-				SpaceGame.getInstance().setScreen(GameScreen(Level()))
+				SpaceGame.getInstance().setScreen(GameScreen(Level.tempLevelGet()))
 			}
 		})
 		table.row()

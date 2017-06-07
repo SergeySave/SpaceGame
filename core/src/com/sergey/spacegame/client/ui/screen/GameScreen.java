@@ -22,7 +22,6 @@ import com.sergey.spacegame.common.ecs.component.SizeComponent;
 import com.sergey.spacegame.common.ecs.component.VelocityComponent;
 import com.sergey.spacegame.common.game.Level;
 import com.sergey.spacegame.common.game.command.Command;
-import com.sergey.spacegame.common.game.command.MoveCommand;
 
 public class GameScreen extends BaseScreen {
 
@@ -79,6 +78,7 @@ public class GameScreen extends BaseScreen {
 		}*/
 		
 		Command moveCommand = level.getCommands().get("move");
+		Command testCommand = level.getCommands().get("test");
 		
 		e = ecsManager.newEntity();
 		ecsManager.getEngine().addEntity(e);
@@ -94,7 +94,7 @@ public class GameScreen extends BaseScreen {
 			ship.rotateSpeed = 22.5f;
 			e.add(ship);
 		}
-		e.add(new ControllableComponent(moveCommand));
+		e.add(new ControllableComponent(moveCommand, testCommand));
 
 		e = ecsManager.newEntity();
 		ecsManager.getEngine().addEntity(e);
@@ -110,7 +110,7 @@ public class GameScreen extends BaseScreen {
 			ship.rotateSpeed = 45;
 			e.add(ship);
 		}
-		e.add(new ControllableComponent(moveCommand));
+		e.add(new ControllableComponent(moveCommand, testCommand));
 		
 	}
 

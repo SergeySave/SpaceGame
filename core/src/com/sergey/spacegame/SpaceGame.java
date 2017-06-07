@@ -12,6 +12,8 @@ import com.badlogic.gdx.graphics.g2d.TextureAtlas.AtlasRegion;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator.FreeTypeFontParameter;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.sergey.spacegame.client.ui.BitmapFontWrapper;
 import com.sergey.spacegame.client.ui.screen.LoadingScreen;
 import com.sergey.spacegame.client.ui.screen.MainMenuScreen;
@@ -20,6 +22,7 @@ import com.sergey.spacegame.common.ecs.system.BuildingSystem;
 import com.sergey.spacegame.common.ecs.system.MovementSystem;
 import com.sergey.spacegame.common.ecs.system.OrderSystem;
 import com.sergey.spacegame.common.ecs.system.RotationSystem;
+import com.sergey.spacegame.common.game.command.Command;
 import com.sergey.spacegame.common.game.command.CommandExecutorService;
 
 public class SpaceGame extends Game {
@@ -36,6 +39,9 @@ public class SpaceGame extends Game {
 	private boolean loaded;
 	
 	private BitmapFontWrapper smallFont, mediumFont, largeFont;
+	
+	private GsonBuilder gsonBuilder;
+	private Gson gson;
 
 	@Override
 	public void create() {
@@ -73,6 +79,12 @@ public class SpaceGame extends Game {
 		Gdx.app.postRunnable(()->skin.load(Gdx.files.internal("scene2d/uiskin.json")));
 		
 		commandExecutor = new CommandExecutorService();
+		
+		gsonBuilder = new GsonBuilder();
+		
+		gsonBuilder.registerTypeAdapter(Command.class, new Command.Adapter());
+		
+		gson = gsonBuilder.create();
 	}
 
 	@Override
@@ -214,5 +226,13 @@ public class SpaceGame extends Game {
 	
 	public CommandExecutorService getCommandExecutor() {
 		return commandExecutor;
+	}
+	
+	public Gson getGson() {
+		return gson;
+	}
+	
+	public GsonBuilder getGsonBuilder() {
+		return gsonBuilder;
 	}
 }

@@ -79,6 +79,9 @@ project(":core") {
 		compile group: 'org.apache.bcel', name: 'bcel', version: '6.0'
         compile 'org.luaj:luaj-jse:3.0.1'
         
+        //GSON
+		compile "com.google.code.gson:gson:2.6.2"
+		compile "com.google.code.gson:gson:2.6.2:sources"
     }
 }
 
