@@ -6,12 +6,13 @@ import com.badlogic.gdx.scenes.scene2d.Stage
 import com.badlogic.gdx.scenes.scene2d.ui.Image
 import com.badlogic.gdx.scenes.scene2d.ui.Table
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton
+import com.badlogic.gdx.scenes.scene2d.ui.Value
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener
 import com.badlogic.gdx.scenes.scene2d.utils.Layout
 import com.badlogic.gdx.utils.Scaling
 import com.badlogic.gdx.utils.viewport.ScreenViewport
 import com.sergey.spacegame.SpaceGame
-import com.badlogic.gdx.scenes.scene2d.ui.Value
+import com.sergey.spacegame.common.game.Level
 
 class MainMenuScreen : BaseScreen() {
 	
@@ -50,7 +51,7 @@ class MainMenuScreen : BaseScreen() {
 		textButtons.add(play)
 		play.addListener(object : ChangeListener() {
 			override fun changed(event:ChangeEvent, actor:Actor) {
-				SpaceGame.getInstance().setScreen(GameScreen())
+				SpaceGame.getInstance().setScreen(GameScreen(Level()))
 			}
 		})
 		table.row()

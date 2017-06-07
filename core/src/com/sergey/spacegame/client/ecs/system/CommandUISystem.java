@@ -20,12 +20,10 @@ import com.badlogic.gdx.math.Vector3;
 import com.sergey.spacegame.SpaceGame;
 import com.sergey.spacegame.client.ecs.component.SelectedComponent;
 import com.sergey.spacegame.common.ecs.component.ControllableComponent;
+import com.sergey.spacegame.common.game.Level;
 import com.sergey.spacegame.common.game.command.Command;
-import com.sergey.spacegame.common.game.command.MoveCommand;
-import com.sergey.spacegame.common.util.Observable;
-import com.sergey.spacegame.common.util.Observer;
 
-public class CommandUISystem extends EntitySystem implements Observer<Command> {
+public class CommandUISystem extends EntitySystem {
 
 	private OrthographicCamera camera;
 	private ShapeRenderer shape;
@@ -36,9 +34,12 @@ public class CommandUISystem extends EntitySystem implements Observer<Command> {
 
 	private ImmutableArray<Entity> selectedEntities;
 
-	public CommandUISystem(OrthographicCamera camera) {
+	private Level level;
+	
+	public CommandUISystem(OrthographicCamera camera, Level level) {
 		super(5);
 		this.camera = camera;
+		this.level = level;
 	}
 
 	@Override
@@ -56,7 +57,10 @@ public class CommandUISystem extends EntitySystem implements Observer<Command> {
 	@Override
 	public void update(float deltaTime) {
 		if (command == null) {
-			command = new Command(new MoveCommand(), true, true);
+			command = level.getCommands().get("move");
+			if (command == null) {
+				return;
+			}
 		}
 		if (!command.isRequiresInput()) {
 			List<Entity> entities = StreamSupport.stream(selectedEntities.spliterator(), true).filter((e)->ControllableComponent.MAPPER.get(e).commands.contains(command)).collect(Collectors.toList());
@@ -93,8 +97,11 @@ public class CommandUISystem extends EntitySystem implements Observer<Command> {
 		}
 	}
 
-	@Override
-	public void update(Observable<Command> observable, Command object) {
-		this.command = object;
+	public void setCommand(Command command) {
+		this.command = command;
+	}
+	
+	public Command getCommand() {
+		return command;
 	}
 }

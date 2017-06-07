@@ -65,6 +65,7 @@ public class SpaceGame extends Game {
 		Gdx.input.setInputProcessor(inputMultiplexer);
 
 		Gdx.app.postRunnable(()->skin = new Skin(new TextureAtlas(Gdx.files.internal("scene2d/uiskin.atlas"))));
+		Gdx.app.postRunnable(()->skin.addRegions(atlas));
 
 		fontGenerator = new FreeTypeFontGenerator(Gdx.files.internal("font/Helvetica.ttf"));
 		generateFonts();

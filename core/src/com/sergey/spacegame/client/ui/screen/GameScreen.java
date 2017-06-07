@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.sergey.spacegame.SpaceGame;
 import com.sergey.spacegame.client.ecs.component.VisualComponent;
 import com.sergey.spacegame.client.ecs.system.CommandUISystem;
+import com.sergey.spacegame.client.ecs.system.HUDSystem;
 import com.sergey.spacegame.client.ecs.system.MainRenderSystem;
 import com.sergey.spacegame.client.ecs.system.OrderRenderSystem;
 import com.sergey.spacegame.client.ecs.system.SelectedRenderSystem;
@@ -19,6 +20,7 @@ import com.sergey.spacegame.common.ecs.component.RotationComponent;
 import com.sergey.spacegame.common.ecs.component.ShipComponent;
 import com.sergey.spacegame.common.ecs.component.SizeComponent;
 import com.sergey.spacegame.common.ecs.component.VelocityComponent;
+import com.sergey.spacegame.common.game.Level;
 import com.sergey.spacegame.common.game.command.Command;
 import com.sergey.spacegame.common.game.command.MoveCommand;
 
@@ -31,12 +33,19 @@ public class GameScreen extends BaseScreen {
 	private SelectedRenderSystem selectedRenderSystem;
 	private SelectionSystem selectionControlSystem;
 	private CommandUISystem commandUISystem;
+	private HUDSystem hudSystem;
 
 	private ECSManager ecsManager;
 
 	private Entity e;
 	
 	private BuildingComponent building;
+	
+	private Level level;
+	
+	public GameScreen(Level level) {
+		this.level = level;
+	}
 
 	@Override
 	public void show() {
@@ -47,7 +56,8 @@ public class GameScreen extends BaseScreen {
 		ecsManager.getEngine().addSystem(orderRenderSystem = new OrderRenderSystem(camera));
 		ecsManager.getEngine().addSystem(selectedRenderSystem = new SelectedRenderSystem(camera));
 		ecsManager.getEngine().addSystem(selectionControlSystem = new SelectionSystem(camera));
-		ecsManager.getEngine().addSystem(commandUISystem = new CommandUISystem(camera));
+		ecsManager.getEngine().addSystem(commandUISystem = new CommandUISystem(camera, level));
+		ecsManager.getEngine().addSystem(hudSystem = new HUDSystem(commandUISystem));
 
 		/*{
 			Entity planet;
@@ -68,7 +78,7 @@ public class GameScreen extends BaseScreen {
 			e.add(new ControllableComponent());
 		}*/
 		
-		Command moveCommand = new Command(new MoveCommand(), true, true);
+		Command moveCommand = level.getCommands().get("move");
 		
 		e = new Entity();
 		ecsManager.getEngine().addEntity(e);
@@ -130,6 +140,7 @@ public class GameScreen extends BaseScreen {
 		ecsManager.getEngine().removeSystem(selectedRenderSystem);
 		ecsManager.getEngine().removeSystem(selectionControlSystem);
 		ecsManager.getEngine().removeSystem(commandUISystem);
+		ecsManager.getEngine().removeSystem(hudSystem);
 	}
 
 	@Override
