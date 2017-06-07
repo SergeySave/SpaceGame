@@ -74,6 +74,11 @@ project(":core") {
         compile "com.badlogicgames.gdx:gdx-freetype:$gdxVersion"
         compile "com.badlogicgames.ashley:ashley:$ashleyVersion"
         compile "org.jetbrains.kotlin:kotlin-stdlib-jre8"
+        
+        // https://mvnrepository.com/artifact/org.apache.bcel/bcel
+		compile group: 'org.apache.bcel', name: 'bcel', version: '6.0'
+        compile 'org.luaj:luaj-jse:3.0.1'
+        
     }
 }
 

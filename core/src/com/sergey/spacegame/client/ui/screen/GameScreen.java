@@ -61,14 +61,14 @@ public class GameScreen extends BaseScreen {
 
 		/*{
 			Entity planet;
-			e = new Entity();
+			e = ecsManager.newEntity();
 			ecsManager.getEngine().addEntity(e);
 			e.add(new VisualComponent(SpaceGame.getInstance().getAtlas().findRegion("planets/1")));
 			e.add(new PositionComponent(250, 250));
 			e.add(new SizeComponent(200, 200));
 			planet = e;
 			
-			e = new Entity();
+			e = ecsManager.newEntity();
 			ecsManager.getEngine().addEntity(e);
 			e.add(new VisualComponent(SpaceGame.getInstance().getAtlas().findRegion("building/factory")));
 			e.add(new PositionComponent());
@@ -80,7 +80,7 @@ public class GameScreen extends BaseScreen {
 		
 		Command moveCommand = level.getCommands().get("move");
 		
-		e = new Entity();
+		e = ecsManager.newEntity();
 		ecsManager.getEngine().addEntity(e);
 
 		e.add(new VisualComponent(SpaceGame.getInstance().getAtlas().findRegion("ships/pew")));
@@ -96,7 +96,7 @@ public class GameScreen extends BaseScreen {
 		}
 		e.add(new ControllableComponent(moveCommand));
 
-		e = new Entity();
+		e = ecsManager.newEntity();
 		ecsManager.getEngine().addEntity(e);
 
 		e.add(new VisualComponent(SpaceGame.getInstance().getAtlas().findRegion("ships/pew")));

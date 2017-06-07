@@ -12,7 +12,7 @@ import com.sergey.spacegame.common.game.orders.FaceOrder;
 import com.sergey.spacegame.common.game.orders.MoveOrder;
 import com.sergey.spacegame.common.game.orders.TimeMoveOrder;
 
-public final class MoveCommand implements CommandExecutable {
+public final class MoveCommandExecutable implements CommandExecutable {
 
 	@Override
 	public void issue(Iterable<Entity> entitySource, int numEntities, Vector2 start, Vector2 end) {
@@ -144,7 +144,7 @@ public final class MoveCommand implements CommandExecutable {
 	
 	@Override
 	public boolean equals(Object obj) {
-		return obj instanceof MoveCommand;
+		return obj instanceof MoveCommandExecutable;
 	}
 	
 	@Override
