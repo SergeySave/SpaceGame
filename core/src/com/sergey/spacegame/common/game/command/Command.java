@@ -18,6 +18,7 @@ public final class Command {
 	private String name;
 	private String drawableName;
 	private String drawableCheckedName;
+	private String id;
 	
 	public Command(CommandExecutable executable, boolean requiresInput, boolean requiresTwoInput, String name, String drawableName, String drawableCheckedName) {
 		this.executable = executable;
@@ -59,6 +60,14 @@ public final class Command {
 	
 	public String getDrawableCheckedName() {
 		return drawableCheckedName;
+	}
+	
+	public String getId() {
+		return id;
+	}
+	
+	public void setId(String id) {
+		this.id = id;
 	}
 	
 	@Override

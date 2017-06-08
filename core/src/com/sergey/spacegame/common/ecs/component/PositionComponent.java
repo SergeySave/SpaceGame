@@ -4,7 +4,7 @@ import com.badlogic.ashley.core.Component;
 import com.badlogic.ashley.core.ComponentMapper;
 import com.badlogic.gdx.math.Vector2;
 
-public class PositionComponent implements Component {
+public class PositionComponent implements ClonableComponent {
 	public static final ComponentMapper<PositionComponent> MAPPER = ComponentMapper.getFor(PositionComponent.class);
 	
 	public float x;
@@ -24,5 +24,10 @@ public class PositionComponent implements Component {
 	public void setFrom(Vector2 v) {
 		x = v.x;
 		y = v.y;
+	}
+
+	@Override
+	public Component copy() {
+		return new PositionComponent(x, y);
 	}
 }

@@ -14,10 +14,13 @@ import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator.FreeTypeFont
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.sergey.spacegame.client.ecs.component.VisualComponent;
 import com.sergey.spacegame.client.ui.BitmapFontWrapper;
 import com.sergey.spacegame.client.ui.screen.LoadingScreen;
 import com.sergey.spacegame.client.ui.screen.MainMenuScreen;
 import com.sergey.spacegame.common.ecs.ECSManager;
+import com.sergey.spacegame.common.ecs.EntityPrototype;
+import com.sergey.spacegame.common.ecs.component.ControllableComponent;
 import com.sergey.spacegame.common.ecs.system.BuildingSystem;
 import com.sergey.spacegame.common.ecs.system.MovementSystem;
 import com.sergey.spacegame.common.ecs.system.OrderSystem;
@@ -83,6 +86,9 @@ public class SpaceGame extends Game {
 		gsonBuilder = new GsonBuilder();
 		
 		gsonBuilder.registerTypeAdapter(Command.class, new Command.Adapter());
+		gsonBuilder.registerTypeAdapter(EntityPrototype.class, new EntityPrototype.Adapter());
+		gsonBuilder.registerTypeAdapter(VisualComponent.class, new VisualComponent.Adapter());
+		gsonBuilder.registerTypeAdapter(ControllableComponent.class, new ControllableComponent.Adapter());
 		
 		gson = gsonBuilder.create();
 	}

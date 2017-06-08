@@ -83,7 +83,7 @@ public class GameScreen extends BaseScreen {
 		e = ecsManager.newEntity();
 		ecsManager.getEngine().addEntity(e);
 
-		e.add(new VisualComponent(SpaceGame.getInstance().getAtlas().findRegion("ships/pew")));
+		e.add(new VisualComponent("ships/pew"));
 		e.add(new PositionComponent(50, 50));
 		e.add(new VelocityComponent());
 		e.add(new SizeComponent(25, 25));
@@ -99,7 +99,7 @@ public class GameScreen extends BaseScreen {
 		e = ecsManager.newEntity();
 		ecsManager.getEngine().addEntity(e);
 
-		e.add(new VisualComponent(SpaceGame.getInstance().getAtlas().findRegion("ships/pew")));
+		e.add(new VisualComponent("ships/pew"));
 		e.add(new PositionComponent(100, 50));
 		e.add(new VelocityComponent());
 		e.add(new SizeComponent(25, 25));
