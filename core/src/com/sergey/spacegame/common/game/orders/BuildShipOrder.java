@@ -4,11 +4,11 @@ import com.badlogic.ashley.core.Entity;
 import com.sergey.spacegame.common.ecs.component.PositionComponent;
 import com.sergey.spacegame.common.game.Level;
 
-public class BuildOrder implements IOrder {
+public class BuildShipOrder implements IOrder {
 	private String entity;
 	private float time;
 	
-	public BuildOrder(String entityName, float time) {
+	public BuildShipOrder(String entityName, float time) {
 		this.entity = entityName;
 		this.time = time;
 	}

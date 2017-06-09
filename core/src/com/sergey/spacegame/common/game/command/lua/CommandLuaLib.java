@@ -10,8 +10,12 @@ import org.luaj.vm2.lib.jse.CoerceLuaToJava;
 import com.badlogic.ashley.core.Entity;
 import com.sergey.spacegame.common.ecs.component.IDComponent;
 import com.sergey.spacegame.common.ecs.component.OrderComponent;
-import com.sergey.spacegame.common.game.orders.BuildOrder;
+import com.sergey.spacegame.common.game.orders.BuildBuildingOrder;
+import com.sergey.spacegame.common.game.orders.BuildShipOrder;
+import com.sergey.spacegame.common.game.orders.FaceOrder;
 import com.sergey.spacegame.common.game.orders.IOrder;
+import com.sergey.spacegame.common.game.orders.MoveOrder;
+import com.sergey.spacegame.common.game.orders.TimeMoveOrder;
 
 public class CommandLuaLib extends TwoArgFunction {
 
@@ -21,7 +25,11 @@ public class CommandLuaLib extends TwoArgFunction {
 		env.set("addOrder", new AddOrder());
 		
 		LuaTable ordersTable = new LuaTable(); {
-			ordersTable.set("BuildOrder", CoerceJavaToLua.coerce(BuildOrder.class));
+			ordersTable.set("BuildShipOrder", CoerceJavaToLua.coerce(BuildShipOrder.class));
+			ordersTable.set("BuildBuildingOrder", CoerceJavaToLua.coerce(BuildBuildingOrder.class));
+			ordersTable.set("FaceOrder", CoerceJavaToLua.coerce(FaceOrder.class));
+			ordersTable.set("MoveOrder", CoerceJavaToLua.coerce(MoveOrder.class));
+			ordersTable.set("TimeMoveOrder", CoerceJavaToLua.coerce(TimeMoveOrder.class));
 		}env.set("orders", ordersTable);
 		
 		//env.set("FaceOrder", CoerceJavaToLua.coerce(FaceOrder.class));

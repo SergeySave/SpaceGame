@@ -13,15 +13,11 @@ import com.sergey.spacegame.client.ecs.system.SelectedRenderSystem;
 import com.sergey.spacegame.client.ecs.system.SelectionSystem;
 import com.sergey.spacegame.common.ecs.ECSManager;
 import com.sergey.spacegame.common.ecs.component.BuildingComponent;
-import com.sergey.spacegame.common.ecs.component.ControllableComponent;
+import com.sergey.spacegame.common.ecs.component.PlanetComponent;
 import com.sergey.spacegame.common.ecs.component.PositionComponent;
-import com.sergey.spacegame.common.ecs.component.RotationComponent;
-import com.sergey.spacegame.common.ecs.component.ShipComponent;
 import com.sergey.spacegame.common.ecs.component.SizeComponent;
-import com.sergey.spacegame.common.ecs.component.VelocityComponent;
 import com.sergey.spacegame.common.ecs.system.OrderSystem;
 import com.sergey.spacegame.common.game.Level;
-import com.sergey.spacegame.common.game.command.Command;
 
 public class GameScreen extends BaseScreen {
 
@@ -60,24 +56,23 @@ public class GameScreen extends BaseScreen {
 		ecsManager.getEngine().addSystem(commandUISystem = new CommandUISystem(camera, level));
 		ecsManager.getEngine().addSystem(hudSystem = new HUDSystem(commandUISystem));
 
-		/*{
-			Entity planet;
+		{
 			e = ecsManager.newEntity();
 			ecsManager.getEngine().addEntity(e);
-			e.add(new VisualComponent(SpaceGame.getInstance().getAtlas().findRegion("planets/1")));
+			e.add(new VisualComponent("planets/1"));
 			e.add(new PositionComponent(250, 250));
 			e.add(new SizeComponent(200, 200));
-			planet = e;
+			e.add(new PlanetComponent());
 			
-			e = ecsManager.newEntity();
-			ecsManager.getEngine().addEntity(e);
-			e.add(new VisualComponent(SpaceGame.getInstance().getAtlas().findRegion("building/factory")));
-			e.add(new PositionComponent());
-			e.add(new SizeComponent(100,100));
-			e.add(new RotationComponent(0, 0.5f, 0.5f));
-			e.add(new BuildingComponent(planet, 0));
-			e.add(new ControllableComponent());
-		}*/
+			//e = ecsManager.newEntity();
+			//ecsManager.getEngine().addEntity(e);
+			//e.add(new VisualComponent(SpaceGame.getInstance().getAtlas().findRegion("building/factory")));
+			//e.add(new PositionComponent());
+			//e.add(new SizeComponent(100,100));
+			//e.add(new RotationComponent(0, 0.5f, 0.5f));
+			//e.add(new BuildingComponent(planet, 0));
+			//e.add(new ControllableComponent());
+		}
 		/*
 		Command moveCommand = level.getCommands().get("move");
 		Command testCommand = level.getCommands().get("test");

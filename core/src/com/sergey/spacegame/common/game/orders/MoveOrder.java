@@ -15,6 +15,7 @@ public class MoveOrder implements IOrder {
 	public MoveOrder(double x, double y) {
 		this.x = x;
 		this.y = y;
+		this.speed = -1;
 	}
 	
 	public MoveOrder(double x, double y, float speed) {
@@ -33,7 +34,8 @@ public class MoveOrder implements IOrder {
 			vel = new VelocityComponent();
 			e.add(vel);
 		}
-		//ShipComponent ship = ShipComponent.MAPPER.get(e);
+		ShipComponent ship = ShipComponent.MAPPER.get(e);
+		if (speed < 0) speed = ship.moveSpeed;
 
 		double dx = x-pos.x;
 		double dy = y-pos.y;
