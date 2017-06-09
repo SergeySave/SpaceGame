@@ -4,6 +4,7 @@ import com.badlogic.ashley.core.Entity;
 import com.sergey.spacegame.common.ecs.component.RotationComponent;
 import com.sergey.spacegame.common.ecs.component.RotationVelocityComponent;
 import com.sergey.spacegame.common.ecs.component.ShipComponent;
+import com.sergey.spacegame.common.game.Level;
 
 public class FaceOrder implements IOrder {
 	private double r;
@@ -16,7 +17,7 @@ public class FaceOrder implements IOrder {
 	}
 
 	@Override
-	public void update(Entity e, float deltaTime) {
+	public void update(Entity e, float deltaTime, Level level) {
 		if (done) return;
 		
 		RotationComponent rot = RotationComponent.MAPPER.get(e);

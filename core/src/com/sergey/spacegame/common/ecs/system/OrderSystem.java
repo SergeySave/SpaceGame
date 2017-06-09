@@ -4,11 +4,15 @@ import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.systems.IteratingSystem;
 import com.sergey.spacegame.common.ecs.component.OrderComponent;
+import com.sergey.spacegame.common.game.Level;
 
 public class OrderSystem extends IteratingSystem {
+	
+	private Level level;
 
-	public OrderSystem() {
+	public OrderSystem(Level level) {
 		super(Family.all(OrderComponent.class).get());
+		this.level = level;
 	}
 
 	@Override
@@ -29,7 +33,7 @@ public class OrderSystem extends IteratingSystem {
 			return;
 		}
 		
-		order.orders.get(0).update(entity, deltaTime);
+		order.orders.get(0).update(entity, deltaTime, level);
 		if (order.orders.get(0).completed()) {
 			order.orders.remove(0);
 		}

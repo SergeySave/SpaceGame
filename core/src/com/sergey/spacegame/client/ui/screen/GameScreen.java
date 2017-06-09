@@ -4,7 +4,6 @@ import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.sergey.spacegame.SpaceGame;
 import com.sergey.spacegame.client.ecs.component.VisualComponent;
 import com.sergey.spacegame.client.ecs.system.CommandUISystem;
 import com.sergey.spacegame.client.ecs.system.HUDSystem;
@@ -20,6 +19,7 @@ import com.sergey.spacegame.common.ecs.component.RotationComponent;
 import com.sergey.spacegame.common.ecs.component.ShipComponent;
 import com.sergey.spacegame.common.ecs.component.SizeComponent;
 import com.sergey.spacegame.common.ecs.component.VelocityComponent;
+import com.sergey.spacegame.common.ecs.system.OrderSystem;
 import com.sergey.spacegame.common.game.Level;
 import com.sergey.spacegame.common.game.command.Command;
 
@@ -27,6 +27,7 @@ public class GameScreen extends BaseScreen {
 
 	private OrthographicCamera camera;
 
+	private OrderSystem orderSystem;
 	private MainRenderSystem mainRenderSystem;
 	private OrderRenderSystem orderRenderSystem;
 	private SelectedRenderSystem selectedRenderSystem;
@@ -50,7 +51,8 @@ public class GameScreen extends BaseScreen {
 	public void show() {
 		camera = new OrthographicCamera(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 		
-		ecsManager = SpaceGame.getInstance().getECSManager();
+		ecsManager = level.getECS();
+		ecsManager.getEngine().addSystem(orderSystem = new OrderSystem(level));
 		ecsManager.getEngine().addSystem(mainRenderSystem = new MainRenderSystem(camera));
 		ecsManager.getEngine().addSystem(orderRenderSystem = new OrderRenderSystem(camera));
 		ecsManager.getEngine().addSystem(selectedRenderSystem = new SelectedRenderSystem(camera));
@@ -76,7 +78,7 @@ public class GameScreen extends BaseScreen {
 			e.add(new BuildingComponent(planet, 0));
 			e.add(new ControllableComponent());
 		}*/
-		
+		/*
 		Command moveCommand = level.getCommands().get("move");
 		Command testCommand = level.getCommands().get("test");
 		
@@ -110,12 +112,20 @@ public class GameScreen extends BaseScreen {
 			ship.rotateSpeed = 45;
 			e.add(ship);
 		}
-		e.add(new ControllableComponent(moveCommand, testCommand));
+		e.add(new ControllableComponent(moveCommand, testCommand));*/
 		
+		e = level.getEntities().get("shipTest1").createEntity(level);
+		e.add(new PositionComponent(150, 150));
+		ecsManager.getEngine().addEntity(e);
+		
+		e = level.getEntities().get("shipTest1").createEntity(level);
+		e.add(new PositionComponent(200, 150));
+		ecsManager.getEngine().addEntity(e);
 	}
 
 	@Override
 	public void render(float delta) {
+		ecsManager.getEngine().update(Gdx.graphics.getDeltaTime());
 		if (Gdx.input.isKeyPressed(Keys.W)) building.setPosition(building.getPosition()+1);
 		if (Gdx.input.isKeyPressed(Keys.S)) building.setPosition(building.getPosition()-1);
 	}
@@ -135,6 +145,7 @@ public class GameScreen extends BaseScreen {
 
 	@Override
 	public void hide() {
+		ecsManager.getEngine().removeSystem(orderSystem);
 		ecsManager.getEngine().removeSystem(mainRenderSystem);
 		ecsManager.getEngine().removeSystem(orderRenderSystem);
 		ecsManager.getEngine().removeSystem(selectedRenderSystem);

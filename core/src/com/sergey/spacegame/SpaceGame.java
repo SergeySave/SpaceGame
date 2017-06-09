@@ -18,13 +18,8 @@ import com.sergey.spacegame.client.ecs.component.VisualComponent;
 import com.sergey.spacegame.client.ui.BitmapFontWrapper;
 import com.sergey.spacegame.client.ui.screen.LoadingScreen;
 import com.sergey.spacegame.client.ui.screen.MainMenuScreen;
-import com.sergey.spacegame.common.ecs.ECSManager;
 import com.sergey.spacegame.common.ecs.EntityPrototype;
 import com.sergey.spacegame.common.ecs.component.ControllableComponent;
-import com.sergey.spacegame.common.ecs.system.BuildingSystem;
-import com.sergey.spacegame.common.ecs.system.MovementSystem;
-import com.sergey.spacegame.common.ecs.system.OrderSystem;
-import com.sergey.spacegame.common.ecs.system.RotationSystem;
 import com.sergey.spacegame.common.game.command.Command;
 import com.sergey.spacegame.common.game.command.CommandExecutorService;
 
@@ -35,11 +30,10 @@ public class SpaceGame extends Game {
 
 	private CommandExecutorService commandExecutor;
 	private InputMultiplexer inputMultiplexer;
-	private ECSManager ecsManager;
 	private TextureAtlas atlas;
 	private Skin skin;
 	private FreeTypeFontGenerator fontGenerator;
-	private boolean loaded;
+	//private boolean loaded;
 	
 	private BitmapFontWrapper smallFont, mediumFont, largeFont;
 	
@@ -56,7 +50,7 @@ public class SpaceGame extends Game {
 
 		Thread loadingThread = new Thread(()->{
 			load();
-			loaded = true;
+			//loaded = true;
 			setScreenAndDisposeOld(new MainMenuScreen());
 		}, "Loading Thread");
 		loadingThread.setDaemon(true);
@@ -64,11 +58,6 @@ public class SpaceGame extends Game {
 	}
 
 	private void load() {
-		ecsManager = new ECSManager();
-		ecsManager.getEngine().addSystem(new MovementSystem());
-		ecsManager.getEngine().addSystem(new RotationSystem());
-		ecsManager.getEngine().addSystem(new OrderSystem());
-		ecsManager.getEngine().addSystem(new BuildingSystem());
 
 		inputMultiplexer = new InputMultiplexer();
 		Gdx.input.setInputProcessor(inputMultiplexer);
@@ -98,9 +87,6 @@ public class SpaceGame extends Game {
 		Gdx.gl.glClearColor(0, 0, 0, 1);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 		//Gdx.gl.
-		if (loaded) {
-			ecsManager.getEngine().update(Gdx.graphics.getDeltaTime());
-		}
 		super.render();
 	}
 
@@ -208,9 +194,9 @@ public class SpaceGame extends Game {
 		return instance;
 	}
 
-	public ECSManager getECSManager() {
-		return ecsManager;
-	}
+	//public ECSManager getECSManager() {
+	//	return ecsManager;
+	//}
 
 	public TextureAtlas getAtlas() {
 		return atlas;

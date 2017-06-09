@@ -13,15 +13,15 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
-import com.sergey.spacegame.SpaceGame;
 import com.sergey.spacegame.common.ecs.component.ClonableComponent;
+import com.sergey.spacegame.common.game.Level;
 
 public class EntityPrototype {
 	
 	private ClonableComponent[] components;
 	
-	public Entity createEntity() {
-		Entity e = SpaceGame.getInstance().getECSManager().newEntity();
+	public Entity createEntity(Level level) {
+		Entity e = level.getECS().newEntity();
 		
 		for (ClonableComponent comp : components) {
 			e.add(comp.copy());

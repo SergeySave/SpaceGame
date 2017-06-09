@@ -4,6 +4,7 @@ import com.badlogic.ashley.core.Entity;
 import com.sergey.spacegame.common.ecs.component.PositionComponent;
 import com.sergey.spacegame.common.ecs.component.ShipComponent;
 import com.sergey.spacegame.common.ecs.component.VelocityComponent;
+import com.sergey.spacegame.common.game.Level;
 
 public class MoveOrder implements IOrder {
 	private double x;
@@ -23,7 +24,7 @@ public class MoveOrder implements IOrder {
 	}
 
 	@Override
-	public void update(Entity e, float deltaTime) {
+	public void update(Entity e, float deltaTime, Level level) {
 		if (done) return;
 		
 		PositionComponent pos = PositionComponent.MAPPER.get(e);

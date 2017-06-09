@@ -37,7 +37,7 @@ public class VisualComponent implements ClonableComponent {
 	}
 	
 	public void setRegion(String name) {
-		this.region = SpaceGame.getInstance().getAtlas().findRegion(name);
+		this.region = SpaceGame.getInstance().getRegion(name);
 		this.name = name;
 	}
 	
