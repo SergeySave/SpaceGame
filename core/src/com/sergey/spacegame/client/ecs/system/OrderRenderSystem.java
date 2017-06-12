@@ -66,8 +66,8 @@ public class OrderRenderSystem extends EntitySystem {
 					
 				} else if (order instanceof BuildBuildingOrder) {
 					BuildBuildingOrder move = (BuildBuildingOrder)order;
-					if (move.getBuilding().isPresent()) {
-						PositionComponent b = move.getBuilding().get();
+					if (move.getPosition().isPresent()) {
+						Vector2 b = move.getPosition().get();
 						shape.setColor(Color.WHITE);
 						shape.line(posVar.x, posVar.y, (float)b.x, (float)b.y);
 						posVar.set((float)b.x, (float)b.y);

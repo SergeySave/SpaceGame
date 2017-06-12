@@ -4,6 +4,7 @@ import java.util.Optional;
 import java.util.stream.StreamSupport;
 
 import com.badlogic.ashley.core.Entity;
+import com.badlogic.gdx.math.Vector2;
 import com.sergey.spacegame.common.ecs.component.BuildingComponent;
 import com.sergey.spacegame.common.ecs.component.InContructionComponent;
 import com.sergey.spacegame.common.ecs.component.PositionComponent;
@@ -25,6 +26,8 @@ public class BuildBuildingOrder implements IOrder {
 	private float y;
 	private Entity planet;
 	private Entity building;
+	private PositionComponent planetPos;
+	private Vector2 desired;
 	private State state;
 	
 	public BuildBuildingOrder(String entityName, float time, float x, float y) {
@@ -54,8 +57,8 @@ public class BuildBuildingOrder implements IOrder {
 				building = level.getEntities().get(entity).createEntity(level); //Copy of building
 				building.add(new InContructionComponent());
 				
-				PositionComponent pPos = PositionComponent.MAPPER.get(planet);
-				BuildingComponent buildingC = new BuildingComponent(planet, pPos.createVector().sub(x, y).scl(-1).angle());
+				planetPos = PositionComponent.MAPPER.get(planet);
+				BuildingComponent buildingC = new BuildingComponent(planet, planetPos.createVector().sub(x, y).scl(-1).angle());
 				
 				building.add(buildingC);
 				
@@ -78,7 +81,7 @@ public class BuildBuildingOrder implements IOrder {
 			}
 			ShipComponent ship = ShipComponent.MAPPER.get(e);
 			float speed = ship.moveSpeed;
-			PositionComponent desired = PositionComponent.MAPPER.get(building);
+			desired = PositionComponent.MAPPER.get(building).createVector().sub(planetPos.x, planetPos.y).scl(1.5f).add(planetPos.x, planetPos.y);
 			
 			double dx = desired.x-pos.x;
 			double dy = desired.y-pos.y;
@@ -116,8 +119,8 @@ public class BuildBuildingOrder implements IOrder {
 		if (building != null) level.getECS().getEngine().removeEntity(building);
 	}
 	
-	public Optional<PositionComponent> getBuilding() {
-		return Optional.ofNullable(PositionComponent.MAPPER.get(building));
+	public Optional<Vector2> getPosition() {
+		return Optional.ofNullable(desired);
 	}
 	
 	private static enum State {

@@ -2,7 +2,6 @@ package com.sergey.spacegame.client.ui.screen;
 
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.sergey.spacegame.client.ecs.component.VisualComponent;
 import com.sergey.spacegame.client.ecs.system.CommandUISystem;
@@ -13,7 +12,6 @@ import com.sergey.spacegame.client.ecs.system.OrderRenderSystem;
 import com.sergey.spacegame.client.ecs.system.SelectedRenderSystem;
 import com.sergey.spacegame.client.ecs.system.SelectionSystem;
 import com.sergey.spacegame.common.ecs.ECSManager;
-import com.sergey.spacegame.common.ecs.component.BuildingComponent;
 import com.sergey.spacegame.common.ecs.component.PlanetComponent;
 import com.sergey.spacegame.common.ecs.component.PositionComponent;
 import com.sergey.spacegame.common.ecs.component.SizeComponent;
@@ -36,8 +34,6 @@ public class GameScreen extends BaseScreen {
 	private ECSManager ecsManager;
 
 	private Entity e;
-	
-	private BuildingComponent building;
 	
 	private Level level;
 	
@@ -124,8 +120,6 @@ public class GameScreen extends BaseScreen {
 	@Override
 	public void render(float delta) {
 		ecsManager.getEngine().update(Gdx.graphics.getDeltaTime());
-		if (Gdx.input.isKeyPressed(Keys.W)) building.setPosition(building.getPosition()+1);
-		if (Gdx.input.isKeyPressed(Keys.S)) building.setPosition(building.getPosition()-1);
 	}
 
 	@Override
