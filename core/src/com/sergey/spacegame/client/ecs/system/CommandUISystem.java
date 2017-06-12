@@ -64,7 +64,7 @@ public class CommandUISystem extends EntitySystem {
 		}
 		if (!command.isRequiresInput()) {
 			List<Entity> entities = StreamSupport.stream(selectedEntities.spliterator(), true).filter((e)->ControllableComponent.MAPPER.get(e).commands.contains(command)).collect(Collectors.toList());
-			SpaceGame.getInstance().getCommandExecutor().executeCommand(command.getExecutable(), entities, entities.size(), Vector2.Zero, Vector2.Zero);
+			SpaceGame.getInstance().getCommandExecutor().executeCommand(command.getExecutable(), entities, entities.size(), Vector2.Zero, Vector2.Zero, level);
 			command = null;
 			return;
 		}
@@ -75,7 +75,7 @@ public class CommandUISystem extends EntitySystem {
 			Vector3 vec = camera.unproject(new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0));
 			if (!command.isRequiresTwoInput()) {
 				List<Entity> entities = StreamSupport.stream(selectedEntities.spliterator(), true).filter((e)->ControllableComponent.MAPPER.get(e).commands.contains(command)).collect(Collectors.toList());
-				SpaceGame.getInstance().getCommandExecutor().executeCommand(command.getExecutable(), entities, entities.size(), new Vector2(vec.x, vec.y), Vector2.Zero);
+				SpaceGame.getInstance().getCommandExecutor().executeCommand(command.getExecutable(), entities, entities.size(), new Vector2(vec.x, vec.y), Vector2.Zero, level);
 				command = null;
 				return;
 			}
@@ -89,7 +89,7 @@ public class CommandUISystem extends EntitySystem {
 			}shape.end();
 			if (!Gdx.input.isButtonPressed(Buttons.RIGHT)) {
 				List<Entity> entities = StreamSupport.stream(selectedEntities.spliterator(), true).filter((e)->ControllableComponent.MAPPER.get(e).commands.contains(command)).collect(Collectors.toList());
-				SpaceGame.getInstance().getCommandExecutor().executeCommand(command.getExecutable(), entities, entities.size(), orderCenter, new Vector2(vec.x, vec.y));
+				SpaceGame.getInstance().getCommandExecutor().executeCommand(command.getExecutable(), entities, entities.size(), orderCenter, new Vector2(vec.x, vec.y), level);
 				command = null;
 				orderCenter = null;
 				return;

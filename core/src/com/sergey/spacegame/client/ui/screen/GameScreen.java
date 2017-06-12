@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.sergey.spacegame.client.ecs.component.VisualComponent;
 import com.sergey.spacegame.client.ecs.system.CommandUISystem;
 import com.sergey.spacegame.client.ecs.system.HUDSystem;
+import com.sergey.spacegame.client.ecs.system.InConstructionRenderSystem;
 import com.sergey.spacegame.client.ecs.system.MainRenderSystem;
 import com.sergey.spacegame.client.ecs.system.OrderRenderSystem;
 import com.sergey.spacegame.client.ecs.system.SelectedRenderSystem;
@@ -27,6 +28,7 @@ public class GameScreen extends BaseScreen {
 	private MainRenderSystem mainRenderSystem;
 	private OrderRenderSystem orderRenderSystem;
 	private SelectedRenderSystem selectedRenderSystem;
+	private InConstructionRenderSystem inConstructionRenderSystem;
 	private SelectionSystem selectionControlSystem;
 	private CommandUISystem commandUISystem;
 	private HUDSystem hudSystem;
@@ -53,6 +55,7 @@ public class GameScreen extends BaseScreen {
 		ecsManager.getEngine().addSystem(orderRenderSystem = new OrderRenderSystem(camera));
 		ecsManager.getEngine().addSystem(selectedRenderSystem = new SelectedRenderSystem(camera));
 		ecsManager.getEngine().addSystem(selectionControlSystem = new SelectionSystem(camera));
+		ecsManager.getEngine().addSystem(inConstructionRenderSystem = new InConstructionRenderSystem(camera));
 		ecsManager.getEngine().addSystem(commandUISystem = new CommandUISystem(camera, level));
 		ecsManager.getEngine().addSystem(hudSystem = new HUDSystem(commandUISystem));
 
@@ -145,6 +148,7 @@ public class GameScreen extends BaseScreen {
 		ecsManager.getEngine().removeSystem(orderRenderSystem);
 		ecsManager.getEngine().removeSystem(selectedRenderSystem);
 		ecsManager.getEngine().removeSystem(selectionControlSystem);
+		ecsManager.getEngine().removeSystem(inConstructionRenderSystem);
 		ecsManager.getEngine().removeSystem(commandUISystem);
 		ecsManager.getEngine().removeSystem(hudSystem);
 	}

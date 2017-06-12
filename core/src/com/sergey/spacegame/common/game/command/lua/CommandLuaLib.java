@@ -49,7 +49,7 @@ public class CommandLuaLib extends TwoArgFunction {
 				entity.add(orderComp);
 			}
 			IOrder orderObj = (IOrder) CoerceLuaToJava.coerce(order, (Class) CoerceLuaToJava.coerce(className, Class.class));
-			orderComp.orders.add(orderObj);
+			orderComp.addOrder(orderObj);
 			return LuaValue.NIL;
 		}
 	}

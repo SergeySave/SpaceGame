@@ -8,6 +8,7 @@ import com.sergey.spacegame.common.ecs.component.OrderComponent;
 import com.sergey.spacegame.common.ecs.component.PositionComponent;
 import com.sergey.spacegame.common.ecs.component.RotationComponent;
 import com.sergey.spacegame.common.ecs.component.ShipComponent;
+import com.sergey.spacegame.common.game.Level;
 import com.sergey.spacegame.common.game.orders.FaceOrder;
 import com.sergey.spacegame.common.game.orders.MoveOrder;
 import com.sergey.spacegame.common.game.orders.TimeMoveOrder;
@@ -15,7 +16,7 @@ import com.sergey.spacegame.common.game.orders.TimeMoveOrder;
 public final class MoveCommandExecutable implements CommandExecutable {
 
 	@Override
-	public void issue(Iterable<Entity> entitySource, int numEntities, Vector2 start, Vector2 end) {
+	public void issue(Iterable<Entity> entitySource, int numEntities, Vector2 start, Vector2 end, Level level) {
 		//Gets the center of all of the ships by averaging their coordinates
 		Vector2 center = StreamSupport.stream(entitySource.spliterator(), true).collect(Vector2::new, (v,s)->v.add(new Vector2(PositionComponent.MAPPER.get(s).x,PositionComponent.MAPPER.get(s).y)), (v1,v2)->v1.add(v2));
 		center.scl(1f/numEntities);
@@ -79,7 +80,13 @@ public final class MoveCommandExecutable implements CommandExecutable {
 				boolean doesTurn = RotationComponent.MAPPER.has(e);
 				ShipComponent ship = ShipComponent.MAPPER.get(e);
 				float ang;
-				OrderComponent ord = new OrderComponent();
+				OrderComponent ord;
+				if (OrderComponent.MAPPER.has(e)) {
+					ord = OrderComponent.MAPPER.get(e);
+					ord.clearOrders(e, level);
+				} else {
+					ord = new OrderComponent();
+				}
 				Vector2 startPos, endPos, deltaPos;
 
 				if (doesTurn) {
@@ -89,18 +96,18 @@ public final class MoveCommandExecutable implements CommandExecutable {
 					ang = deltaPos.angle();
 
 					//Fleet rotate 1
-					ord.orders.add(new FaceOrder(ang, ship.rotateSpeed));
+					ord.addOrder(new FaceOrder(ang, ship.rotateSpeed));
 					double maxTime = maxTimes[0];
 					float d1 = getThroughRotateDistance(ang,fleetMoveDir);
 					float d2 = getThroughRotateDistance(ang,RotationComponent.MAPPER.get(e).r);
 					float dt = d1 + d2;
 					float tr = dt/ship.rotateSpeed;
 					float mT = (float) (maxTime - tr);
-					ord.orders.add(new TimeMoveOrder(endPos.x, endPos.y, mT));
-					ord.orders.add(new FaceOrder(fleetMoveDir, ship.rotateSpeed)); 
+					ord.addOrder(new TimeMoveOrder(endPos.x, endPos.y, mT));
+					ord.addOrder(new FaceOrder(fleetMoveDir, ship.rotateSpeed)); 
 
 					//Fleet move
-					ord.orders.add(new TimeMoveOrder(endPos.x+dx, endPos.y+dy, time));
+					ord.addOrder(new TimeMoveOrder(endPos.x+dx, endPos.y+dy, time));
 
 					startPos = endPos.add(dx, dy);
 					endPos = startPos.cpy().sub(farCenter).rotate(dr2).add(farCenter);
@@ -108,23 +115,23 @@ public final class MoveCommandExecutable implements CommandExecutable {
 					ang = deltaPos.angle();
 
 					//Fleet rotate 2
-					ord.orders.add(new FaceOrder(ang, ship.rotateSpeed));
+					ord.addOrder(new FaceOrder(ang, ship.rotateSpeed));
 					mT = (float) (maxTimes[2]-(getThroughRotateDistance(ang,fleetMoveDir)+getThroughRotateDistance(ang,dr))/ship.rotateSpeed);
-					ord.orders.add(new TimeMoveOrder(endPos.x, endPos.y, mT));
-					ord.orders.add(new FaceOrder(dr, ship.rotateSpeed));
+					ord.addOrder(new TimeMoveOrder(endPos.x, endPos.y, mT));
+					ord.addOrder(new FaceOrder(dr, ship.rotateSpeed));
 				} else {
 					startPos = PositionComponent.MAPPER.get(e).createVector();
 					endPos = startPos.cpy().sub(center).rotate(dr1).add(center);
 					deltaPos = endPos.cpy().sub(startPos);
 
-					ord.orders.add(new TimeMoveOrder(endPos.x, endPos.y, (float) (maxTimes[0])));
-					ord.orders.add(new TimeMoveOrder(endPos.x+dx, endPos.y+dy, time));
+					ord.addOrder(new TimeMoveOrder(endPos.x, endPos.y, (float) (maxTimes[0])));
+					ord.addOrder(new TimeMoveOrder(endPos.x+dx, endPos.y+dy, time));
 
 					startPos = endPos.add(dx, dy);
 					endPos = startPos.cpy().sub(farCenter).rotate(dr2).add(farCenter);
 					deltaPos = endPos.cpy().sub(startPos);
 
-					ord.orders.add(new TimeMoveOrder(endPos.x, endPos.y, (float) (maxTimes[2])));
+					ord.addOrder(new TimeMoveOrder(endPos.x, endPos.y, (float) (maxTimes[2])));
 				}
 
 				e.add(ord);
@@ -136,6 +143,10 @@ public final class MoveCommandExecutable implements CommandExecutable {
 						new FaceOrder(fleetMoveDir, 45),
 						new MoveOrder(PositionComponent.MAPPER.get(e).x+dx, PositionComponent.MAPPER.get(e).y+dy, speed),
 						new FaceOrder(dr, 45));
+				
+				if (OrderComponent.MAPPER.has(e)) {
+					OrderComponent.MAPPER.get(e).clearOrders(e, level);
+				}
 
 				e.add(ord);
 			});

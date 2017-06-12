@@ -19,25 +19,25 @@ public class OrderSystem extends IteratingSystem {
 	protected void processEntity(Entity entity, float deltaTime) {
 		OrderComponent order = OrderComponent.MAPPER.get(entity);
 		
-		if (order.orders.size() == 0) {
+		if (order.size() == 0) {
 			entity.remove(OrderComponent.class);
 			return;
 		}
 		
-		while (order.orders.size()>0 && !order.orders.get(0).isValidFor(entity)) {
-			order.orders.remove(0);
+		while (order.size()>0 && !order.peek().isValidFor(entity)) {
+			order.pop();
 		}
 		
-		if (order.orders.size() == 0) {
+		if (order.size() == 0) {
 			entity.remove(OrderComponent.class);
 			return;
 		}
 		
-		order.orders.get(0).update(entity, deltaTime, level);
-		if (order.orders.get(0).completed()) {
-			order.orders.remove(0);
+		order.peek().update(entity, deltaTime, level);
+		if (order.peek().completed()) {
+			order.pop();
 		}
-		if (order.orders.size() == 0) {
+		if (order.size() == 0) {
 			entity.remove(OrderComponent.class);
 		}
 	}

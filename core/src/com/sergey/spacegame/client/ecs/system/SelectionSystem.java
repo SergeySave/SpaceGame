@@ -18,6 +18,7 @@ import com.badlogic.gdx.math.Vector3;
 import com.sergey.spacegame.SpaceGame;
 import com.sergey.spacegame.client.ecs.component.SelectedComponent;
 import com.sergey.spacegame.common.ecs.component.ControllableComponent;
+import com.sergey.spacegame.common.ecs.component.InContructionComponent;
 import com.sergey.spacegame.common.ecs.component.PositionComponent;
 import com.sergey.spacegame.common.ecs.component.RotationComponent;
 import com.sergey.spacegame.common.ecs.component.SizeComponent;
@@ -40,7 +41,7 @@ public class SelectionSystem extends EntitySystem implements InputProcessor {
 	@Override
 	public void addedToEngine (Engine engine) {
 		selectedEntities = engine.getEntitiesFor(Family.all(SelectedComponent.class).get());
-		controllableEntities = engine.getEntitiesFor(Family.all(ControllableComponent.class, PositionComponent.class).get());
+		controllableEntities = engine.getEntitiesFor(Family.all(ControllableComponent.class, PositionComponent.class).exclude(InContructionComponent.class).get());
 		shape = new ShapeRenderer();
 
 		SpaceGame.getInstance().getInputMultiplexer().addProcessor(this);

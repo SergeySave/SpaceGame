@@ -7,4 +7,6 @@ public interface IOrder {
 	public void update(Entity e, float deltaTime, Level level);
 	public boolean isValidFor(Entity e);
 	public boolean completed();
+	
+	public default void onCancel(Entity e, Level level){}
 }

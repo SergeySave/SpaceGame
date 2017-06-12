@@ -10,6 +10,7 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.sergey.spacegame.client.ecs.component.SelectedComponent;
 import com.sergey.spacegame.client.ecs.component.VisualComponent;
+import com.sergey.spacegame.common.ecs.component.InContructionComponent;
 import com.sergey.spacegame.common.ecs.component.PositionComponent;
 import com.sergey.spacegame.common.ecs.component.RotationComponent;
 import com.sergey.spacegame.common.ecs.component.SizeComponent;
@@ -28,7 +29,7 @@ public class MainRenderSystem extends EntitySystem {
 
 	@Override
 	public void addedToEngine (Engine engine) {
-		entities = engine.getEntitiesFor(Family.all(VisualComponent.class, SizeComponent.class, PositionComponent.class).exclude(SelectedComponent.class).get());
+		entities = engine.getEntitiesFor(Family.all(VisualComponent.class, SizeComponent.class, PositionComponent.class).exclude(SelectedComponent.class, InContructionComponent.class).get());
 		batch = new SpriteBatch();
 	}
 
