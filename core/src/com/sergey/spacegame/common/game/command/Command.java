@@ -1,6 +1,7 @@
 package com.sergey.spacegame.common.game.command;
 
 import java.lang.reflect.Type;
+import java.util.Optional;
 
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonDeserializer;
@@ -20,13 +21,13 @@ public final class Command {
 	private String drawableCheckedName;
 	private String id;
 	
-	public Command(CommandExecutable executable, boolean requiresInput, boolean requiresTwoInput, String name, String drawableName, String drawableCheckedName) {
+	public Command(CommandExecutable executable, boolean requiresInput, boolean requiresTwoInput, String name, String drawableName, Optional<String> drawableCheckedName) {
 		this.executable = executable;
 		this.requiresInput = requiresInput;
 		this.requiresTwoInput = requiresTwoInput;
 		this.name = name;
 		this.drawableName = drawableName;
-		this.drawableCheckedName = drawableCheckedName;
+		if (drawableCheckedName.isPresent()) this.drawableCheckedName = drawableCheckedName.get();
 	}
 
 	/**
@@ -74,12 +75,12 @@ public final class Command {
 	public boolean equals(Object obj) {
 		if (!(obj instanceof Command)) return false;
 		Command other = (Command)obj;
-		return executable.equals(other.executable) && requiresInput == other.requiresInput && requiresTwoInput == other.requiresTwoInput && name.equals(other.name) && drawableName.equals(other.drawableName) && drawableCheckedName.equals(other.drawableCheckedName);
+		return executable.equals(other.executable) && requiresInput == other.requiresInput && requiresTwoInput == other.requiresTwoInput && name.equals(other.name) && drawableName.equals(other.drawableName) && (drawableCheckedName == null ? other.drawableCheckedName == null : drawableCheckedName.equals(other.drawableCheckedName));
 	}
 	
 	@Override
 	public int hashCode() {
-		return executable.hashCode() << 2 + (requiresInput ? 2 : 0) + (requiresTwoInput ? 1 : 0) + name.hashCode() + drawableName.hashCode() + drawableCheckedName.hashCode();
+		return executable.hashCode() << 2 + (requiresInput ? 2 : 0) + (requiresTwoInput ? 1 : 0) + name.hashCode() + drawableName.hashCode() + (drawableCheckedName == null ? 0 : drawableCheckedName.hashCode());
 	}
 	
 	public static class Adapter implements JsonSerializer<Command>, JsonDeserializer<Command>{
@@ -110,7 +111,7 @@ public final class Command {
 			boolean requiresTwoInput = obj.getAsJsonPrimitive("requiresTwoInput").getAsBoolean();
 			String name = obj.getAsJsonPrimitive("name").getAsString();
 			String drawableName = obj.getAsJsonPrimitive("iconName").getAsString();
-			String drawableCheckedName = obj.getAsJsonPrimitive("pressedIconName").getAsString();
+			Optional<String> drawableCheckedName = Optional.ofNullable(obj.getAsJsonPrimitive("pressedIconName")).map((j)->j.getAsString());
 			
 			return new Command(executable, requiresInput, requiresTwoInput, name, drawableName, drawableCheckedName);
 		}

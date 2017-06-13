@@ -1,6 +1,6 @@
 
 atlas.png
-size: 512,128
+size: 1024,128
 format: RGBA8888
 filter: Nearest,Nearest
 repeat: none
@@ -11,9 +11,16 @@ building/factory
   orig: 128, 128
   offset: 0, 0
   index: -1
+icons/gotoarrow
+  rotate: false
+  xy: 256, 0
+  size: 128, 128
+  orig: 128, 128
+  offset: 0, 0
+  index: -1
 missingTexture
   rotate: false
-  xy: 384, 126
+  xy: 512, 126
   size: 2, 2
   orig: 2, 2
   offset: 0, 0
@@ -27,7 +34,7 @@ planets/1
   index: -1
 ships/pew
   rotate: false
-  xy: 256, 0
+  xy: 384, 0
   size: 128, 128
   orig: 128, 128
   offset: 0, 0

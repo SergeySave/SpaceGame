@@ -2,6 +2,8 @@ package com.sergey.spacegame.client.ecs.system;
 
 import java.util.Iterator;
 import java.util.LinkedHashSet;
+import java.util.LinkedList;
+import java.util.List;
 
 import com.badlogic.ashley.core.Engine;
 import com.badlogic.ashley.core.Entity;
@@ -34,7 +36,7 @@ public class HUDSystem extends EntitySystem implements EntityListener {
 	private CommandUISystem commandUI;
 	private ImmutableArray<Entity> selectedEntities;
 	private Skin skin = SpaceGame.getInstance().getSkin();
-	
+
 	private TooltipManager tooltipManager;
 
 	private Stage stage;
@@ -76,9 +78,9 @@ public class HUDSystem extends EntitySystem implements EntityListener {
 		{
 			leftTable = new Table();
 			table.add(leftTable).fillY().expandY().width(Value.percentWidth(0.20f, table)).align(Align.left);
-			
+
 			table.add().fill().expand();
-			
+
 			rightTable = new Table();
 			table.add(rightTable).height(Value.percentWidth(0.20f, table)).width(Value.percentWidth(0.20f, table)).align(Align.bottomRight);
 		}
@@ -86,7 +88,7 @@ public class HUDSystem extends EntitySystem implements EntityListener {
 		{
 			Table bottomTable = new Table();
 			table.add(bottomTable).fillX().expandX().height(Value.percentHeight(0.075f, table)).align(Align.bottom).colspan(3);
-			
+
 			actionBar = new Table();
 			ScrollPane scroll = new ScrollPane(actionBar, skin, "noBg");
 			actionBar.align(Align.left);
@@ -115,7 +117,7 @@ public class HUDSystem extends EntitySystem implements EntityListener {
 	}
 
 	private void recalculateUI() {
-		
+
 		LinkedHashSet<Command> commands = null;
 		for (Entity e : selectedEntities) {
 			if (commands == null) {
@@ -131,32 +133,46 @@ public class HUDSystem extends EntitySystem implements EntityListener {
 				}
 			}
 		}
-		
+
 		actionBar.clear();
 		if (commands != null) {
 			Command uiCmd = commandUI.getCommand();
+			List<ImageButton> buttons = new LinkedList<>();
 			for (Command cmd : commands) {
 				ImageButtonStyle ibs = skin.get(ImageButtonStyle.class);
 				ibs = new ImageButtonStyle(ibs);
 				ibs.imageUp = skin.getDrawable(cmd.getDrawableName());
-				ibs.imageChecked = skin.getDrawable(cmd.getDrawableCheckedName());
+				if (cmd.getDrawableCheckedName() != null) {
+					ibs.imageOver = skin.getDrawable(cmd.getDrawableCheckedName());
+				}
+				//ibs.imageChecked = skin.getDrawable(cmd.getDrawableCheckedName());
 				//ibs.checkedOffsetX = 10;
 				//ibs.checkedOffsetY = 20;
 				ImageButton butt = new ImageButton(ibs);
+				buttons.add(butt);
 				butt.getImageCell().grow();
 				butt.setChecked(cmd.equals(uiCmd));
 				butt.addListener(new ChangeListener() {
 					@Override
 					public void changed(ChangeEvent event, Actor actor) {
-						commandUI.setCommand(cmd);
-						butt.setChecked(true);
+						if (butt.isChecked()) {
+							//Set this as the command
+							commandUI.setCommand(cmd);
+							//Disable other buttons
+							buttons.forEach((b)->{ if (b != butt) b.setChecked(false); });
+						} else {
+							//If trying to uncheck recheck
+							if (commandUI.getCommand() == cmd) {
+								butt.setChecked(true);
+							}
+						}
 					}
 				});
 				butt.addListener(new Tooltip<Actor>(new Label(cmd.getName(), skin), tooltipManager));
 				actionBar.add(butt).height(Value.percentHeight(1f, actionBar)).width(Value.percentHeight(1f, actionBar)).align(Align.left).pad(0, 5, 0, 5);
 			}
 		}
-		
+
 	}
 
 	@Override
