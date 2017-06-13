@@ -47,7 +47,7 @@ public class BuildBuildingOrder implements IOrder {
 				.filter(PositionComponent.MAPPER::has)
 				.map((p)->new Object[] {p, PositionComponent.MAPPER.get(p)})
 				.map((p)->new Object[] {p[0], (((PositionComponent)p[1]).x-x)*(((PositionComponent)p[1]).x-x) + (((PositionComponent)p[1]).y-y)*(((PositionComponent)p[1]).y-y)})
-				.min((l,r)->Double.compare((Double)l[1], (Double)r[1]))
+				.min((l,r)->Float.compare((Float)l[1], (Float)r[1]))
 				.map((c)->(Entity)c[0]);
 			
 			if (closestPlanet.isPresent()) {

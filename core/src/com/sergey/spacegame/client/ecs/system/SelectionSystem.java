@@ -32,10 +32,13 @@ public class SelectionSystem extends EntitySystem implements InputProcessor {
 
 	private ImmutableArray<Entity> selectedEntities;
 	private ImmutableArray<Entity> controllableEntities;
+	
+	private CommandUISystem cmdUI;
 
-	public SelectionSystem(OrthographicCamera camera) {
+	public SelectionSystem(OrthographicCamera camera, CommandUISystem commandUI) {
 		super(4);
 		this.camera = camera;
+		this.cmdUI = commandUI;
 	}
 
 	@Override
@@ -93,6 +96,7 @@ public class SelectionSystem extends EntitySystem implements InputProcessor {
 						}
 					}
 				});
+				cmdUI.setCommand(null);
 				selectionBegin = null;
 				selectionEnd = null;
 			}

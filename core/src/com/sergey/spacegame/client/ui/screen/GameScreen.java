@@ -50,9 +50,9 @@ public class GameScreen extends BaseScreen {
 		ecsManager.getEngine().addSystem(mainRenderSystem = new MainRenderSystem(camera));
 		ecsManager.getEngine().addSystem(orderRenderSystem = new OrderRenderSystem(camera));
 		ecsManager.getEngine().addSystem(selectedRenderSystem = new SelectedRenderSystem(camera));
-		ecsManager.getEngine().addSystem(selectionControlSystem = new SelectionSystem(camera));
 		ecsManager.getEngine().addSystem(inConstructionRenderSystem = new InConstructionRenderSystem(camera));
 		ecsManager.getEngine().addSystem(commandUISystem = new CommandUISystem(camera, level));
+		ecsManager.getEngine().addSystem(selectionControlSystem = new SelectionSystem(camera, commandUISystem));
 		ecsManager.getEngine().addSystem(hudSystem = new HUDSystem(commandUISystem));
 
 		{
@@ -60,6 +60,13 @@ public class GameScreen extends BaseScreen {
 			ecsManager.getEngine().addEntity(e);
 			e.add(new VisualComponent("planets/1"));
 			e.add(new PositionComponent(250, 250));
+			e.add(new SizeComponent(200, 200));
+			e.add(new PlanetComponent());
+			
+			e = ecsManager.newEntity();
+			ecsManager.getEngine().addEntity(e);
+			e.add(new VisualComponent("planets/1"));
+			e.add(new PositionComponent(750, 750));
 			e.add(new SizeComponent(200, 200));
 			e.add(new PlanetComponent());
 			

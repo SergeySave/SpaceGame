@@ -12,7 +12,9 @@ import com.badlogic.ashley.utils.ImmutableArray;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Buttons;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.badlogic.gdx.math.Vector2;
@@ -27,6 +29,7 @@ public class CommandUISystem extends EntitySystem {
 
 	private OrthographicCamera camera;
 	private ShapeRenderer shape;
+	private SpriteBatch batch;
 
 	private Vector2 orderCenter;
 	
@@ -46,12 +49,14 @@ public class CommandUISystem extends EntitySystem {
 	public void addedToEngine (Engine engine) {
 		selectedEntities = engine.getEntitiesFor(Family.all(SelectedComponent.class, ControllableComponent.class).get());
 		shape = new ShapeRenderer();
+		batch = new SpriteBatch();
 	}
 
 	@Override
 	public void removedFromEngine (Engine engine) {
 		selectedEntities = null;
 		shape.dispose();
+		batch.dispose();
 	}
 
 	@Override
@@ -91,6 +96,15 @@ public class CommandUISystem extends EntitySystem {
 				orderCenter = null;
 				return;
 			}
+		}
+		
+		batch.setProjectionMatrix(camera.combined);
+		batch.setBlendFunction(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
+		if (command != null && command.getCursor() != null) {
+			if (command.getCursor().needsInitialization()) command.getCursor().init();
+			batch.begin();
+			command.getCursor().drawExtra(level, batch);
+			batch.end();
 		}
 	}
 

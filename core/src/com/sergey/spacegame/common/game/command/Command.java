@@ -10,6 +10,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
+import com.sergey.spacegame.client.ui.cursor.CursorOverride;
 
 public final class Command {
 
@@ -20,14 +21,16 @@ public final class Command {
 	private String drawableName;
 	private String drawableCheckedName;
 	private String id;
+	private CursorOverride cursor;
 	
-	public Command(CommandExecutable executable, boolean requiresInput, boolean requiresTwoInput, String name, String drawableName, Optional<String> drawableCheckedName) {
+	public Command(CommandExecutable executable, boolean requiresInput, boolean requiresTwoInput, String name, String drawableName, Optional<String> drawableCheckedName, CursorOverride cursor) {
 		this.executable = executable;
 		this.requiresInput = requiresInput;
 		this.requiresTwoInput = requiresTwoInput;
 		this.name = name;
 		this.drawableName = drawableName;
 		if (drawableCheckedName.isPresent()) this.drawableCheckedName = drawableCheckedName.get();
+		this.cursor = cursor;
 	}
 
 	/**
@@ -65,6 +68,10 @@ public final class Command {
 	
 	public String getId() {
 		return id;
+	}
+	
+	public CursorOverride getCursor() {
+		return cursor;
 	}
 	
 	public void setId(String id) {
@@ -113,7 +120,20 @@ public final class Command {
 			String drawableName = obj.getAsJsonPrimitive("iconName").getAsString();
 			Optional<String> drawableCheckedName = Optional.ofNullable(obj.getAsJsonPrimitive("pressedIconName")).map((j)->j.getAsString());
 			
-			return new Command(executable, requiresInput, requiresTwoInput, name, drawableName, drawableCheckedName);
+			CursorOverride cursor = null;
+			
+			if (obj.has("cursor")) {
+				JsonObject cursorObj = obj.getAsJsonObject("cursor");
+				String className = cursorObj.get("class").getAsString();
+				try {
+					Class<?> clazz = ClassLoader.getSystemClassLoader().loadClass(className);
+					cursor = context.deserialize(cursorObj, clazz);
+				} catch (ClassNotFoundException e) {
+					throw new JsonParseException("Class " + className + " not found. ", e);
+				}
+			}
+			
+			return new Command(executable, requiresInput, requiresTwoInput, name, drawableName, drawableCheckedName, cursor);
 		}
 
 		@Override
