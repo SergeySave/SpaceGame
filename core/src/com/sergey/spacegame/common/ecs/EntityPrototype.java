@@ -16,7 +16,7 @@ import com.google.gson.JsonSerializer;
 import com.sergey.spacegame.common.ecs.component.ClonableComponent;
 import com.sergey.spacegame.common.game.Level;
 
-public class EntityPrototype {
+public final class EntityPrototype {
 	
 	private ClonableComponent[] components;
 	
