@@ -24,6 +24,8 @@ public class OrderSystem extends IteratingSystem {
 			return;
 		}
 		
+		order.initAll(entity, level);
+		
 		while (order.size()>0 && !order.peek().isValidFor(entity)) {
 			order.pop();
 		}

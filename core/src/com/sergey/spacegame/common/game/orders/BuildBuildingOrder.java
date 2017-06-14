@@ -28,50 +28,46 @@ public class BuildBuildingOrder implements IOrder {
 	private Entity building;
 	private PositionComponent planetPos;
 	private Vector2 desired;
-	private State state;
-	
+
 	public BuildBuildingOrder(String entityName, float time, float x, float y) {
 		this.entity = entityName;
 		this.time = time;
 		this.x = x;
 		this.y = y;
-		this.state = State.UNINITIALIZED;
+	}
+
+	@Override
+	public void init(Entity e, Level level) {
+		Optional<Entity> closestPlanet = StreamSupport.stream(level.getPlanets().spliterator(), false)
+			.filter(PositionComponent.MAPPER::has)
+			.map((p)->new Object[] {p, PositionComponent.MAPPER.get(p)})
+			.map((p)->new Object[] {p[0], (((PositionComponent)p[1]).x-x)*(((PositionComponent)p[1]).x-x) + (((PositionComponent)p[1]).y-y)*(((PositionComponent)p[1]).y-y)})
+			.min((l,r)->Float.compare((Float)l[1], (Float)r[1]))
+			.map((c)->(Entity)c[0]);
+
+		if (closestPlanet.isPresent()) {
+			planet = closestPlanet.get();
+
+			building = level.getEntities().get(entity).createEntity(level); //Copy of building
+			building.add(new InContructionComponent());
+
+			planetPos = PositionComponent.MAPPER.get(planet);
+			BuildingComponent buildingC = new BuildingComponent(planet, planetPos.createVector().sub(x, y).scl(-1).angle());
+
+			building.add(buildingC);
+
+			level.getECS().getEngine().addEntity(building);
+		} else {
+			//No planet fail to build
+			time = -1;
+			return;
+		}
 	}
 
 	@Override
 	public void update(Entity e, float deltaTime, Level level) {
 		if (time < 0) return;
-		
-		if (state == State.UNINITIALIZED) {
-			Optional<Entity> closestPlanet = StreamSupport.stream(level.getPlanets().spliterator(), false)
-				.filter(PositionComponent.MAPPER::has)
-				.map((p)->new Object[] {p, PositionComponent.MAPPER.get(p)})
-				.map((p)->new Object[] {p[0], (((PositionComponent)p[1]).x-x)*(((PositionComponent)p[1]).x-x) + (((PositionComponent)p[1]).y-y)*(((PositionComponent)p[1]).y-y)})
-				.min((l,r)->Float.compare((Float)l[1], (Float)r[1]))
-				.map((c)->(Entity)c[0]);
-			
-			if (closestPlanet.isPresent()) {
-				state = State.BUILDING;
-				planet = closestPlanet.get();
-				
-				building = level.getEntities().get(entity).createEntity(level); //Copy of building
-				building.add(new InContructionComponent());
-				
-				planetPos = PositionComponent.MAPPER.get(planet);
-				BuildingComponent buildingC = new BuildingComponent(planet, planetPos.createVector().sub(x, y).scl(-1).angle());
-				
-				building.add(buildingC);
-				
-				state = State.BUILDING;
-				
-				level.getECS().getEngine().addEntity(building);
-			} else {
-				//No planet fail to build
-				time = -1;
-				return;
-			}
-		}
-		
+
 		if (ShipComponent.MAPPER.has(e) && PositionComponent.MAPPER.has(e)) {
 			PositionComponent pos = PositionComponent.MAPPER.get(e);
 			VelocityComponent vel = VelocityComponent.MAPPER.get(e);
@@ -82,7 +78,7 @@ public class BuildBuildingOrder implements IOrder {
 			ShipComponent ship = ShipComponent.MAPPER.get(e);
 			float speed = ship.moveSpeed;
 			desired = PositionComponent.MAPPER.get(building).createVector().sub(planetPos.x, planetPos.y).scl(1.5f).add(planetPos.x, planetPos.y);
-			
+
 			double dx = desired.x-pos.x;
 			double dy = desired.y-pos.y;
 			double dist = Math.hypot(dx, dy);
@@ -98,7 +94,7 @@ public class BuildBuildingOrder implements IOrder {
 		} else {
 			time -= deltaTime;
 		}
-		
+
 		if (time < 0) {
 			building.remove(InContructionComponent.class);
 		}
@@ -113,18 +109,13 @@ public class BuildBuildingOrder implements IOrder {
 	public boolean completed() {
 		return time < 0;
 	}
-	
+
 	@Override
 	public void onCancel(Entity e, Level level) {
 		if (building != null) level.getECS().getEngine().removeEntity(building);
 	}
-	
+
 	public Optional<Vector2> getPosition() {
-		return Optional.ofNullable(desired);
-	}
-	
-	private static enum State {
-		UNINITIALIZED,
-		BUILDING;
+		return Optional.ofNullable(building).map(PositionComponent.MAPPER::get).map((p)->p.createVector().sub(planetPos.x, planetPos.y).scl(1.5f).add(planetPos.x, planetPos.y));
 	}
 }

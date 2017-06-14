@@ -8,5 +8,6 @@ public interface IOrder {
 	public boolean isValidFor(Entity e);
 	public boolean completed();
 	
+	public default void init(Entity e, Level level) {}
 	public default void onCancel(Entity e, Level level){}
 }
