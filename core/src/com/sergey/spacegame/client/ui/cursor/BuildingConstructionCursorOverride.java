@@ -10,11 +10,12 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.sergey.spacegame.client.ecs.component.VisualComponent;
 import com.sergey.spacegame.client.ui.UIUtil;
-import com.sergey.spacegame.common.ecs.component.BuildingComponent;
+import com.sergey.spacegame.common.ecs.component.PlanetComponent;
 import com.sergey.spacegame.common.ecs.component.PositionComponent;
 import com.sergey.spacegame.common.ecs.component.RotationComponent;
 import com.sergey.spacegame.common.ecs.component.SizeComponent;
 import com.sergey.spacegame.common.ecs.system.BuildingSystem;
+import com.sergey.spacegame.common.ecs.system.PlanetSystem;
 import com.sergey.spacegame.common.game.Level;
 
 public final class BuildingConstructionCursorOverride implements CursorOverride {
@@ -59,11 +60,10 @@ public final class BuildingConstructionCursorOverride implements CursorOverride 
 					if (!SizeComponent.MAPPER.has(building)) return;
 					
 					PositionComponent planetPos = PositionComponent.MAPPER.get(planet);
-					BuildingComponent buildingC = new BuildingComponent(planet, planetPos.createVector().sub(x, y).scl(-1).angle());
 					
-					building.add(buildingC);
+					float pos = planetPos.createVector().sub(x, y).scl(-1).angle();
 					
-					BuildingSystem.doSetBuildingPosition(building);
+					BuildingSystem.doSetBuildingPosition(building, planet, pos);
 					
 					PositionComponent posVar;
 					SizeComponent sizeVar;
@@ -71,7 +71,9 @@ public final class BuildingConstructionCursorOverride implements CursorOverride 
 
 					RotationComponent rotVar;
 					
-					boolean validPlacement = true;
+					float[] minMax = PlanetSystem.getMinMax(building, planet, pos);
+					
+					boolean validPlacement = PlanetComponent.MAPPER.get(planet).isFree(minMax[0], minMax[1]);
 					
 					batch.setShader(validPlacement ? green : red);
 

@@ -7,9 +7,11 @@ import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.math.Vector2;
 import com.sergey.spacegame.common.ecs.component.BuildingComponent;
 import com.sergey.spacegame.common.ecs.component.InContructionComponent;
+import com.sergey.spacegame.common.ecs.component.PlanetComponent;
 import com.sergey.spacegame.common.ecs.component.PositionComponent;
 import com.sergey.spacegame.common.ecs.component.ShipComponent;
 import com.sergey.spacegame.common.ecs.component.VelocityComponent;
+import com.sergey.spacegame.common.ecs.system.PlanetSystem;
 import com.sergey.spacegame.common.game.Level;
 
 /**
@@ -48,15 +50,30 @@ public class BuildBuildingOrder implements IOrder {
 		if (closestPlanet.isPresent()) {
 			planet = closestPlanet.get();
 
-			building = level.getEntities().get(entity).createEntity(level); //Copy of building
+			Entity building = level.getEntities().get(entity).createEntity(level); //Copy of building
 			building.add(new InContructionComponent());
 
 			planetPos = PositionComponent.MAPPER.get(planet);
-			BuildingComponent buildingC = new BuildingComponent(planet, planetPos.createVector().sub(x, y).scl(-1).angle());
+			
+			float buildingPos = planetPos.createVector().sub(x, y).scl(-1).angle();
+			
+			float[] minMax = PlanetSystem.getMinMax(building, planet, buildingPos);
+			
+			if (!PlanetComponent.MAPPER.get(planet).isFree(minMax[0], minMax[1])) {
+				//If placement is invalid
+				time = -1;
+				//Fail to build
+				return;
+			}
+			
+			BuildingComponent buildingC = new BuildingComponent();
+			
+			buildingC.init(planet, buildingPos);
 
 			building.add(buildingC);
 
 			level.getECS().getEngine().addEntity(building);
+			this.building = building;
 		} else {
 			//No planet fail to build
 			time = -1;
@@ -112,10 +129,13 @@ public class BuildBuildingOrder implements IOrder {
 
 	@Override
 	public void onCancel(Entity e, Level level) {
-		if (building != null) level.getECS().getEngine().removeEntity(building);
+		if (building != null) {
+			level.getECS().getEngine().removeEntity(building);
+		}
 	}
 
 	public Optional<Vector2> getPosition() {
-		return Optional.ofNullable(building).map(PositionComponent.MAPPER::get).map((p)->p.createVector().sub(planetPos.x, planetPos.y).scl(1.5f).add(planetPos.x, planetPos.y));
+		if (building == null) return Optional.empty();
+		return Optional.of(PositionComponent.MAPPER.get(building).createVector().sub(planetPos.x, planetPos.y).scl(1.5f).add(planetPos.x, planetPos.y));
 	}
 }

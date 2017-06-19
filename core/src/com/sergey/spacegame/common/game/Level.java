@@ -12,6 +12,7 @@ import com.sergey.spacegame.common.ecs.EntityPrototype;
 import com.sergey.spacegame.common.ecs.component.PlanetComponent;
 import com.sergey.spacegame.common.ecs.system.BuildingSystem;
 import com.sergey.spacegame.common.ecs.system.MovementSystem;
+import com.sergey.spacegame.common.ecs.system.PlanetSystem;
 import com.sergey.spacegame.common.ecs.system.RotationSystem;
 import com.sergey.spacegame.common.game.command.Command;
 
@@ -44,6 +45,7 @@ public class Level {
 		ecsManager.getEngine().addSystem(new MovementSystem());
 		ecsManager.getEngine().addSystem(new RotationSystem());
 		ecsManager.getEngine().addSystem(new BuildingSystem());
+		ecsManager.getEngine().addSystem(new PlanetSystem());
 		
 		planets = ecsManager.getEngine().getEntitiesFor(Family.all(PlanetComponent.class).get());
 	}
