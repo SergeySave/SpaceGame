@@ -48,7 +48,6 @@ class MainMenuScreen : BaseScreen() {
 		
 		var play = TextButton("Play", skin, "noBackgroundLarge")
 		play.pad(Value.percentHeight(0.1f))
-		textButtons.add(play)
 		play.addListener(object : ChangeListener() {
 			override fun changed(event:ChangeEvent, actor:Actor) {
 				SpaceGame.getInstance().setScreen(GameScreen(Level.tempLevelGet()))
@@ -59,7 +58,6 @@ class MainMenuScreen : BaseScreen() {
 		
 		var options = TextButton("Options", skin, "noBackgroundLarge")
 		options.pad(Value.percentHeight(0.1f))
-		textButtons.add(options)
 		options.addListener(object : ChangeListener() {
 			override fun changed(event:ChangeEvent, actor:Actor) {
 				println("Options Button")
@@ -74,7 +72,6 @@ class MainMenuScreen : BaseScreen() {
 		table.row()
 		var exit = TextButton("Exit", skin, "noBackgroundLarge")
 		exit.pad(Value.percentHeight(0.1f))
-		textButtons.add(exit)
 		exit.addListener(object : ChangeListener() {
 			override fun changed(event:ChangeEvent, actor:Actor) {
 				Gdx.app.exit()
@@ -89,8 +86,10 @@ class MainMenuScreen : BaseScreen() {
 	}
 
 	override fun resize(width:Int, height:Int) {
-		super.resize(width, height)
-		stage.getViewport().update(width, height, true)
+		dispose()
+		show()
+		//super.resize(width, height)
+		//stage.getViewport().update(width, height, true)
 	}
 
 	override fun pause() {
