@@ -3,7 +3,7 @@ package com.sergey.spacegame.client.ui.cursor;
 import java.util.Optional;
 
 import com.badlogic.gdx.graphics.Cursor;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.sergey.spacegame.client.gl.DrawingBatch;
 import com.sergey.spacegame.common.game.Level;
 
 public interface CursorOverride {
@@ -17,7 +17,7 @@ public interface CursorOverride {
 	
 	public default void init() {}
 	
-	public default void drawExtra(Level level, SpriteBatch batch) {}
+	public default void drawExtra(Level level, DrawingBatch batch) {}
 	
 	public default boolean needsInitialization() {
 		return false;

@@ -8,15 +8,14 @@ import com.badlogic.ashley.utils.ImmutableArray;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Buttons;
 import com.badlogic.gdx.InputProcessor;
-import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.sergey.spacegame.SpaceGame;
 import com.sergey.spacegame.client.ecs.component.SelectedComponent;
+import com.sergey.spacegame.client.gl.DrawingBatch;
 import com.sergey.spacegame.common.ecs.component.ControllableComponent;
 import com.sergey.spacegame.common.ecs.component.InContructionComponent;
 import com.sergey.spacegame.common.ecs.component.PositionComponent;
@@ -24,9 +23,11 @@ import com.sergey.spacegame.common.ecs.component.RotationComponent;
 import com.sergey.spacegame.common.ecs.component.SizeComponent;
 
 public class SelectionSystem extends EntitySystem implements InputProcessor {
+	
+	private static final float SELECTION_COLOR = Color.toFloatBits(0.4f, 0.4f, 1f, 0.5f);
 
 	private OrthographicCamera camera;
-	private ShapeRenderer shape;
+	private DrawingBatch batch;
 	private Vector2 selectionBegin;
 	private Vector2 selectionEnd;
 
@@ -35,9 +36,10 @@ public class SelectionSystem extends EntitySystem implements InputProcessor {
 	
 	private CommandUISystem cmdUI;
 
-	public SelectionSystem(OrthographicCamera camera, CommandUISystem commandUI) {
+	public SelectionSystem(OrthographicCamera camera, DrawingBatch batch, CommandUISystem commandUI) {
 		super(4);
 		this.camera = camera;
+		this.batch = batch;
 		this.cmdUI = commandUI;
 	}
 
@@ -45,7 +47,6 @@ public class SelectionSystem extends EntitySystem implements InputProcessor {
 	public void addedToEngine (Engine engine) {
 		selectedEntities = engine.getEntitiesFor(Family.all(SelectedComponent.class).get());
 		controllableEntities = engine.getEntitiesFor(Family.all(ControllableComponent.class, PositionComponent.class).exclude(InContructionComponent.class).get());
-		shape = new ShapeRenderer();
 
 		SpaceGame.getInstance().getInputMultiplexer().addProcessor(this);
 	}
@@ -54,23 +55,17 @@ public class SelectionSystem extends EntitySystem implements InputProcessor {
 	public void removedFromEngine (Engine engine) {
 		selectedEntities = null;
 		controllableEntities = null;
-		shape.dispose();
 
 		SpaceGame.getInstance().getInputMultiplexer().removeProcessor(this);
 	}
 
 	@Override
 	public void update(float deltaTime) {
-		shape.setProjectionMatrix(camera.combined);
-		Gdx.gl.glEnable(GL20.GL_BLEND);
-		Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
-
 		if (selectionBegin != null) {
 			Vector3 vec = camera.unproject(new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0));
-			shape.begin(ShapeType.Filled);{
-				shape.setColor(0.4f, 0.4f, 1f, 0.5f);
-				shape.rect(selectionBegin.x, selectionBegin.y, vec.x-selectionBegin.x, vec.y-selectionBegin.y);
-			}shape.end();
+			batch.enableBlending();
+			batch.setForceColor(SELECTION_COLOR);
+			batch.rect(selectionBegin.x, selectionBegin.y, vec.x, vec.y);
 			if (selectionEnd != null) {
 				selectedEntities.forEach((e)->e.remove(SelectedComponent.class));
 				Rectangle rect = new Rectangle(Math.min(selectionEnd.x, selectionBegin.x), Math.min(selectionEnd.y, selectionBegin.y), Math.abs(selectionEnd.x-selectionBegin.x), Math.abs(selectionEnd.y-selectionBegin.y));
@@ -101,7 +96,6 @@ public class SelectionSystem extends EntitySystem implements InputProcessor {
 				selectionEnd = null;
 			}
 		}
-		Gdx.gl.glDisable(GL20.GL_BLEND);
 	}
 
 	@Override

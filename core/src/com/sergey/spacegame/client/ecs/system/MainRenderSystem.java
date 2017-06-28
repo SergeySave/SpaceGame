@@ -5,48 +5,45 @@ import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.EntitySystem;
 import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.utils.ImmutableArray;
-import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.Color;
 import com.sergey.spacegame.client.ecs.component.SelectedComponent;
 import com.sergey.spacegame.client.ecs.component.VisualComponent;
+import com.sergey.spacegame.client.gl.DrawingBatch;
 import com.sergey.spacegame.common.ecs.component.InContructionComponent;
 import com.sergey.spacegame.common.ecs.component.PositionComponent;
 import com.sergey.spacegame.common.ecs.component.RotationComponent;
 import com.sergey.spacegame.common.ecs.component.SizeComponent;
 
 public class MainRenderSystem extends EntitySystem {
+	
+	private static final float MULT = Color.toFloatBits(1f, 1f, 1f, 1f);
+	private static final float ADD = Color.toFloatBits(0f, 0f, 0f, 0f);
 
-	private SpriteBatch batch;
-	private OrthographicCamera camera;
+	private DrawingBatch batch;
 
 	private ImmutableArray<Entity> entities;
 
-	public MainRenderSystem(OrthographicCamera camera) {
+	public MainRenderSystem(DrawingBatch batch) {
 		super(2);
-		this.camera = camera;
+		this.batch = batch;
 	}
 
 	@Override
 	public void addedToEngine (Engine engine) {
 		entities = engine.getEntitiesFor(Family.all(VisualComponent.class, SizeComponent.class, PositionComponent.class).exclude(SelectedComponent.class, InContructionComponent.class).get());
-		batch = new SpriteBatch();
 	}
 
 	@Override
 	public void removedFromEngine (Engine engine) {
 		entities = null;
-		batch.dispose();
 	}
 
 	@Override
 	public void update(float deltaTime) {
-		camera.update();
-
-		batch.setProjectionMatrix(camera.combined);
-		batch.setBlendFunction(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
-		batch.begin();
-
+		batch.enableBlending();
+		batch.setMultTint(MULT);
+		batch.setAddTint(ADD);
+		
 		PositionComponent posVar;
 		SizeComponent sizeVar;
 		VisualComponent visVar;
@@ -68,6 +65,5 @@ public class MainRenderSystem extends EntitySystem {
 			}
 
 		}
-		batch.end();
 	}
 }

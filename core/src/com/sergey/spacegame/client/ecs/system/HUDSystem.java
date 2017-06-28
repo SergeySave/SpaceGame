@@ -28,6 +28,7 @@ import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.sergey.spacegame.SpaceGame;
 import com.sergey.spacegame.client.ecs.component.SelectedComponent;
+import com.sergey.spacegame.client.gl.DrawingBatch;
 import com.sergey.spacegame.common.ecs.component.ControllableComponent;
 import com.sergey.spacegame.common.game.command.Command;
 
@@ -38,6 +39,8 @@ public class HUDSystem extends EntitySystem implements EntityListener {
 	private Skin skin = SpaceGame.getInstance().getSkin();
 
 	private TooltipManager tooltipManager;
+	
+	private DrawingBatch batch;
 
 	private Stage stage;
 	private Table topTable;
@@ -46,8 +49,9 @@ public class HUDSystem extends EntitySystem implements EntityListener {
 	private Table actionBar;
 	private TextButton collapseMinimap;
 
-	public HUDSystem(CommandUISystem commandUI) {
+	public HUDSystem(DrawingBatch batch, CommandUISystem commandUI) {
 		super(6);
+		this.batch = batch;
 		this.commandUI = commandUI;
 		tooltipManager = new TooltipManager();
 		tooltipManager.initialTime 		= 0.50f;
@@ -112,8 +116,10 @@ public class HUDSystem extends EntitySystem implements EntityListener {
 
 	@Override
 	public void update(float deltaTime) {
+		batch.end();
 		stage.act(deltaTime);
 		stage.draw();
+		batch.begin();
 	}
 
 	private void recalculateUI() {

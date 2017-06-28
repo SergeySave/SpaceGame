@@ -2,6 +2,7 @@ package com.sergey.spacegame.client.ui.screen;
 
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.sergey.spacegame.client.ecs.component.VisualComponent;
 import com.sergey.spacegame.client.ecs.system.CommandUISystem;
@@ -11,6 +12,8 @@ import com.sergey.spacegame.client.ecs.system.MainRenderSystem;
 import com.sergey.spacegame.client.ecs.system.OrderRenderSystem;
 import com.sergey.spacegame.client.ecs.system.SelectedRenderSystem;
 import com.sergey.spacegame.client.ecs.system.SelectionSystem;
+import com.sergey.spacegame.client.gl.DrawingBatch;
+import com.sergey.spacegame.client.ui.UIUtil;
 import com.sergey.spacegame.common.ecs.ECSManager;
 import com.sergey.spacegame.common.ecs.component.PlanetComponent;
 import com.sergey.spacegame.common.ecs.component.PositionComponent;
@@ -36,6 +39,7 @@ public class GameScreen extends BaseScreen {
 	private Entity e;
 	
 	private Level level;
+	private DrawingBatch batch;
 	
 	public GameScreen(Level level) {
 		this.level = level;
@@ -44,16 +48,20 @@ public class GameScreen extends BaseScreen {
 	@Override
 	public void show() {
 		camera = new OrthographicCamera(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+		batch = new DrawingBatch(1000, UIUtil.compileShader(Gdx.files.internal("shaders/basic.vertex.glsl"), Gdx.files.internal("shaders/basic.fragment.glsl")), true);
+		batch.setLineWidth(1f);
+		batch.setBlendFunction(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
 		
 		ecsManager = level.getECS();
 		ecsManager.getEngine().addSystem(orderSystem = new OrderSystem(level));
-		ecsManager.getEngine().addSystem(mainRenderSystem = new MainRenderSystem(camera));
-		ecsManager.getEngine().addSystem(orderRenderSystem = new OrderRenderSystem(camera));
-		ecsManager.getEngine().addSystem(selectedRenderSystem = new SelectedRenderSystem(camera));
-		ecsManager.getEngine().addSystem(inConstructionRenderSystem = new InConstructionRenderSystem(camera));
-		ecsManager.getEngine().addSystem(commandUISystem = new CommandUISystem(camera, level));
-		ecsManager.getEngine().addSystem(selectionControlSystem = new SelectionSystem(camera, commandUISystem));
-		ecsManager.getEngine().addSystem(hudSystem = new HUDSystem(commandUISystem));
+		
+		ecsManager.getEngine().addSystem(mainRenderSystem = new MainRenderSystem(batch));
+		ecsManager.getEngine().addSystem(orderRenderSystem = new OrderRenderSystem(batch));
+		ecsManager.getEngine().addSystem(selectedRenderSystem = new SelectedRenderSystem(batch));
+		ecsManager.getEngine().addSystem(inConstructionRenderSystem = new InConstructionRenderSystem(batch));
+		ecsManager.getEngine().addSystem(commandUISystem = new CommandUISystem(camera, batch, level));
+		ecsManager.getEngine().addSystem(selectionControlSystem = new SelectionSystem(camera, batch, commandUISystem));
+		ecsManager.getEngine().addSystem(hudSystem = new HUDSystem(batch, commandUISystem));
 
 		{
 			e = ecsManager.newEntity();
@@ -126,7 +134,11 @@ public class GameScreen extends BaseScreen {
 
 	@Override
 	public void render(float delta) {
+		camera.update();
+		batch.setProjectionMatrix(camera.combined);
+		batch.begin();
 		ecsManager.getEngine().update(Gdx.graphics.getDeltaTime());
+		batch.end();
 	}
 
 	@Override
@@ -152,9 +164,10 @@ public class GameScreen extends BaseScreen {
 		ecsManager.getEngine().removeSystem(inConstructionRenderSystem);
 		ecsManager.getEngine().removeSystem(commandUISystem);
 		ecsManager.getEngine().removeSystem(hudSystem);
+		
+		batch.dispose();
 	}
 
 	@Override
-	public void dispose() {
-	}
+	public void dispose() {}
 }
