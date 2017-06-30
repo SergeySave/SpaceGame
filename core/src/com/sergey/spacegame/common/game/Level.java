@@ -1,8 +1,5 @@
 package com.sergey.spacegame.common.game;
 
-import java.util.HashMap;
-import java.util.Map.Entry;
-
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.utils.ImmutableArray;
@@ -16,6 +13,9 @@ import com.sergey.spacegame.common.ecs.system.PlanetSystem;
 import com.sergey.spacegame.common.ecs.system.RotationSystem;
 import com.sergey.spacegame.common.game.command.Command;
 import org.intellij.lang.annotations.Language;
+
+import java.util.HashMap;
+import java.util.Map.Entry;
 
 public class Level {
 	private static Level _deserializing;
@@ -73,7 +73,7 @@ public class Level {
 				"\t}\n" +
 				"}";
 		SpaceGame.getInstance().regenerateAtlasNow();
-		Level level = deserialize(json);
+		@SuppressWarnings("UnnecessaryLocalVariable") Level level = deserialize(json);
 		return level;
 		//commands.put("move", new Command(new MoveCommandExecutable(), true, true, "Move", "missingTexture", "missingTexture"));
 	}

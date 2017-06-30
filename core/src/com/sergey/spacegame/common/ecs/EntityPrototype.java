@@ -1,10 +1,5 @@
 package com.sergey.spacegame.common.ecs;
 
-import java.lang.reflect.Type;
-import java.util.ArrayList;
-import java.util.Map.Entry;
-import java.util.Set;
-
 import com.badlogic.ashley.core.Entity;
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonDeserializer;
@@ -15,6 +10,11 @@ import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
 import com.sergey.spacegame.common.ecs.component.ClonableComponent;
 import com.sergey.spacegame.common.game.Level;
+
+import java.lang.reflect.Type;
+import java.util.ArrayList;
+import java.util.Map.Entry;
+import java.util.Set;
 
 public final class EntityPrototype {
 	
@@ -30,7 +30,7 @@ public final class EntityPrototype {
 		return e;
 	}
 	
-	public static class Adapter implements JsonSerializer<EntityPrototype>, JsonDeserializer<EntityPrototype>{
+	public static class Adapter implements JsonSerializer<EntityPrototype>, JsonDeserializer<EntityPrototype> {
 
 		@Override
 		public EntityPrototype deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {

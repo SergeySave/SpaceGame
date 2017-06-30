@@ -1,7 +1,5 @@
 package com.sergey.spacegame.client.ecs.component;
 
-import java.lang.reflect.Type;
-
 import com.badlogic.ashley.core.Component;
 import com.badlogic.ashley.core.ComponentMapper;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
@@ -14,6 +12,8 @@ import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
 import com.sergey.spacegame.SpaceGame;
 import com.sergey.spacegame.common.ecs.component.ClonableComponent;
+
+import java.lang.reflect.Type;
 
 public class VisualComponent implements ClonableComponent {
 	public static final ComponentMapper<VisualComponent> MAPPER = ComponentMapper.getFor(VisualComponent.class);
@@ -45,7 +45,7 @@ public class VisualComponent implements ClonableComponent {
 		return name;
 	}
 	
-	public static class Adapter implements JsonSerializer<VisualComponent>, JsonDeserializer<VisualComponent>{
+	public static class Adapter implements JsonSerializer<VisualComponent>, JsonDeserializer<VisualComponent> {
 
 		@Override
 		public VisualComponent deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {

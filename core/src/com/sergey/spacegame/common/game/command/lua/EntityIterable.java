@@ -1,13 +1,12 @@
 package com.sergey.spacegame.common.game.command.lua;
 
-import java.util.Iterator;
-
+import com.badlogic.ashley.core.Entity;
+import com.sergey.spacegame.common.ecs.component.IDComponent;
 import org.luaj.vm2.LuaValue;
 import org.luaj.vm2.lib.ZeroArgFunction;
 import org.luaj.vm2.lib.jse.CoerceJavaToLua;
 
-import com.badlogic.ashley.core.Entity;
-import com.sergey.spacegame.common.ecs.component.IDComponent;
+import java.util.Iterator;
 
 public class EntityIterable {
 	

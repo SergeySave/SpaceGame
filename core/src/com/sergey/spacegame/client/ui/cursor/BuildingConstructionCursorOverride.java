@@ -1,8 +1,5 @@
 package com.sergey.spacegame.client.ui.cursor;
 
-import java.util.Optional;
-import java.util.stream.StreamSupport;
-
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
@@ -16,6 +13,9 @@ import com.sergey.spacegame.common.ecs.component.SizeComponent;
 import com.sergey.spacegame.common.ecs.system.BuildingSystem;
 import com.sergey.spacegame.common.ecs.system.PlanetSystem;
 import com.sergey.spacegame.common.game.Level;
+
+import java.util.Optional;
+import java.util.stream.StreamSupport;
 
 public final class BuildingConstructionCursorOverride implements CursorOverride {
 	

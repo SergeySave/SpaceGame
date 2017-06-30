@@ -6,7 +6,7 @@ package com.sergey.spacegame.common.util;
  * 
  * @author sergeys
  * @see     java.util.Observer
- * @see     com.serget.spacegame.common.util.Observable<T>
+ * @see     com.sergey.spacegame.common.util.Observable<T>
  * @param <T> the type of the object being observed
  */
 public interface Observer<T> {
@@ -17,8 +17,8 @@ public interface Observer<T> {
      * <code>notifyObservers</code> method to have all the object's
      * observers notified of the change.
      *
-     * @param   o     the observable object.
-     * @param   arg   an argument passed to the <code>notifyObservers</code>
+     * @param   observable     the observable object.
+     * @param   object   an argument passed to the <code>notifyObservers</code>
      *                 method.
      */
     void update(Observable<T> observable, T object);

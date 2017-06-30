@@ -27,7 +27,6 @@ import com.sergey.spacegame.client.ui.screen.LoadingScreen;
 import com.sergey.spacegame.client.ui.screen.MainMenuScreen;
 import com.sergey.spacegame.common.ecs.EntityPrototype;
 import com.sergey.spacegame.common.ecs.component.ControllableComponent;
-import com.sergey.spacegame.common.event.Event;
 import com.sergey.spacegame.common.event.EventBus;
 import com.sergey.spacegame.common.game.command.Command;
 import com.sergey.spacegame.common.game.command.CommandExecutorService;

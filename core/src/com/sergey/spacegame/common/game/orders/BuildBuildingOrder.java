@@ -1,8 +1,5 @@
 package com.sergey.spacegame.common.game.orders;
 
-import java.util.Optional;
-import java.util.stream.StreamSupport;
-
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.math.Vector2;
 import com.sergey.spacegame.common.ecs.component.BuildingComponent;
@@ -13,6 +10,9 @@ import com.sergey.spacegame.common.ecs.component.ShipComponent;
 import com.sergey.spacegame.common.ecs.component.VelocityComponent;
 import com.sergey.spacegame.common.ecs.system.PlanetSystem;
 import com.sergey.spacegame.common.game.Level;
+
+import java.util.Optional;
+import java.util.stream.StreamSupport;
 
 /**
  * 
@@ -26,7 +26,6 @@ public class BuildBuildingOrder implements IOrder {
 	private float time;
 	private float x;
 	private float y;
-	private Entity planet;
 	private Entity building;
 	private PositionComponent planetPos;
 	private Vector2 desired;
@@ -48,7 +47,7 @@ public class BuildBuildingOrder implements IOrder {
 			.map((c)->(Entity)c[0]);
 
 		if (closestPlanet.isPresent()) {
-			planet = closestPlanet.get();
+			Entity planet = closestPlanet.get();
 
 			Entity building = level.getEntities().get(entity).createEntity(level); //Copy of building
 			building.add(new InContructionComponent());
@@ -77,7 +76,6 @@ public class BuildBuildingOrder implements IOrder {
 		} else {
 			//No planet fail to build
 			time = -1;
-			return;
 		}
 	}
 
@@ -100,8 +98,8 @@ public class BuildBuildingOrder implements IOrder {
 			double dy = desired.y-pos.y;
 			double dist = Math.hypot(dx, dy);
 			if (dist < speed*deltaTime) {
-				pos.x = (float)desired.x;
-				pos.y = (float)desired.y;
+				pos.x = desired.x;
+				pos.y = desired.y;
 				e.remove(VelocityComponent.class);
 				time -= deltaTime;
 			} else {
@@ -136,6 +134,6 @@ public class BuildBuildingOrder implements IOrder {
 
 	public Optional<Vector2> getPosition() {
 		if (building == null) return Optional.empty();
-		return Optional.of(PositionComponent.MAPPER.get(building).createVector().sub(planetPos.x, planetPos.y).scl(1.5f).add(planetPos.x, planetPos.y));
+		return Optional.of(desired);
 	}
 }

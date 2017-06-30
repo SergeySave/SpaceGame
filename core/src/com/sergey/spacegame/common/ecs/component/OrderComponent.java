@@ -1,16 +1,17 @@
 package com.sergey.spacegame.common.ecs.component;
 
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-
 import com.badlogic.ashley.core.Component;
 import com.badlogic.ashley.core.ComponentMapper;
 import com.badlogic.ashley.core.Entity;
 import com.sergey.spacegame.common.game.Level;
 import com.sergey.spacegame.common.game.orders.IOrder;
 import com.sergey.spacegame.common.util.ImmutableIterator;
+import org.jetbrains.annotations.NotNull;
+
+import java.util.Arrays;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
 
 public class OrderComponent implements Component, Iterable<IOrder> {
 	public static final ComponentMapper<OrderComponent> MAPPER = ComponentMapper.getFor(OrderComponent.class);
@@ -19,7 +20,7 @@ public class OrderComponent implements Component, Iterable<IOrder> {
 	private List<IOrder> needInitialization;
 
 	public OrderComponent() {
-		this.orders = new LinkedList<IOrder>();
+		this.orders = new LinkedList<>();
 		this.needInitialization = new LinkedList<>();
 	}
 
@@ -61,6 +62,7 @@ public class OrderComponent implements Component, Iterable<IOrder> {
 		}
 	}
 
+	@NotNull
 	@Override
 	public Iterator<IOrder> iterator() {
 		return new ImmutableIterator<>(orders.iterator());

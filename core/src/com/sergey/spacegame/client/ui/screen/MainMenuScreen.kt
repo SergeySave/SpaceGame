@@ -20,7 +20,7 @@ class MainMenuScreen : BaseScreen() {
 	private var stage:Stage
 			get() = _stage!!
 			set(value) {
-				_stage = value;
+				_stage = value
 			}
 	
 	private var needsValidation:ArrayList<Layout> = ArrayList()
@@ -28,11 +28,11 @@ class MainMenuScreen : BaseScreen() {
 	override fun show() {
 		stage = Stage(ScreenViewport())
 		
-		SpaceGame.getInstance().getInputMultiplexer().addProcessor(stage)
+		SpaceGame.getInstance().inputMultiplexer.addProcessor(stage)
 		
-		var skin = SpaceGame.getInstance().getSkin()
+		val skin = SpaceGame.getInstance().skin
 		
-		var table = Table()
+		val table = Table()
 		table.setFillParent(true)
 		//table.setDebug(true)
 		stage.addActor(table)
@@ -41,22 +41,22 @@ class MainMenuScreen : BaseScreen() {
 		table.defaults().padLeft(Value.percentWidth(0.005f, table))
 		table.defaults().padRight(Value.percentWidth(0.005f, table))
 		
-		var image = Image(SpaceGame.getInstance().getRegion("screen/mainMenu_title"))
+		val image = Image(SpaceGame.getInstance().getRegion("screen/mainMenu_title"))
 		image.setScaling(Scaling.fit)
 		table.add(image).grow().padTop(Value.percentHeight(0.01f, table))
 		
 		
-		var play = TextButton("Play", skin, "noBackgroundLarge")
+		val play = TextButton("Play", skin, "noBackgroundLarge")
 		play.pad(Value.percentHeight(0.1f))
 		play.addListener(object : ChangeListener() {
 			override fun changed(event:ChangeEvent, actor:Actor) {
-				SpaceGame.getInstance().setScreen(GameScreen(Level.tempLevelGet()))
+				SpaceGame.getInstance().screen = GameScreen(Level.tempLevelGet())
 			}
 		})
 		table.row()
 		table.add(play).expandX().fillX()
 		
-		var options = TextButton("Options", skin, "noBackgroundLarge")
+		val options = TextButton("Options", skin, "noBackgroundLarge")
 		options.pad(Value.percentHeight(0.1f))
 		options.addListener(object : ChangeListener() {
 			override fun changed(event:ChangeEvent, actor:Actor) {
@@ -70,7 +70,7 @@ class MainMenuScreen : BaseScreen() {
 		table.add().expandY()
 		
 		table.row()
-		var exit = TextButton("Exit", skin, "noBackgroundLarge")
+		val exit = TextButton("Exit", skin, "noBackgroundLarge")
 		exit.pad(Value.percentHeight(0.1f))
 		exit.addListener(object : ChangeListener() {
 			override fun changed(event:ChangeEvent, actor:Actor) {
@@ -99,7 +99,7 @@ class MainMenuScreen : BaseScreen() {
 	}
 
 	override fun hide() {
-		SpaceGame.getInstance().getInputMultiplexer().removeProcessor(stage)
+		SpaceGame.getInstance().inputMultiplexer.removeProcessor(stage)
 	}
 
 	override fun dispose() {

@@ -60,8 +60,8 @@ public class OrderRenderSystem extends EntitySystem {
 					BuildBuildingOrder move = (BuildBuildingOrder)order;
 					if (move.getPosition().isPresent()) {
 						Vector2 b = move.getPosition().get();
-						batch.line(posVar.x, posVar.y, (float)b.x, (float)b.y);
-						posVar.set((float)b.x, (float)b.y);
+						batch.line(posVar.x, posVar.y, b.x, b.y);
+						posVar.set(b.x, b.y);
 					}
 				}
 			}

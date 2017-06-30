@@ -13,5 +13,5 @@ import com.sergey.spacegame.common.game.Level;
  */
 @FunctionalInterface
 public interface CommandExecutable {
-	public void issue(Iterable<Entity> entitySource, int numEntities, Vector2 start, Vector2 end, Level level);
+	void issue(Iterable<Entity> entitySource, int numEntities, Vector2 start, Vector2 end, Level level);
 }

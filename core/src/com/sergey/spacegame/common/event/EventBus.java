@@ -1,16 +1,16 @@
 package com.sergey.spacegame.common.event;
 
-import java.lang.invoke.LambdaConversionException;
+import java.lang.invoke.LambdaMetafactory;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodType;
-import java.lang.invoke.LambdaMetafactory;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+@SuppressWarnings("SuspiciousMethodCalls")
 public class EventBus {
 
 	private HashMap<Class, List<EventConsumer>> handles = new HashMap<>();
@@ -47,12 +47,10 @@ public class EventBus {
 					MethodType invokedType = MethodType.methodType(EventConsumer.class, handler.getClass());//, handler.getClass()
 					MethodType samType = MethodType.methodType(void.class, Event.class);
 					MethodType instantiatedMethodType = MethodType.methodType(void.class, parameter);
-					EventConsumer lambda = (EventConsumer)LambdaMetafactory.metafactory(lookup, "accept", invokedType, samType, methodHandle, instantiatedMethodType).getTarget().invoke(handler);
+					EventConsumer lambda = (EventConsumer) LambdaMetafactory.metafactory(lookup, "accept", invokedType, samType, methodHandle, instantiatedMethodType).getTarget().invoke(handler);
 
 					handles.get(parameter).add(lambda);
 					thisHandler.get(parameter).add(lambda);
-				} catch (IllegalAccessException | LambdaConversionException e) {
-					e.printStackTrace();
 				} catch (Throwable throwable) {
 					throwable.printStackTrace();
 				}
@@ -73,9 +71,7 @@ public class EventBus {
 
 		for (Map.Entry<Class, List<EventConsumer>> classListEntry : registeredEvents.entrySet()) {
 			List<EventConsumer> classHandles = handles.get(classListEntry.getKey());
-			for (EventConsumer handle : classListEntry.getValue()) {
-				classHandles.remove(handle);
-			}
+			classHandles.removeAll(classListEntry.getValue());
 			if (classHandles.isEmpty()) {
 				handles.remove(classListEntry.getKey());
 			}

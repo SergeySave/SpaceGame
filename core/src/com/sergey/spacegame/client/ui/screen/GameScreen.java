@@ -36,8 +36,6 @@ public class GameScreen extends BaseScreen {
 
 	private ECSManager ecsManager;
 
-	private Entity e;
-	
 	private Level level;
 	private DrawingBatch batch;
 	
@@ -63,6 +61,7 @@ public class GameScreen extends BaseScreen {
 		ecsManager.getEngine().addSystem(selectionControlSystem = new SelectionSystem(camera, batch, commandUISystem));
 		ecsManager.getEngine().addSystem(hudSystem = new HUDSystem(batch, commandUISystem));
 
+		Entity e;
 		{
 			e = ecsManager.newEntity();
 			ecsManager.getEngine().addEntity(e);

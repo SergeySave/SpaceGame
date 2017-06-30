@@ -9,10 +9,8 @@ import com.sergey.spacegame.common.ecs.component.PositionComponent
 import com.sergey.spacegame.common.ecs.component.RotationComponent
 import com.sergey.spacegame.common.ecs.component.SizeComponent
 
-class BuildingSystem : IteratingSystem {
-	
-	constructor() : super((Family.all(BuildingComponent::class.java, PositionComponent::class.java, SizeComponent::class.java).get()))
-	
+class BuildingSystem : IteratingSystem((Family.all(BuildingComponent::class.java, PositionComponent::class.java, SizeComponent::class.java).get())) {
+
 	override fun processEntity(entity:Entity, deltaTime:Float) {
 		val building = BuildingComponent.MAPPER.get(entity)
 		doSetBuildingPosition(entity, building.planet, building.position)

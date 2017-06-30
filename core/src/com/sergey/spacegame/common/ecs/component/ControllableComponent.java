@@ -1,10 +1,5 @@
 package com.sergey.spacegame.common.ecs.component;
 
-import java.lang.reflect.Type;
-import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.List;
-
 import com.badlogic.ashley.core.Component;
 import com.badlogic.ashley.core.ComponentMapper;
 import com.google.gson.JsonArray;
@@ -17,13 +12,18 @@ import com.google.gson.JsonSerializer;
 import com.sergey.spacegame.common.game.Level;
 import com.sergey.spacegame.common.game.command.Command;
 
+import java.lang.reflect.Type;
+import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.List;
+
 public class ControllableComponent implements ClonableComponent {
 	public static final ComponentMapper<ControllableComponent> MAPPER = ComponentMapper.getFor(ControllableComponent.class);
 	
 	public List<Command> commands;
 	
 	public ControllableComponent() {
-		this.commands = new LinkedList<Command>();
+		this.commands = new LinkedList<>();
 	}
 
 	public ControllableComponent(Command... commands) {
@@ -38,7 +38,7 @@ public class ControllableComponent implements ClonableComponent {
 		return controllableComponent;
 	}
 	
-	public static class Adapter implements JsonSerializer<ControllableComponent>, JsonDeserializer<ControllableComponent>{
+	public static class Adapter implements JsonSerializer<ControllableComponent>, JsonDeserializer<ControllableComponent> {
 
 		@Override
 		public ControllableComponent deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {

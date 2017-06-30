@@ -1,15 +1,14 @@
 package com.sergey.spacegame.common.game.command;
 
-import org.luaj.vm2.Globals;
-import org.luaj.vm2.LuaValue;
-import org.luaj.vm2.lib.jse.CoerceJavaToLua;
-
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.math.Vector2;
 import com.sergey.spacegame.common.game.Level;
 import com.sergey.spacegame.common.game.command.lua.CommandLuaLib;
 import com.sergey.spacegame.common.game.command.lua.EntityIterable;
 import com.sergey.spacegame.common.lua.LuaUtils;
+import org.luaj.vm2.Globals;
+import org.luaj.vm2.LuaValue;
+import org.luaj.vm2.lib.jse.CoerceJavaToLua;
 
 public final class LuaCommandExecutable implements CommandExecutable {
 	

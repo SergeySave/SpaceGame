@@ -1,10 +1,5 @@
 package com.sergey.spacegame.client.ecs.system;
 
-import java.util.Iterator;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
-
 import com.badlogic.ashley.core.Engine;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.EntityListener;
@@ -31,6 +26,10 @@ import com.sergey.spacegame.client.ecs.component.SelectedComponent;
 import com.sergey.spacegame.client.gl.DrawingBatch;
 import com.sergey.spacegame.common.ecs.component.ControllableComponent;
 import com.sergey.spacegame.common.game.command.Command;
+
+import java.util.LinkedHashSet;
+import java.util.LinkedList;
+import java.util.List;
 
 public class HUDSystem extends EntitySystem implements EntityListener {
 
@@ -130,13 +129,7 @@ public class HUDSystem extends EntitySystem implements EntityListener {
 				commands = new LinkedHashSet<>();
 				commands.addAll(ControllableComponent.MAPPER.get(e).commands);
 			} else {
-				Iterator<Command> cmdIter = commands.iterator();
-				while (cmdIter.hasNext()) {
-					Command command = cmdIter.next();
-					if (!ControllableComponent.MAPPER.get(e).commands.contains(command)) {
-						cmdIter.remove();
-					}
-				}
+				commands.removeIf(command -> !ControllableComponent.MAPPER.get(e).commands.contains(command));
 			}
 		}
 

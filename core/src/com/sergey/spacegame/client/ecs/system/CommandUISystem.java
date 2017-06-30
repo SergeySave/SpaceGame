@@ -1,9 +1,5 @@
 package com.sergey.spacegame.client.ecs.system;
 
-import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
-
 import com.badlogic.ashley.core.Engine;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.EntitySystem;
@@ -21,6 +17,10 @@ import com.sergey.spacegame.client.gl.DrawingBatch;
 import com.sergey.spacegame.common.ecs.component.ControllableComponent;
 import com.sergey.spacegame.common.game.Level;
 import com.sergey.spacegame.common.game.command.Command;
+
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 public class CommandUISystem extends EntitySystem {
 	

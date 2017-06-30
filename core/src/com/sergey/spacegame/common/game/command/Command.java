@@ -1,16 +1,17 @@
 package com.sergey.spacegame.common.game.command;
 
-import java.lang.reflect.Type;
-import java.util.Optional;
-
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
+import com.google.gson.JsonPrimitive;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
 import com.sergey.spacegame.client.ui.cursor.CursorOverride;
+
+import java.lang.reflect.Type;
+import java.util.Optional;
 
 public final class Command {
 
@@ -23,13 +24,13 @@ public final class Command {
 	private String id;
 	private CursorOverride cursor;
 	
-	public Command(CommandExecutable executable, boolean requiresInput, boolean requiresTwoInput, String name, String drawableName, Optional<String> drawableCheckedName, CursorOverride cursor) {
+	public Command(CommandExecutable executable, boolean requiresInput, boolean requiresTwoInput, String name, String drawableName, String drawableCheckedName, CursorOverride cursor) {
 		this.executable = executable;
 		this.requiresInput = requiresInput;
 		this.requiresTwoInput = requiresTwoInput;
 		this.name = name;
 		this.drawableName = drawableName;
-		if (drawableCheckedName.isPresent()) this.drawableCheckedName = drawableCheckedName.get();
+		this.drawableCheckedName = drawableCheckedName;
 		this.cursor = cursor;
 	}
 
@@ -90,7 +91,7 @@ public final class Command {
 		return executable.hashCode() << 2 + (requiresInput ? 2 : 0) + (requiresTwoInput ? 1 : 0) + name.hashCode() + drawableName.hashCode() + (drawableCheckedName == null ? 0 : drawableCheckedName.hashCode());
 	}
 	
-	public static class Adapter implements JsonSerializer<Command>, JsonDeserializer<Command>{
+	public static class Adapter implements JsonSerializer<Command>, JsonDeserializer<Command> {
 
 		@Override
 		public Command deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
@@ -118,7 +119,7 @@ public final class Command {
 			boolean requiresTwoInput = obj.getAsJsonPrimitive("requiresTwoInput").getAsBoolean();
 			String name = obj.getAsJsonPrimitive("name").getAsString();
 			String drawableName = obj.getAsJsonPrimitive("iconName").getAsString();
-			Optional<String> drawableCheckedName = Optional.ofNullable(obj.getAsJsonPrimitive("pressedIconName")).map((j)->j.getAsString());
+			String drawableCheckedName = Optional.ofNullable(obj.getAsJsonPrimitive("pressedIconName")).map(JsonPrimitive::getAsString).orElse(null);
 			
 			CursorOverride cursor = null;
 			

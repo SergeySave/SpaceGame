@@ -1,10 +1,10 @@
 package com.sergey.spacegame.client.ui.cursor;
 
-import java.util.Optional;
-
 import com.badlogic.gdx.graphics.Cursor;
 import com.sergey.spacegame.client.gl.DrawingBatch;
 import com.sergey.spacegame.common.game.Level;
+
+import java.util.Optional;
 
 public interface CursorOverride {
 	/**
@@ -13,15 +13,15 @@ public interface CursorOverride {
 	 * 
 	 * @return an optional cursor object if a cursor is requested
 	 */
-	public Optional<Cursor> getRequestedCursor();
+	Optional<Cursor> getRequestedCursor();
 	
-	public default void init() {}
+	default void init() {}
 	
-	public default void drawExtra(Level level, DrawingBatch batch) {}
+	default void drawExtra(Level level, DrawingBatch batch) {}
 	
-	public default boolean needsInitialization() {
+	default boolean needsInitialization() {
 		return false;
 	}
 	
-	public void dispose();
+	void dispose();
 }

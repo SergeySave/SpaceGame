@@ -15,5 +15,5 @@ public interface ClonableComponent extends Component {
 	 * 
 	 * @return a copy of this component
 	 */
-	public Component copy();
+	Component copy();
 }

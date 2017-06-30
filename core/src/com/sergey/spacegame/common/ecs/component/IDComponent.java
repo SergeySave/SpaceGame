@@ -1,11 +1,11 @@
 package com.sergey.spacegame.common.ecs.component;
 
-import java.util.HashMap;
-import java.util.concurrent.atomic.AtomicInteger;
-
 import com.badlogic.ashley.core.Component;
 import com.badlogic.ashley.core.ComponentMapper;
 import com.badlogic.ashley.core.Entity;
+
+import java.util.HashMap;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class IDComponent implements Component {
 	public static final ComponentMapper<IDComponent> MAPPER = ComponentMapper.getFor(IDComponent.class);

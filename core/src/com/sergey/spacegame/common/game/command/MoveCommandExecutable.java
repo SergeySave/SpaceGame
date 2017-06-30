@@ -1,7 +1,5 @@
 package com.sergey.spacegame.common.game.command;
 
-import java.util.stream.StreamSupport;
-
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.math.Vector2;
 import com.sergey.spacegame.common.ecs.component.OrderComponent;
@@ -13,12 +11,14 @@ import com.sergey.spacegame.common.game.orders.FaceOrder;
 import com.sergey.spacegame.common.game.orders.MoveOrder;
 import com.sergey.spacegame.common.game.orders.TimeMoveOrder;
 
+import java.util.stream.StreamSupport;
+
 public final class MoveCommandExecutable implements CommandExecutable {
 
 	@Override
 	public void issue(Iterable<Entity> entitySource, int numEntities, Vector2 start, Vector2 end, Level level) {
 		//Gets the center of all of the ships by averaging their coordinates
-		Vector2 center = StreamSupport.stream(entitySource.spliterator(), true).collect(Vector2::new, (v,s)->v.add(new Vector2(PositionComponent.MAPPER.get(s).x,PositionComponent.MAPPER.get(s).y)), (v1,v2)->v1.add(v2));
+		Vector2 center = StreamSupport.stream(entitySource.spliterator(), true).collect(Vector2::new, (v,s)->v.add(new Vector2(PositionComponent.MAPPER.get(s).x,PositionComponent.MAPPER.get(s).y)), Vector2::add);
 		center.scl(1f/numEntities);
 		
 		//The direction we want the fleet to move
@@ -40,7 +40,7 @@ public final class MoveCommandExecutable implements CommandExecutable {
 			Vector2 farCenter = center.cpy().add(dx, dy);
 
 			//Average Angle
-			float fleetDir = StreamSupport.stream(entitySource.spliterator(), true).filter(RotationComponent.MAPPER::has).map((e)->new Vector2(1,0).rotate(RotationComponent.MAPPER.get(e).r)).collect(Vector2::new, (v1,v2)->v1.add(v2), (v1,v2)->v1.add(v2)).angle();
+			float fleetDir = StreamSupport.stream(entitySource.spliterator(), true).filter(RotationComponent.MAPPER::has).map((e)->new Vector2(1,0).rotate(RotationComponent.MAPPER.get(e).r)).collect(Vector2::new, Vector2::add, Vector2::add).angle();
 			//First fleet rotation angle
 			float dr1 = fleetMoveDir-fleetDir;
 			//Second fleet rotation angle
@@ -122,14 +122,14 @@ public final class MoveCommandExecutable implements CommandExecutable {
 				} else {
 					startPos = PositionComponent.MAPPER.get(e).createVector();
 					endPos = startPos.cpy().sub(center).rotate(dr1).add(center);
-					deltaPos = endPos.cpy().sub(startPos);
+					//deltaPos = endPos.cpy().sub(startPos);
 
 					ord.addOrder(new TimeMoveOrder(endPos.x, endPos.y, (float) (maxTimes[0])));
 					ord.addOrder(new TimeMoveOrder(endPos.x+dx, endPos.y+dy, time));
 
 					startPos = endPos.add(dx, dy);
 					endPos = startPos.cpy().sub(farCenter).rotate(dr2).add(farCenter);
-					deltaPos = endPos.cpy().sub(startPos);
+					//deltaPos = endPos.cpy().sub(startPos);
 
 					ord.addOrder(new TimeMoveOrder(endPos.x, endPos.y, (float) (maxTimes[2])));
 				}
@@ -137,6 +137,7 @@ public final class MoveCommandExecutable implements CommandExecutable {
 				e.add(ord);
 			});
 		} else {
+			@SuppressWarnings("ConstantConditions")
 			float speed = (float) StreamSupport.stream(entitySource.spliterator(), true).mapToDouble((e)->ShipComponent.MAPPER.get(e).moveSpeed).min().getAsDouble();
 			entitySource.forEach((e)->{
 				OrderComponent ord = new OrderComponent(

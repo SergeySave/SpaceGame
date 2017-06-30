@@ -1,5 +1,6 @@
 package com.sergey.spacegame.common.math;
 
+@SuppressWarnings("ConstantConditions")
 public final class AngleRange {
 	private double min;
 	private double max;

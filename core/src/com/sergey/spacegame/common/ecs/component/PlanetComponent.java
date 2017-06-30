@@ -1,13 +1,13 @@
 package com.sergey.spacegame.common.ecs.component;
 
+import com.badlogic.ashley.core.Component;
+import com.badlogic.ashley.core.ComponentMapper;
+import com.sergey.spacegame.common.math.AngleRange;
+
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
-
-import com.badlogic.ashley.core.Component;
-import com.badlogic.ashley.core.ComponentMapper;
-import com.sergey.spacegame.common.math.AngleRange;
 
 public class PlanetComponent implements ClonableComponent {
 	public static final ComponentMapper<PlanetComponent> MAPPER = ComponentMapper.getFor(PlanetComponent.class);

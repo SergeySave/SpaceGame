@@ -1,12 +1,5 @@
 package com.sergey.spacegame.common.game.command.lua;
 
-import org.luaj.vm2.LuaTable;
-import org.luaj.vm2.LuaValue;
-import org.luaj.vm2.lib.ThreeArgFunction;
-import org.luaj.vm2.lib.TwoArgFunction;
-import org.luaj.vm2.lib.jse.CoerceJavaToLua;
-import org.luaj.vm2.lib.jse.CoerceLuaToJava;
-
 import com.badlogic.ashley.core.Entity;
 import com.sergey.spacegame.common.ecs.component.IDComponent;
 import com.sergey.spacegame.common.ecs.component.OrderComponent;
@@ -16,6 +9,12 @@ import com.sergey.spacegame.common.game.orders.FaceOrder;
 import com.sergey.spacegame.common.game.orders.IOrder;
 import com.sergey.spacegame.common.game.orders.MoveOrder;
 import com.sergey.spacegame.common.game.orders.TimeMoveOrder;
+import org.luaj.vm2.LuaTable;
+import org.luaj.vm2.LuaValue;
+import org.luaj.vm2.lib.ThreeArgFunction;
+import org.luaj.vm2.lib.TwoArgFunction;
+import org.luaj.vm2.lib.jse.CoerceJavaToLua;
+import org.luaj.vm2.lib.jse.CoerceLuaToJava;
 
 public class CommandLuaLib extends TwoArgFunction {
 
