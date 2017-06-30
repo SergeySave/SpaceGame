@@ -476,19 +476,19 @@ public class DrawingBatch {
 
 	public void disableBlending () {
 		if (!blending) return;
-		flush();
+		if (drawing) flush();
 		blending = false;
 	}
 
 	public void enableBlending () {
 		if (blending) return;
-		flush();
+		if (drawing) flush();
 		blending = true;
 	}
 
 	public void setBlendFunction (int srcFunc, int dstFunc) {
 		if (blendSrcFunc == srcFunc && blendDstFunc == dstFunc) return;
-		flush();
+		if (drawing) flush();
 		blendSrcFunc = srcFunc;
 		blendDstFunc = dstFunc;
 	}

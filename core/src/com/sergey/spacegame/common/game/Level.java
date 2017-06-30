@@ -15,6 +15,7 @@ import com.sergey.spacegame.common.ecs.system.MovementSystem;
 import com.sergey.spacegame.common.ecs.system.PlanetSystem;
 import com.sergey.spacegame.common.ecs.system.RotationSystem;
 import com.sergey.spacegame.common.game.command.Command;
+import org.intellij.lang.annotations.Language;
 
 public class Level {
 	private static Level _deserializing;
@@ -27,8 +28,53 @@ public class Level {
 	private ImmutableArray<Entity> planets;
 	
 	public static Level tempLevelGet() {
-		String json = "{\"commands\":{\"move\":{\"type\":\"java\",\"class\":\"com.sergey.spacegame.common.game.command.MoveCommandExecutable\",\"requiresInput\":true,\"requiresTwoInput\":true,\"name\":\"Move\",\"iconName\":\"icons/gotoarrow\",\"pressedIconName\":\"missingTexture\"},\"test\":{\"type\":\"lua\",\"lua\":\"local entities = selected.iterator()\nwhile entities.hasNext() do\n\tlocal entity = entities.next()\n\taddOrder(entity, orders.BuildBuildingOrder.new('buildingTest', 5, x1, y1), orders.BuildBuildingOrder)\nend\n\",\"requiresInput\":true,\"requiresTwoInput\":false,\"name\":\"Test\",\"iconName\":\"building/factory\",\"pressedIconName\":\"missingTexture\",\"cursor\":{\"class\":\"com.sergey.spacegame.client.ui.cursor.BuildingConstructionCursorOverride\",\"entity\":\"buildingTest\"}}},\"entities\":{\"shipTest1\":{\"com.sergey.spacegame.client.ecs.component.VisualComponent\":{\"image\":\"ships/pew\"},\"com.sergey.spacegame.common.ecs.component.PositionComponent\":{},\"com.sergey.spacegame.common.ecs.component.VelocityComponent\":{},\"com.sergey.spacegame.common.ecs.component.SizeComponent\":{\"w\":25,\"h\":25},\"com.sergey.spacegame.common.ecs.component.RotationComponent\":{\"originX\":0.5,\"originY\":0.5},\"com.sergey.spacegame.common.ecs.component.ShipComponent\":{\"moveSpeed\":200,\"rotateSpeed\":45},\"com.sergey.spacegame.common.ecs.component.ControllableComponent\":[\"move\",\"test\"]},\"buildingTest\":{\"com.sergey.spacegame.client.ecs.component.VisualComponent\":{\"image\":\"building/factory\"},\"com.sergey.spacegame.common.ecs.component.PositionComponent\":{},\"com.sergey.spacegame.common.ecs.component.VelocityComponent\":{},\"com.sergey.spacegame.common.ecs.component.SizeComponent\":{\"w\":50,\"h\":50},\"com.sergey.spacegame.common.ecs.component.RotationComponent\":{\"originX\":0.5,\"originY\":0.5},\"com.sergey.spacegame.common.ecs.component.ControllableComponent\":[]}}}";
-		return deserialize(json);
+		@Language("JSON") String json = "{\n" +
+				"\t\"commands\":{\n" +
+				"\t\t\"move\":{\n" +
+				"\t\t\t\"type\":\"java\",\n" +
+				"\t\t\t\"class\":\"com.sergey.spacegame.common.game.command.MoveCommandExecutable\",\n" +
+				"\t\t\t\"requiresInput\":true,\n" +
+				"\t\t\t\"requiresTwoInput\":true,\n" +
+				"\t\t\t\"name\":\"Move\",\n" +
+				"\t\t\t\"iconName\":\"icons/gotoarrow\",\n" +
+				"\t\t\t\"pressedIconName\":\"missingTexture\"\n" +
+				"\t\t},\n" +
+				"\t\t\"test\":{\n" +
+				"\t\t\t\"type\":\"lua\",\n" +
+				"\t\t\t\"lua\":\"local entities = selected.iterator()\\nwhile entities.hasNext() do\\n\\tlocal entity = entities.next()\\n\\taddOrder(entity, orders.BuildBuildingOrder.new('buildingTest', 5, x1, y1), orders.BuildBuildingOrder)\\nend\",\n" +
+				"\t\t\t\"requiresInput\":true,\n" +
+				"\t\t\t\"requiresTwoInput\":false,\n" +
+				"\t\t\t\"name\":\"Test\",\n" +
+				"\t\t\t\"iconName\":\"building/factory\",\n" +
+				"\t\t\t\"pressedIconName\":\"missingTexture\",\n" +
+				"\t\t\t\"cursor\":{\n" +
+				"\t\t\t\t\"class\":\"com.sergey.spacegame.client.ui.cursor.BuildingConstructionCursorOverride\",\n" +
+				"\t\t\t\t\"entity\":\"buildingTest\"}\n" +
+				"\t\t}\n" +
+				"\t},\n" +
+				"\t\"entities\":{\n" +
+				"\t\t\"shipTest1\":{\n" +
+				"\t\t\t\"com.sergey.spacegame.client.ecs.component.VisualComponent\":{\"image\":\"ships/pew\"},\n" +
+				"\t\t\t\"com.sergey.spacegame.common.ecs.component.PositionComponent\":{},\n" +
+				"\t\t\t\"com.sergey.spacegame.common.ecs.component.VelocityComponent\":{},\n" +
+				"\t\t\t\"com.sergey.spacegame.common.ecs.component.SizeComponent\":{\"w\":25,\"h\":25},\n" +
+				"\t\t\t\"com.sergey.spacegame.common.ecs.component.RotationComponent\":{\"originX\":0.5,\"originY\":0.5},\n" +
+				"\t\t\t\"com.sergey.spacegame.common.ecs.component.ShipComponent\":{\"moveSpeed\":200,\"rotateSpeed\":45},\n" +
+				"\t\t\t\"com.sergey.spacegame.common.ecs.component.ControllableComponent\":[\"move\",\"test\"]\n" +
+				"\t\t},\n" +
+				"\t\t\"buildingTest\":{\n" +
+				"\t\t\t\"com.sergey.spacegame.client.ecs.component.VisualComponent\":{\"image\":\"building/factory\"},\n" +
+				"\t\t\t\"com.sergey.spacegame.common.ecs.component.PositionComponent\":{},\n" +
+				"\t\t\t\"com.sergey.spacegame.common.ecs.component.VelocityComponent\":{},\n" +
+				"\t\t\t\"com.sergey.spacegame.common.ecs.component.SizeComponent\":{\"w\":50,\"h\":50},\n" +
+				"\t\t\t\"com.sergey.spacegame.common.ecs.component.RotationComponent\":{\"originX\":0.5,\"originY\":0.5},\n" +
+				"\t\t\t\"com.sergey.spacegame.common.ecs.component.ControllableComponent\":[]\n" +
+				"\t\t}\n" +
+				"\t}\n" +
+				"}";
+		SpaceGame.getInstance().regenerateAtlasNow();
+		Level level = deserialize(json);
+		return level;
 		//commands.put("move", new Command(new MoveCommandExecutable(), true, true, "Move", "missingTexture", "missingTexture"));
 	}
 	

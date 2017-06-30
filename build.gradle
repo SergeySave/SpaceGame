@@ -38,19 +38,6 @@ buildscript {
     }
 }
 
-project.ext.texturePacker = [ file("core/images/").getAbsolutePath(), file("core/assets/").getAbsolutePath(), "atlas" ]
-
-import com.badlogic.gdx.tools.texturepacker.TexturePacker
-
-task texturePacker {
-  if (project.ext.has('texturePacker')) {
-    logger.info "Calling TexturePacker: "+texturePacker
-    TexturePacker.process(texturePacker[0], texturePacker[1], texturePacker[2])
-  }
-}
-
-texturePacker
-
 project(":desktop") {
     apply plugin: "java"
     apply plugin: "kotlin"

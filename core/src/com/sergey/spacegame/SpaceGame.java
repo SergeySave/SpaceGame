@@ -6,20 +6,29 @@ import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.Pixmap;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.PixmapPacker;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas.AtlasRegion;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator.FreeTypeFontParameter;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.utils.Array;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.sergey.spacegame.client.ecs.component.VisualComponent;
+import com.sergey.spacegame.client.event.AtlasRegistryEvent;
+import com.sergey.spacegame.client.event.BaseEventHandler;
 import com.sergey.spacegame.client.ui.BitmapFontWrapper;
 import com.sergey.spacegame.client.ui.screen.LoadingScreen;
 import com.sergey.spacegame.client.ui.screen.MainMenuScreen;
 import com.sergey.spacegame.common.ecs.EntityPrototype;
 import com.sergey.spacegame.common.ecs.component.ControllableComponent;
+import com.sergey.spacegame.common.event.Event;
+import com.sergey.spacegame.common.event.EventBus;
 import com.sergey.spacegame.common.game.command.Command;
 import com.sergey.spacegame.common.game.command.CommandExecutorService;
 
@@ -40,24 +49,39 @@ public class SpaceGame extends Game {
 	private GsonBuilder gsonBuilder;
 	private Gson gson;
 
+	private EventBus eventBus;
+
+	public SpaceGame() {
+	}
+
 	@Override
 	public void create() {
 		instance = this;
 
 		setScreen(new LoadingScreen());
 
-		atlas = new TextureAtlas(Gdx.files.internal("atlas.atlas"));
+		eventBus = new EventBus();
 
 		Thread loadingThread = new Thread(()->{
-			load();
-			//loaded = true;
-			setScreenAndDisposeOld(new MainMenuScreen());
+			try {
+				load();
+				//loaded = true;
+				setScreenAndDisposeOld(new MainMenuScreen());
+			} catch (Throwable throwable) {
+				//If we failed to load exit the game
+				throwable.printStackTrace();
+				Gdx.app.exit();
+			}
 		}, "Loading Thread");
 		loadingThread.setDaemon(true);
 		loadingThread.start();
 	}
 
 	private void load() {
+
+		//Register event handlers
+		getEventBus().register(new BaseEventHandler());
+		regenerateAtlas();
 
 		inputMultiplexer = new InputMultiplexer();
 		Gdx.input.setInputProcessor(inputMultiplexer);
@@ -82,6 +106,56 @@ public class SpaceGame extends Game {
 		gson = gsonBuilder.create();
 	}
 
+	public void regenerateAtlas() {
+		PixmapPacker packer = new PixmapPacker(1024, 1024, Pixmap.Format.RGBA8888, 0, false, new PixmapPacker.GuillotineStrategy());
+		getEventBus().post(new AtlasRegistryEvent(packer));
+
+		Gdx.app.postRunnable(()->{
+			//unload current atlas
+			if (atlas != null) {
+				Array<AtlasRegion> regions = atlas.getRegions();
+				for (int i = 0, n = regions.size; i < n; i++) {
+					AtlasRegion region = regions.get(i);
+					String name = region.name;
+					if (region.index != -1) {
+						name += "_" + region.index;
+					}
+					skin.remove(name, TextureRegion.class);
+				}
+				atlas.dispose();
+			}
+
+			//load new atlas
+			atlas = packer.generateTextureAtlas(Texture.TextureFilter.MipMapLinearLinear, Texture.TextureFilter.MipMapLinearLinear, true);
+			if (skin != null) skin.addRegions(atlas);
+			packer.dispose();
+		});
+	}
+
+	public void regenerateAtlasNow() {
+		PixmapPacker packer = new PixmapPacker(1024, 1024, Pixmap.Format.RGBA8888, 0, false, new PixmapPacker.GuillotineStrategy());
+		getEventBus().post(new AtlasRegistryEvent(packer));
+
+		//unload current atlas
+		if (atlas != null) {
+			Array<AtlasRegion> regions = atlas.getRegions();
+			for (int i = 0, n = regions.size; i < n; i++) {
+				AtlasRegion region = regions.get(i);
+				String name = region.name;
+				if (region.index != -1) {
+					name += "_" + region.index;
+				}
+				skin.remove(name, TextureRegion.class);
+			}
+			atlas.dispose();
+		}
+
+		//load new atlas
+		atlas = packer.generateTextureAtlas(Texture.TextureFilter.MipMapLinearLinear, Texture.TextureFilter.MipMapLinearLinear, true);
+		skin.addRegions(atlas);
+		packer.dispose();
+	}
+
 	@Override
 	public void render() {
 		Gdx.gl.glClearColor(0, 0, 0, 1);
@@ -93,9 +167,9 @@ public class SpaceGame extends Game {
 	@Override
 	public void dispose() {
 		super.dispose();
-		atlas.dispose();
-		skin.dispose();
-		fontGenerator.dispose();
+		if (atlas != null) atlas.dispose();
+		if (skin != null) skin.dispose();
+		if (fontGenerator != null) fontGenerator.dispose();
 	}
 
 	@Override
@@ -194,10 +268,6 @@ public class SpaceGame extends Game {
 		return instance;
 	}
 
-	//public ECSManager getECSManager() {
-	//	return ecsManager;
-	//}
-
 	public TextureAtlas getAtlas() {
 		return atlas;
 	}
@@ -226,5 +296,9 @@ public class SpaceGame extends Game {
 	
 	public GsonBuilder getGsonBuilder() {
 		return gsonBuilder;
+	}
+
+	public EventBus getEventBus() {
+		return eventBus;
 	}
 }
