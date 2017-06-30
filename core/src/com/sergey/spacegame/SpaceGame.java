@@ -7,9 +7,11 @@ import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Pixmap;
+import com.badlogic.gdx.graphics.PixmapIO;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.PixmapPacker;
+import com.badlogic.gdx.graphics.g2d.PixmapPackerIO;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas.AtlasRegion;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
@@ -127,6 +129,14 @@ public class SpaceGame extends Game {
 			//load new atlas
 			atlas = packer.generateTextureAtlas(Texture.TextureFilter.MipMapLinearLinear, Texture.TextureFilter.MipMapLinearLinear, true);
 			if (skin != null) skin.addRegions(atlas);
+
+			Gdx.files.local("atlas").deleteDirectory();
+			Array<PixmapPacker.Page> pages = packer.getPages();
+			for (int i = 0; i < pages.size; i++) {
+				PixmapPacker.Page page = pages.get(i);
+				PixmapIO.writePNG(Gdx.files.local("atlas/" + i + ".png"), page.getPixmap());
+			}
+
 			packer.dispose();
 		});
 	}
@@ -152,6 +162,14 @@ public class SpaceGame extends Game {
 		//load new atlas
 		atlas = packer.generateTextureAtlas(Texture.TextureFilter.MipMapLinearLinear, Texture.TextureFilter.MipMapLinearLinear, true);
 		skin.addRegions(atlas);
+
+		Gdx.files.local("atlas").deleteDirectory();
+		Array<PixmapPacker.Page> pages = packer.getPages();
+		for (int i = 0; i < pages.size; i++) {
+			PixmapPacker.Page page = pages.get(i);
+			PixmapIO.writePNG(Gdx.files.local("atlas/" + i + ".png"), page.getPixmap());
+		}
+		
 		packer.dispose();
 	}
 

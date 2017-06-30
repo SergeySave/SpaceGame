@@ -8,6 +8,7 @@ import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.g2d.PixmapPacker;
 import com.badlogic.gdx.utils.GdxRuntimeException;
+import com.google.gson.stream.JsonReader;
 import com.sergey.spacegame.SpaceGame;
 import com.sergey.spacegame.client.event.AtlasRegistryEvent;
 import com.sergey.spacegame.common.ecs.ECSManager;
@@ -22,6 +23,16 @@ import com.sergey.spacegame.common.event.EventHandle;
 import com.sergey.spacegame.common.game.command.Command;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.FileSystem;
+import java.nio.file.FileSystems;
+import java.nio.file.FileVisitResult;
+import java.nio.file.FileVisitor;
+import java.nio.file.Files;
+import java.nio.file.LinkOption;
+import java.nio.file.Path;
+import java.nio.file.attribute.BasicFileAttributes;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map.Entry;
 
@@ -38,21 +49,31 @@ public class Level {
 	private transient LevelEventRegistry levelEventRegistry;
 	
 	public static Level tempLevelGet() {
-		FileHandle levelFolder = Gdx.files.internal("levelFolder");
+		FileHandle levelZip = Gdx.files.internal("level.sgl");
 
-		EventBus eventBus = SpaceGame.getInstance().getEventBus();
-		LevelEventRegistry ler = new LevelEventRegistry(levelFolder.child("images"));
-		eventBus.register(ler);
+		try {
+			FileSystem fileSystem = FileSystems.newFileSystem(levelZip.file().toPath(), null); //Collections.emptyMap()
 
-		SpaceGame.getInstance().regenerateAtlasNow();
+			Path jsonPath = fileSystem.getPath("level.json");
 
-		Level level = deserialize(levelFolder.child("level.json"));
-		level.init(ler);
-		return level;
+			EventBus eventBus = SpaceGame.getInstance().getEventBus();
+			LevelEventRegistry ler = new LevelEventRegistry(fileSystem.getPath("images"));
+			eventBus.register(ler);
+
+			SpaceGame.getInstance().regenerateAtlasNow();
+
+			Level level = deserialize(jsonPath);
+			level.init(ler);
+			return level;
+		} catch (IOException e) {
+			e.printStackTrace();
+			Gdx.app.exit();
+		}
+		return null;
 	}
 	
-	private static synchronized Level deserialize(FileHandle jsonFile) {
-		Level level = SpaceGame.getInstance().getGson().fromJson(jsonFile.reader(), Level.class);
+	private static synchronized Level deserialize(Path jsonFile) throws IOException {
+		Level level = SpaceGame.getInstance().getGson().fromJson(Files.newBufferedReader(jsonFile), Level.class);
 		_deserializing = null;
 		return level;
 	}
@@ -102,15 +123,19 @@ public class Level {
 	}
 
 	public static class LevelEventRegistry {
-		private FileHandle imagesFolder;
+		private Path imagesFolder;
 
-		public LevelEventRegistry(FileHandle imagesFolder) {
+		public LevelEventRegistry(Path imagesFolder) {
 			this.imagesFolder = imagesFolder;
 		}
 
 		@EventHandle
 		public void onAtlasRegistry(AtlasRegistryEvent event) {
-			recurLoad(event.getPacker(), "", imagesFolder.list(this::fileFilter));
+			try {
+				Files.walkFileTree(imagesFolder, new FileWalker(event.getPacker()));
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 		}
 
 		private void recurLoad(PixmapPacker packer, String dir, FileHandle[] files) {
@@ -118,17 +143,51 @@ public class Level {
 				if (file.isDirectory()) {
 					recurLoad(packer, (dir.isEmpty() ? "" : dir + "/") + file.name(), file.list(this::fileFilter));
 				} else {
-					try {
-						packer.pack(dir + "/" + file.nameWithoutExtension(), new Pixmap(file));
-					} catch (GdxRuntimeException e) {
-						System.out.println("Failed to load file: " + dir + "/" + file.name() + " as an image.");
-					}
 				}
 			}
 		}
 
 		private boolean fileFilter(File file) {
 			return file.exists() && !file.isHidden();
+		}
+
+		private static class FileWalker implements FileVisitor<Path> {
+			private  PixmapPacker packer;
+
+			public FileWalker(PixmapPacker packer) {
+				this.packer = packer;
+			}
+
+			@Override
+			public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) throws IOException {
+				return FileVisitResult.CONTINUE;
+			}
+
+			@Override
+			public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+				if (!Files.isHidden(file) && Files.exists(file, LinkOption.NOFOLLOW_LINKS)) {
+					try {
+						String name = file.toString().substring(0, file.toString().lastIndexOf('.')).replaceFirst("/images/", "");
+						byte[] bytes = Files.readAllBytes(file);
+						packer.pack(name, new Pixmap(bytes, 0, bytes.length));
+					} catch (GdxRuntimeException e) {
+						System.err.println("Failed to load file: " + file + " as an image.");
+					}
+				} else {
+				}
+				return FileVisitResult.CONTINUE;
+			}
+
+			@Override
+			public FileVisitResult visitFileFailed(Path file, IOException exc) throws IOException {
+				System.err.println("ERROR: Cannot visit path: " + file);
+				return FileVisitResult.CONTINUE;
+			}
+
+			@Override
+			public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
+				return FileVisitResult.CONTINUE;
+			}
 		}
 	}
 }
