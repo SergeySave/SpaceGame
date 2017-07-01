@@ -61,7 +61,7 @@ public class GameScreen extends BaseScreen {
 		ecsManager.getEngine().addSystem(selectionControlSystem = new SelectionSystem(camera, batch, commandUISystem));
 		ecsManager.getEngine().addSystem(hudSystem = new HUDSystem(batch, commandUISystem));
 
-		Entity e;
+		/*Entity e;
 		{
 			e = ecsManager.newEntity();
 			ecsManager.getEngine().addEntity(e);
@@ -85,7 +85,7 @@ public class GameScreen extends BaseScreen {
 			//e.add(new RotationComponent(0, 0.5f, 0.5f));
 			//e.add(new BuildingComponent(planet, 0));
 			//e.add(new ControllableComponent());
-		}
+		}*/
 		/*
 		Command moveCommand = level.getCommands().get("move");
 		Command testCommand = level.getCommands().get("test");
@@ -121,14 +121,14 @@ public class GameScreen extends BaseScreen {
 			e.add(ship);
 		}
 		e.add(new ControllableComponent(moveCommand, testCommand));*/
-		
+		/*
 		e = level.getEntities().get("shipTest1").createEntity(level);
 		e.add(new PositionComponent(150, 150));
 		ecsManager.getEngine().addEntity(e);
 		
 		e = level.getEntities().get("shipTest1").createEntity(level);
 		e.add(new PositionComponent(200, 150));
-		ecsManager.getEngine().addEntity(e);
+		ecsManager.getEngine().addEntity(e);*/
 	}
 
 	@Override

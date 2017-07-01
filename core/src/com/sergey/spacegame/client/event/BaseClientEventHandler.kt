@@ -6,7 +6,7 @@ import com.badlogic.gdx.graphics.g2d.PixmapPacker
 import com.sergey.spacegame.common.event.EventHandle
 
 
-class BaseEventHandler {
+class BaseClientEventHandler {
 
     @EventHandle
     fun onAtlasRegistry(event: AtlasRegistryEvent) {

@@ -1,5 +1,7 @@
-## Java
+## Project specific
+core/assets/atlas/
 
+## Java
 *.class
 *.war
 *.ear

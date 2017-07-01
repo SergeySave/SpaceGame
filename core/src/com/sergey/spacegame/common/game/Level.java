@@ -8,6 +8,15 @@ import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.g2d.PixmapPacker;
 import com.badlogic.gdx.utils.GdxRuntimeException;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonDeserializationContext;
+import com.google.gson.JsonDeserializer;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParseException;
+import com.google.gson.JsonSerializationContext;
+import com.google.gson.JsonSerializer;
+import com.google.gson.reflect.TypeToken;
 import com.google.gson.stream.JsonReader;
 import com.sergey.spacegame.SpaceGame;
 import com.sergey.spacegame.client.event.AtlasRegistryEvent;
@@ -24,6 +33,7 @@ import com.sergey.spacegame.common.game.command.Command;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Type;
 import java.nio.file.FileSystem;
 import java.nio.file.FileSystems;
 import java.nio.file.FileVisitResult;
@@ -190,4 +200,36 @@ public class Level {
 			}
 		}
 	}
+
+	public static class Adapter implements JsonSerializer<Level>, JsonDeserializer<Level> {
+
+		@Override
+		public Level deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
+			JsonObject obj = json.getAsJsonObject();
+
+			Level level = new Level();
+
+			level.commands = context.deserialize(obj.get("commands"), new TypeToken<HashMap<String, Command>>(){}.getType());
+			level.entities = context.deserialize(obj.get("entities"), new TypeToken<HashMap<String, EntityPrototype>>(){}.getType());
+
+			JsonArray levelDefaults = obj.getAsJsonArray("levelDefaults");
+			if (levelDefaults != null) {
+				for (JsonElement element : levelDefaults) {
+					Entity entity = context.deserialize(element, Entity.class);
+					level.getECS().getEngine().addEntity(entity);
+				}
+			}
+
+			return level;
+		}
+
+		@Override
+		public JsonElement serialize(Level src, Type typeOfSrc, JsonSerializationContext context) {
+			JsonObject obj = new JsonObject();
+
+			return obj;
+		}
+
+	}
+
 }

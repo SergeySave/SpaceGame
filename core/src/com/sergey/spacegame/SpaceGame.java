@@ -11,7 +11,6 @@ import com.badlogic.gdx.graphics.PixmapIO;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.PixmapPacker;
-import com.badlogic.gdx.graphics.g2d.PixmapPackerIO;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas.AtlasRegion;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
@@ -23,7 +22,9 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.sergey.spacegame.client.ecs.component.VisualComponent;
 import com.sergey.spacegame.client.event.AtlasRegistryEvent;
-import com.sergey.spacegame.client.event.BaseEventHandler;
+import com.sergey.spacegame.client.event.BaseClientEventHandler;
+import com.sergey.spacegame.client.event.BaseCommonEventHandler;
+import com.sergey.spacegame.client.event.GsonRegisterEvent;
 import com.sergey.spacegame.client.ui.BitmapFontWrapper;
 import com.sergey.spacegame.client.ui.screen.LoadingScreen;
 import com.sergey.spacegame.client.ui.screen.MainMenuScreen;
@@ -81,7 +82,8 @@ public class SpaceGame extends Game {
 	private void load() {
 
 		//Register event handlers
-		getEventBus().register(new BaseEventHandler());
+		getEventBus().register(new BaseClientEventHandler());
+		getEventBus().register(new BaseCommonEventHandler());
 		regenerateAtlas();
 
 		inputMultiplexer = new InputMultiplexer();
@@ -98,12 +100,9 @@ public class SpaceGame extends Game {
 		commandExecutor = new CommandExecutorService();
 		
 		gsonBuilder = new GsonBuilder();
-		
-		gsonBuilder.registerTypeAdapter(Command.class, new Command.Adapter());
-		gsonBuilder.registerTypeAdapter(EntityPrototype.class, new EntityPrototype.Adapter());
-		gsonBuilder.registerTypeAdapter(VisualComponent.class, new VisualComponent.Adapter());
-		gsonBuilder.registerTypeAdapter(ControllableComponent.class, new ControllableComponent.Adapter());
-		
+
+		getEventBus().post(new GsonRegisterEvent(gsonBuilder));
+
 		gson = gsonBuilder.create();
 	}
 

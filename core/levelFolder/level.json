@@ -1,44 +1,77 @@
 {
-	"commands":{
-		"move":{
-			"type":"java",
-			"class":"com.sergey.spacegame.common.game.command.MoveCommandExecutable",
-			"requiresInput":true,
-			"requiresTwoInput":true,
-			"name":"Move",
-			"iconName":"icons/gotoarrow",
-			"pressedIconName":"missingTexture"
+	"commands": {
+		"move": {
+			"type": "java",
+			"class": "com.sergey.spacegame.common.game.command.MoveCommandExecutable",
+			"requiresInput": true,
+			"requiresTwoInput": true,
+			"name": "Move",
+			"iconName": "icons/gotoarrow",
+			"pressedIconName": "missingTexture"
 		},
-		"test":{
-			"type":"lua",
-			"lua":"local entities = selected.iterator()\nwhile entities.hasNext() do\n\tlocal entity = entities.next()\n\taddOrder(entity, orders.BuildBuildingOrder.new('buildingTest', 5, x1, y1), orders.BuildBuildingOrder)\nend",
-			"requiresInput":true,
-			"requiresTwoInput":false,
-			"name":"Test",
-			"iconName":"building/factory",
-			"pressedIconName":"missingTexture",
-			"cursor":{
-				"class":"com.sergey.spacegame.client.ui.cursor.BuildingConstructionCursorOverride",
-				"entity":"buildingTest"}
+		"test": {
+			"type": "lua",
+			"lua": "local entities = selected.iterator()\nwhile entities.hasNext() do\n\tlocal entity = entities.next()\n\taddOrder(entity, orders.BuildBuildingOrder.new('buildingTest', 5, x1, y1), orders.BuildBuildingOrder)\nend",
+			"requiresInput": true,
+			"requiresTwoInput": false,
+			"name": "Test",
+			"iconName": "building/factory",
+			"pressedIconName": "missingTexture",
+			"cursor": {
+				"class": "com.sergey.spacegame.client.ui.cursor.BuildingConstructionCursorOverride",
+				"entity": "buildingTest"
+			}
 		}
 	},
-	"entities":{
-		"shipTest1":{
-			"com.sergey.spacegame.client.ecs.component.VisualComponent":{"image":"ships/pew"},
-			"com.sergey.spacegame.common.ecs.component.PositionComponent":{},
-			"com.sergey.spacegame.common.ecs.component.VelocityComponent":{},
-			"com.sergey.spacegame.common.ecs.component.SizeComponent":{"w":25,"h":25},
-			"com.sergey.spacegame.common.ecs.component.RotationComponent":{"originX":0.5,"originY":0.5},
-			"com.sergey.spacegame.common.ecs.component.ShipComponent":{"moveSpeed":200,"rotateSpeed":45},
-			"com.sergey.spacegame.common.ecs.component.ControllableComponent":["move","test"]
+	"entities": {
+		"shipTest1": {
+			"com.sergey.spacegame.client.ecs.component.VisualComponent": { "image": "ships/pew" },
+			"com.sergey.spacegame.common.ecs.component.PositionComponent": {},
+			"com.sergey.spacegame.common.ecs.component.VelocityComponent": {},
+			"com.sergey.spacegame.common.ecs.component.SizeComponent": { "w": 25, "h": 25 },
+			"com.sergey.spacegame.common.ecs.component.RotationComponent": { "originX": 0.5, "originY": 0.5 },
+			"com.sergey.spacegame.common.ecs.component.ShipComponent": { "moveSpeed": 200, "rotateSpeed": 45 },
+			"com.sergey.spacegame.common.ecs.component.ControllableComponent": [ "move", "test" ]
 		},
-		"buildingTest":{
-			"com.sergey.spacegame.client.ecs.component.VisualComponent":{"image":"building/factory"},
-			"com.sergey.spacegame.common.ecs.component.PositionComponent":{},
-			"com.sergey.spacegame.common.ecs.component.VelocityComponent":{},
-			"com.sergey.spacegame.common.ecs.component.SizeComponent":{"w":50,"h":50},
-			"com.sergey.spacegame.common.ecs.component.RotationComponent":{"originX":0.5,"originY":0.5},
-			"com.sergey.spacegame.common.ecs.component.ControllableComponent":[]
+		"buildingTest": {
+			"com.sergey.spacegame.client.ecs.component.VisualComponent": { "image": "building/factory" },
+			"com.sergey.spacegame.common.ecs.component.PositionComponent": {},
+			"com.sergey.spacegame.common.ecs.component.VelocityComponent": {},
+			"com.sergey.spacegame.common.ecs.component.SizeComponent": { "w": 50, "h": 50 },
+			"com.sergey.spacegame.common.ecs.component.RotationComponent": { "originX": 0.5, "originY": 0.5 },
+			"com.sergey.spacegame.common.ecs.component.ControllableComponent": []
 		}
-	}
+	},
+	"levelDefaults": [
+		{
+			"com.sergey.spacegame.client.ecs.component.VisualComponent": { "image": "planets/1" },
+			"com.sergey.spacegame.common.ecs.component.PositionComponent": { "x": 250, "y": 250 },
+			"com.sergey.spacegame.common.ecs.component.SizeComponent": { "w": 200, "h": 200 },
+			"com.sergey.spacegame.common.ecs.component.PlanetComponent": {}
+		},
+		{
+			"com.sergey.spacegame.client.ecs.component.VisualComponent": { "image": "planets/1" },
+			"com.sergey.spacegame.common.ecs.component.PositionComponent": { "x": 750, "y": 750 },
+			"com.sergey.spacegame.common.ecs.component.SizeComponent": { "w": 200, "h": 200 },
+			"com.sergey.spacegame.common.ecs.component.PlanetComponent": {}
+		},
+		{
+			"com.sergey.spacegame.client.ecs.component.VisualComponent": { "image": "ships/pew" },
+			"com.sergey.spacegame.common.ecs.component.PositionComponent":{ "x": 150, "y": 150 },
+			"com.sergey.spacegame.common.ecs.component.VelocityComponent": {},
+			"com.sergey.spacegame.common.ecs.component.SizeComponent": { "w": 25, "h": 25 },
+			"com.sergey.spacegame.common.ecs.component.RotationComponent":{ "originX": 0.5, "originY": 0.5, "r": 90 },
+			"com.sergey.spacegame.common.ecs.component.ShipComponent": { "moveSpeed": 200, "rotateSpeed": 45 },
+			"com.sergey.spacegame.common.ecs.component.ControllableComponent": [ "move", "test" ]
+		},
+		{
+			"com.sergey.spacegame.client.ecs.component.VisualComponent": { "image": "ships/pew" },
+			"com.sergey.spacegame.common.ecs.component.PositionComponent":{ "x": 200, "y": 150 },
+			"com.sergey.spacegame.common.ecs.component.VelocityComponent": {},
+			"com.sergey.spacegame.common.ecs.component.SizeComponent": { "w": 25, "h": 25 },
+			"com.sergey.spacegame.common.ecs.component.RotationComponent":{ "originX": 0.5, "originY": 0.5, "r": 90 },
+			"com.sergey.spacegame.common.ecs.component.ShipComponent": { "moveSpeed": 200, "rotateSpeed": 45 },
+			"com.sergey.spacegame.common.ecs.component.ControllableComponent": [ "move", "test" ]
+		}
+	]
 }
