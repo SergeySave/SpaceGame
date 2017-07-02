@@ -1,10 +1,8 @@
 package com.sergey.spacegame.client.ui.screen;
 
-import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.sergey.spacegame.client.ecs.component.VisualComponent;
 import com.sergey.spacegame.client.ecs.system.CommandUISystem;
 import com.sergey.spacegame.client.ecs.system.HUDSystem;
 import com.sergey.spacegame.client.ecs.system.InConstructionRenderSystem;
@@ -15,9 +13,6 @@ import com.sergey.spacegame.client.ecs.system.SelectionSystem;
 import com.sergey.spacegame.client.gl.DrawingBatch;
 import com.sergey.spacegame.client.ui.UIUtil;
 import com.sergey.spacegame.common.ecs.ECSManager;
-import com.sergey.spacegame.common.ecs.component.PlanetComponent;
-import com.sergey.spacegame.common.ecs.component.PositionComponent;
-import com.sergey.spacegame.common.ecs.component.SizeComponent;
 import com.sergey.spacegame.common.ecs.system.OrderSystem;
 import com.sergey.spacegame.common.game.Level;
 

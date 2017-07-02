@@ -44,10 +44,9 @@ class EntityJsonAdapter : JsonSerializer<Entity>, JsonDeserializer<Entity> {
     override fun serialize(src: Entity, typeOfSrc: Type, context: JsonSerializationContext): JsonElement {
         val obj = JsonObject()
 
-        for (component in src.components) {
-            if (component is IDComponent) continue
-            obj.add(component.javaClass.name, context.serialize(component))
-        }
+        src.components
+                .filter { it !is IDComponent }
+                .forEach { obj.add(it.javaClass.name, context.serialize(it)) }
 
         return obj
     }

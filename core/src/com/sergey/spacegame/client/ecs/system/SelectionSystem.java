@@ -21,6 +21,10 @@ import com.sergey.spacegame.common.ecs.component.InContructionComponent;
 import com.sergey.spacegame.common.ecs.component.PositionComponent;
 import com.sergey.spacegame.common.ecs.component.RotationComponent;
 import com.sergey.spacegame.common.ecs.component.SizeComponent;
+import com.sergey.spacegame.common.event.SelectionChangeEvent;
+
+import java.util.LinkedList;
+import java.util.List;
 
 public class SelectionSystem extends EntitySystem implements InputProcessor {
 	
@@ -35,6 +39,8 @@ public class SelectionSystem extends EntitySystem implements InputProcessor {
 	private ImmutableArray<Entity> controllableEntities;
 	
 	private CommandUISystem cmdUI;
+
+	private SelectionChangeEvent.Builder eventBuilder = new SelectionChangeEvent.Builder();
 
 	public SelectionSystem(OrthographicCamera camera, DrawingBatch batch, CommandUISystem commandUI) {
 		super(4);
@@ -69,6 +75,9 @@ public class SelectionSystem extends EntitySystem implements InputProcessor {
 			if (selectionEnd != null) {
 				selectedEntities.forEach((e)->e.remove(SelectedComponent.class));
 				Rectangle rect = new Rectangle(Math.min(selectionEnd.x, selectionBegin.x), Math.min(selectionEnd.y, selectionBegin.y), Math.abs(selectionEnd.x-selectionBegin.x), Math.abs(selectionEnd.y-selectionBegin.y));
+
+				List<Entity> changedSelected = new LinkedList<>();
+
 				controllableEntities.forEach((e)->{
 					PositionComponent pos = PositionComponent.MAPPER.get(e);
 					if (SizeComponent.MAPPER.has(e)) {
@@ -79,18 +88,24 @@ public class SelectionSystem extends EntitySystem implements InputProcessor {
 							float oY = rot.originY * size.h;
 							if (rect.overlaps(new Rectangle(pos.x-oX, pos.y-oY, size.w, size.h))) {
 								e.add(new SelectedComponent());
+								changedSelected.add(e);
 							}
 						} else {
 							if (rect.overlaps(new Rectangle(pos.x-size.w/2, pos.y-size.h, size.w, size.h))) {
 								e.add(new SelectedComponent());
+								changedSelected.add(e);
 							}
 						}
 					} else {
 						if (rect.contains(new Vector2(pos.x, pos.y))) {
 							e.add(new SelectedComponent());
+							changedSelected.add(e);
 						}
 					}
 				});
+
+				SpaceGame.getInstance().getEventBus().post(eventBuilder.get(changedSelected));
+
 				cmdUI.setCommand(null);
 				selectionBegin = null;
 				selectionEnd = null;

@@ -16,7 +16,11 @@ public class EventBus {
 	private HashMap<Class, List<EventConsumer>> handles = new HashMap<>();
 	private HashMap<Object, HashMap<Class, List<EventConsumer>>> handlers = new HashMap<>();
 
-	public void register(Object handler) {
+	private List<EventConsumer> getNewList() {
+		return new ArrayList<>();
+	}
+
+	public void registerAnnotated(Object handler) {
 		if (handlers.containsKey(handler)) {
 			throw new IllegalStateException("This handler has already been registered.");
 		}
@@ -35,10 +39,10 @@ public class EventBus {
 				Class parameter = method.getParameters()[0].getType();
 
 				if (!handles.containsKey(parameter)) {
-					handles.put(parameter, new ArrayList<>());
+					handles.put(parameter, getNewList());
 				}
 				if (!thisHandler.containsKey(parameter)) {
-					thisHandler.put(parameter, new ArrayList<>());
+					thisHandler.put(parameter, getNewList());
 				}
 
 				try {
@@ -58,11 +62,33 @@ public class EventBus {
 		}
 
 		if (!thisHandler.isEmpty()) {
-			handlers.put(handler, thisHandler);
+			if (handlers.containsKey(handler)) {
+				handlers.get(handler).putAll(thisHandler);
+			} else {
+				handlers.put(handler, thisHandler);
+			}
 		}
 	}
 
-	public void unregister(Object handler) {
+	public void registerSpecific(Object handler, Class<? extends Event> eventType, EventConsumer consumer) {
+		if (!handles.containsKey(eventType)) {
+			handles.put(eventType, getNewList());
+		}
+
+		handles.get(eventType).add(consumer);
+
+		if (!handlers.containsKey(handler)) {
+			handlers.put(handler, new HashMap<>());
+		}
+
+		if (!handlers.get(handler).containsKey(eventType)) {
+			handlers.get(handler).put(eventType, getNewList());
+		}
+
+		handlers.get(handler).get(eventType).add(consumer);
+	}
+
+	public void unregisterAll(Object handler) {
 		if (!handlers.containsKey(handler)) {
 			throw new IllegalStateException("This handler has not been registered.");
 		}
@@ -80,6 +106,22 @@ public class EventBus {
 		handles.remove(handler);
 	}
 
+	public void unregisterSpecific(Object handler, Class<? extends Event> eventType, EventConsumer consumer) {
+		if (handlers.containsKey(handler) && handlers.get(handler).containsKey(eventType) && handlers.get(handler).get(eventType).contains(consumer)) {
+			handles.get(eventType).remove(consumer);
+			if (handles.get(eventType).isEmpty()) {
+				handles.remove(eventType);
+			}
+			handlers.get(handler).get(eventType).remove(consumer);
+			if (handlers.get(handler).get(eventType).isEmpty()) {
+				handlers.get(handler).remove(eventType);
+			}
+			if (handlers.get(handler).isEmpty()) {
+				handlers.remove(handler);
+			}
+		}
+	}
+
 	public void post(Event e) {
 		Class type = e.getClass();
 		List<EventConsumer> handleList = handles.get(type);
@@ -89,7 +131,7 @@ public class EventBus {
 	}
 
 	@FunctionalInterface
-	private interface EventConsumer {
+	public interface EventConsumer {
 		void accept(Event e);
 	}
 }

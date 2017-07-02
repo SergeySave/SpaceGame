@@ -1,11 +1,10 @@
-package com.sergey.spacegame.client.event
+package com.sergey.spacegame.common.event
 
 import com.badlogic.ashley.core.Entity
 import com.sergey.spacegame.client.ecs.component.VisualComponent
 import com.sergey.spacegame.common.ecs.EntityJsonAdapter
 import com.sergey.spacegame.common.ecs.EntityPrototype
 import com.sergey.spacegame.common.ecs.component.ControllableComponent
-import com.sergey.spacegame.common.event.EventHandle
 import com.sergey.spacegame.common.game.Level
 import com.sergey.spacegame.common.game.command.Command
 

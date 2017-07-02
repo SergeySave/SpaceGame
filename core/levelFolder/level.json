@@ -42,7 +42,7 @@
 			"com.sergey.spacegame.common.ecs.component.ControllableComponent": []
 		}
 	},
-	"levelDefaults": [
+	"state": [
 		{
 			"com.sergey.spacegame.client.ecs.component.VisualComponent": { "image": "planets/1" },
 			"com.sergey.spacegame.common.ecs.component.PositionComponent": { "x": 250, "y": 250 },
@@ -73,5 +73,8 @@
 			"com.sergey.spacegame.common.ecs.component.ShipComponent": { "moveSpeed": 200, "rotateSpeed": 45 },
 			"com.sergey.spacegame.common.ecs.component.ControllableComponent": [ "move", "test" ]
 		}
-	]
+	],
+	"events": {
+		"com.sergey.spacegame.common.event.SelectionChangeEvent": "print(event.selected())"
+	}
 }

@@ -12,6 +12,7 @@ import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector2;
+import com.sergey.spacegame.SpaceGame;
 
 public class DrawingBatch {
 	private static final float ZERO = Color.toFloatBits(0f, 0f, 0f, 0f);
@@ -421,6 +422,10 @@ public class DrawingBatch {
 		totalRenderCalls++;
 		int quads = index / 24; // 6 values per vertex * 4 vertexes per quad
 		int count = quads * 6; //6 indicies per quad
+
+		if (lastTexture == null) {
+			lastTexture = SpaceGame.getInstance().getAtlas().getTextures().first();
+		}
 
 		lastTexture.bind();
 		Mesh mesh = this.mesh;

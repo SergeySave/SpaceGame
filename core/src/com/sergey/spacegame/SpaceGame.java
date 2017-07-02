@@ -20,18 +20,14 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.Array;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.sergey.spacegame.client.ecs.component.VisualComponent;
 import com.sergey.spacegame.client.event.AtlasRegistryEvent;
 import com.sergey.spacegame.client.event.BaseClientEventHandler;
-import com.sergey.spacegame.client.event.BaseCommonEventHandler;
-import com.sergey.spacegame.client.event.GsonRegisterEvent;
+import com.sergey.spacegame.common.event.BaseCommonEventHandler;
+import com.sergey.spacegame.common.event.GsonRegisterEvent;
 import com.sergey.spacegame.client.ui.BitmapFontWrapper;
 import com.sergey.spacegame.client.ui.screen.LoadingScreen;
 import com.sergey.spacegame.client.ui.screen.MainMenuScreen;
-import com.sergey.spacegame.common.ecs.EntityPrototype;
-import com.sergey.spacegame.common.ecs.component.ControllableComponent;
 import com.sergey.spacegame.common.event.EventBus;
-import com.sergey.spacegame.common.game.command.Command;
 import com.sergey.spacegame.common.game.command.CommandExecutorService;
 
 public class SpaceGame extends Game {
@@ -82,8 +78,8 @@ public class SpaceGame extends Game {
 	private void load() {
 
 		//Register event handlers
-		getEventBus().register(new BaseClientEventHandler());
-		getEventBus().register(new BaseCommonEventHandler());
+		getEventBus().registerAnnotated(new BaseClientEventHandler());
+		getEventBus().registerAnnotated(new BaseCommonEventHandler());
 		regenerateAtlas();
 
 		inputMultiplexer = new InputMultiplexer();

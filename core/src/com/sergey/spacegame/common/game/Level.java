@@ -17,7 +17,6 @@ import com.google.gson.JsonParseException;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
 import com.google.gson.reflect.TypeToken;
-import com.google.gson.stream.JsonReader;
 import com.sergey.spacegame.SpaceGame;
 import com.sergey.spacegame.client.event.AtlasRegistryEvent;
 import com.sergey.spacegame.common.ecs.ECSManager;
@@ -27,11 +26,12 @@ import com.sergey.spacegame.common.ecs.system.BuildingSystem;
 import com.sergey.spacegame.common.ecs.system.MovementSystem;
 import com.sergey.spacegame.common.ecs.system.PlanetSystem;
 import com.sergey.spacegame.common.ecs.system.RotationSystem;
+import com.sergey.spacegame.common.event.Event;
 import com.sergey.spacegame.common.event.EventBus;
 import com.sergey.spacegame.common.event.EventHandle;
+import com.sergey.spacegame.common.event.LuaEventHandler;
 import com.sergey.spacegame.common.game.command.Command;
 
-import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Type;
 import java.nio.file.FileSystem;
@@ -42,7 +42,6 @@ import java.nio.file.Files;
 import java.nio.file.LinkOption;
 import java.nio.file.Path;
 import java.nio.file.attribute.BasicFileAttributes;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map.Entry;
 
@@ -62,13 +61,13 @@ public class Level {
 		FileHandle levelZip = Gdx.files.internal("level.sgl");
 
 		try {
-			FileSystem fileSystem = FileSystems.newFileSystem(levelZip.file().toPath(), null); //Collections.emptyMap()
+			FileSystem fileSystem = FileSystems.newFileSystem(levelZip.file().toPath(), null);
 
 			Path jsonPath = fileSystem.getPath("level.json");
 
 			EventBus eventBus = SpaceGame.getInstance().getEventBus();
 			LevelEventRegistry ler = new LevelEventRegistry(fileSystem.getPath("images"));
-			eventBus.register(ler);
+			eventBus.registerAnnotated(ler);
 
 			SpaceGame.getInstance().regenerateAtlasNow();
 
@@ -88,7 +87,7 @@ public class Level {
 		return level;
 	}
 	
-	public Level() {
+	private Level() {
 		_deserializing = this;
 		
 		ecsManager = new ECSManager();
@@ -109,7 +108,7 @@ public class Level {
 	}
 
 	public void deinit() {
-		SpaceGame.getInstance().getEventBus().unregister(levelEventRegistry);
+		SpaceGame.getInstance().getEventBus().unregisterAll(levelEventRegistry);
 	}
 
 	public static Level deserializing() {
@@ -148,19 +147,6 @@ public class Level {
 			}
 		}
 
-		private void recurLoad(PixmapPacker packer, String dir, FileHandle[] files) {
-			for (FileHandle file : files) {
-				if (file.isDirectory()) {
-					recurLoad(packer, (dir.isEmpty() ? "" : dir + "/") + file.name(), file.list(this::fileFilter));
-				} else {
-				}
-			}
-		}
-
-		private boolean fileFilter(File file) {
-			return file.exists() && !file.isHidden();
-		}
-
 		private static class FileWalker implements FileVisitor<Path> {
 			private  PixmapPacker packer;
 
@@ -183,7 +169,6 @@ public class Level {
 					} catch (GdxRuntimeException e) {
 						System.err.println("Failed to load file: " + file + " as an image.");
 					}
-				} else {
 				}
 				return FileVisitResult.CONTINUE;
 			}
@@ -212,11 +197,32 @@ public class Level {
 			level.commands = context.deserialize(obj.get("commands"), new TypeToken<HashMap<String, Command>>(){}.getType());
 			level.entities = context.deserialize(obj.get("entities"), new TypeToken<HashMap<String, EntityPrototype>>(){}.getType());
 
-			JsonArray levelDefaults = obj.getAsJsonArray("levelDefaults");
+			JsonArray levelDefaults = obj.getAsJsonArray("state");
 			if (levelDefaults != null) {
 				for (JsonElement element : levelDefaults) {
 					Entity entity = context.deserialize(element, Entity.class);
 					level.getECS().getEngine().addEntity(entity);
+				}
+			}
+
+			if (obj.has("events")) {
+				for (Entry<String, JsonElement> event : obj.getAsJsonObject("events").entrySet()) {
+					String eventClassStr = event.getKey();
+					String lua = event.getValue().getAsString();
+
+					try {
+						@SuppressWarnings("unchecked")
+						Class<? extends Event> eventClass = (Class<? extends Event>) Class.forName(eventClassStr);
+
+						LuaEventHandler handler = new LuaEventHandler(lua);
+
+						//Level event handlers are registered on the level to simplify deregistration later on
+						SpaceGame.getInstance().getEventBus().registerSpecific(level, eventClass, handler::execute);
+					} catch (ClassNotFoundException e) {
+						System.out.println("Failed to find event " + eventClassStr + " for event handler. Not loaded.");
+					} catch (ClassCastException e) {
+						System.out.println("Key " + eventClassStr + " must be a type of event.");
+					}
 				}
 			}
 
@@ -227,9 +233,19 @@ public class Level {
 		public JsonElement serialize(Level src, Type typeOfSrc, JsonSerializationContext context) {
 			JsonObject obj = new JsonObject();
 
+			obj.add("commands", context.serialize(src.commands, new TypeToken<HashMap<String, Command>>(){}.getType()));
+			obj.add("entities", context.serialize(src.entities, new TypeToken<HashMap<String, EntityPrototype>>(){}.getType()));
+
+			JsonArray state = new JsonArray();
+
+			for (Entity entity : src.getECS().getEngine().getEntities()) {
+				state.add(context.serialize(entity));
+			}
+
+			obj.add("state", state);
+
 			return obj;
 		}
 
 	}
-
 }
