@@ -1,7 +1,6 @@
 package com.sergey.spacegame.common.game.command.lua;
 
 import com.badlogic.ashley.core.Entity;
-import com.sergey.spacegame.common.ecs.component.IDComponent;
 import com.sergey.spacegame.common.ecs.component.OrderComponent;
 import com.sergey.spacegame.common.game.orders.BuildBuildingOrder;
 import com.sergey.spacegame.common.game.orders.BuildShipOrder;
@@ -38,8 +37,8 @@ public class CommandLuaLib extends TwoArgFunction {
 	public class AddOrder extends ThreeArgFunction {
 		@SuppressWarnings("rawtypes")
 		@Override
-		public LuaValue call(LuaValue entityID, LuaValue order, LuaValue className) {
-			Entity entity = IDComponent.entities.get(entityID.checkint());
+		public LuaValue call(LuaValue entityLua, LuaValue order, LuaValue className) {
+			Entity entity = (Entity) CoerceLuaToJava.coerce(entityLua, Entity.class);
 			OrderComponent orderComp;
 			if (OrderComponent.MAPPER.has(entity)) {
 				orderComp = OrderComponent.MAPPER.get(entity);

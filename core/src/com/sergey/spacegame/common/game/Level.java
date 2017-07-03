@@ -225,6 +225,7 @@ public class Level {
 					}
 				}
 			}
+			//SpaceGame.getInstance().getEventBus().registerSpecific(level, SelectionChangeEvent.class, new LuaEventHandler("print(event:getSelected())")::execute);
 
 			return level;
 		}

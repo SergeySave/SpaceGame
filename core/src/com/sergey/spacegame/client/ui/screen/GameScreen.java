@@ -3,6 +3,7 @@ package com.sergey.spacegame.client.ui.screen;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.sergey.spacegame.SpaceGame;
 import com.sergey.spacegame.client.ecs.system.CommandUISystem;
 import com.sergey.spacegame.client.ecs.system.HUDSystem;
 import com.sergey.spacegame.client.ecs.system.InConstructionRenderSystem;
@@ -14,6 +15,7 @@ import com.sergey.spacegame.client.gl.DrawingBatch;
 import com.sergey.spacegame.client.ui.UIUtil;
 import com.sergey.spacegame.common.ecs.ECSManager;
 import com.sergey.spacegame.common.ecs.system.OrderSystem;
+import com.sergey.spacegame.common.event.BeginLevelEvent;
 import com.sergey.spacegame.common.game.Level;
 
 public class GameScreen extends BaseScreen {
@@ -56,74 +58,7 @@ public class GameScreen extends BaseScreen {
 		ecsManager.getEngine().addSystem(selectionControlSystem = new SelectionSystem(camera, batch, commandUISystem));
 		ecsManager.getEngine().addSystem(hudSystem = new HUDSystem(batch, commandUISystem));
 
-		/*Entity e;
-		{
-			e = ecsManager.newEntity();
-			ecsManager.getEngine().addEntity(e);
-			e.add(new VisualComponent("planets/1"));
-			e.add(new PositionComponent(250, 250));
-			e.add(new SizeComponent(200, 200));
-			e.add(new PlanetComponent());
-			
-			e = ecsManager.newEntity();
-			ecsManager.getEngine().addEntity(e);
-			e.add(new VisualComponent("planets/1"));
-			e.add(new PositionComponent(750, 750));
-			e.add(new SizeComponent(200, 200));
-			e.add(new PlanetComponent());
-			
-			//e = ecsManager.newEntity();
-			//ecsManager.getEngine().addEntity(e);
-			//e.add(new VisualComponent(SpaceGame.getInstance().getAtlas().findRegion("building/factory")));
-			//e.add(new PositionComponent());
-			//e.add(new SizeComponent(100,100));
-			//e.add(new RotationComponent(0, 0.5f, 0.5f));
-			//e.add(new BuildingComponent(planet, 0));
-			//e.add(new ControllableComponent());
-		}*/
-		/*
-		Command moveCommand = level.getCommands().get("move");
-		Command testCommand = level.getCommands().get("test");
-		
-		e = ecsManager.newEntity();
-		ecsManager.getEngine().addEntity(e);
-
-		e.add(new VisualComponent("ships/pew"));
-		e.add(new PositionComponent(50, 50));
-		e.add(new VelocityComponent());
-		e.add(new SizeComponent(25, 25));
-		e.add(new RotationComponent(90, 0.5f, 0.5f));
-		{
-			ShipComponent ship = new ShipComponent();
-			ship.moveSpeed = 200;
-			ship.rotateSpeed = 22.5f;
-			e.add(ship);
-		}
-		e.add(new ControllableComponent(moveCommand, testCommand));
-
-		e = ecsManager.newEntity();
-		ecsManager.getEngine().addEntity(e);
-
-		e.add(new VisualComponent("ships/pew"));
-		e.add(new PositionComponent(100, 50));
-		e.add(new VelocityComponent());
-		e.add(new SizeComponent(25, 25));
-		e.add(new RotationComponent(90, 0.5f, 0.5f));
-		{
-			ShipComponent ship = new ShipComponent();
-			ship.moveSpeed = 100;
-			ship.rotateSpeed = 45;
-			e.add(ship);
-		}
-		e.add(new ControllableComponent(moveCommand, testCommand));*/
-		/*
-		e = level.getEntities().get("shipTest1").createEntity(level);
-		e.add(new PositionComponent(150, 150));
-		ecsManager.getEngine().addEntity(e);
-		
-		e = level.getEntities().get("shipTest1").createEntity(level);
-		e.add(new PositionComponent(200, 150));
-		ecsManager.getEngine().addEntity(e);*/
+		SpaceGame.getInstance().getEventBus().post(new BeginLevelEvent());
 	}
 
 	@Override

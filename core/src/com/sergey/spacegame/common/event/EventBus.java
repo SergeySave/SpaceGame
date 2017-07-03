@@ -125,6 +125,7 @@ public class EventBus {
 	public void post(Event e) {
 		Class type = e.getClass();
 		List<EventConsumer> handleList = handles.get(type);
+		if (handleList == null) return;
 		for (EventConsumer handle : handleList) {
 			handle.accept(e);
 		}

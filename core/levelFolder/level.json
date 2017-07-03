@@ -75,6 +75,7 @@
 		}
 	],
 	"events": {
-		"com.sergey.spacegame.common.event.SelectionChangeEvent": "print(event.selected())"
+		"com.sergey.spacegame.common.event.SelectionChangeEvent": "print(event:getSelected())",
+		"com.sergey.spacegame.common.event.BeginLevelEvent": "print('level begin')"
 	}
 }

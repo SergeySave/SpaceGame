@@ -1,7 +1,6 @@
 package com.sergey.spacegame.common.game.command.lua;
 
 import com.badlogic.ashley.core.Entity;
-import com.sergey.spacegame.common.ecs.component.IDComponent;
 import org.luaj.vm2.LuaValue;
 import org.luaj.vm2.lib.ZeroArgFunction;
 import org.luaj.vm2.lib.jse.CoerceJavaToLua;
@@ -12,7 +11,7 @@ public class EntityIterable {
 	
 	private Iterable<Entity> backing;
 	public final IteratorGetter iterator = new IteratorGetter();
-	
+
 	public EntityIterable() {}
 	
 	public void setBacking(Iterable<Entity> backing) {
@@ -22,7 +21,7 @@ public class EntityIterable {
 	public Iterable<Entity> getBacking() {
 		return backing;
 	}
-	
+
 	public class IteratorGetter extends ZeroArgFunction {
 
 		@Override
@@ -51,7 +50,7 @@ public class EntityIterable {
 		public class GetNext extends ZeroArgFunction {
 			@Override
 			public LuaValue call() {
-				return LuaValue.valueOf(IDComponent.MAPPER.get(iter.next()).id);
+				return CoerceJavaToLua.coerce(iter.next());
 			}
 		}
 	}
