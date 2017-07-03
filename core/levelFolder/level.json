@@ -11,7 +11,7 @@
 		},
 		"test": {
 			"type": "lua",
-			"lua": "local entities = selected.iterator()\nwhile entities.hasNext() do\n\tlocal entity = entities.next()\n\taddOrder(entity, orders.BuildBuildingOrder.new('buildingTest', 5, x1, y1), orders.BuildBuildingOrder)\nend",
+			"lua": "file://lua/testCommand.lua",
 			"requiresInput": true,
 			"requiresTwoInput": false,
 			"name": "Test",

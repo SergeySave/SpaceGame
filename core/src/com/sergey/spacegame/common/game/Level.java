@@ -44,9 +44,11 @@ import java.nio.file.Path;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.HashMap;
 import java.util.Map.Entry;
+import java.util.stream.Collectors;
 
 public class Level {
 	private static Level _deserializing;
+	private static FileSystem levelFile;
 	
 	private HashMap<String, Command> commands = new HashMap<>();
 	private HashMap<String, EntityPrototype> entities = new HashMap<>();
@@ -61,18 +63,7 @@ public class Level {
 		FileHandle levelZip = Gdx.files.internal("level.sgl");
 
 		try {
-			FileSystem fileSystem = FileSystems.newFileSystem(levelZip.file().toPath(), null);
-
-			Path jsonPath = fileSystem.getPath("level.json");
-
-			EventBus eventBus = SpaceGame.getInstance().getEventBus();
-			LevelEventRegistry ler = new LevelEventRegistry(fileSystem.getPath("images"));
-			eventBus.registerAnnotated(ler);
-
-			SpaceGame.getInstance().regenerateAtlasNow();
-
-			Level level = deserialize(jsonPath);
-			level.init(ler);
+			Level level = deserialize(levelZip);
 			return level;
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -81,9 +72,22 @@ public class Level {
 		return null;
 	}
 	
-	private static synchronized Level deserialize(Path jsonFile) throws IOException {
-		Level level = SpaceGame.getInstance().getGson().fromJson(Files.newBufferedReader(jsonFile), Level.class);
+	private static synchronized Level deserialize(FileHandle levelZip) throws IOException {
+		FileSystem fileSystem = FileSystems.newFileSystem(levelZip.file().toPath(), null);
+		levelFile = fileSystem;
+
+		Path jsonPath = fileSystem.getPath("level.json");
+
+		EventBus eventBus = SpaceGame.getInstance().getEventBus();
+		LevelEventRegistry ler = new LevelEventRegistry(fileSystem.getPath("images"));
+		eventBus.registerAnnotated(ler);
+
+		SpaceGame.getInstance().regenerateAtlasNow();
+
+		Level level = SpaceGame.getInstance().getGson().fromJson(Files.newBufferedReader(jsonPath), Level.class);
 		_deserializing = null;
+		levelFile = null;
+		level.init(ler);
 		return level;
 	}
 	
@@ -113,6 +117,9 @@ public class Level {
 
 	public static Level deserializing() {
 		return _deserializing;
+	}
+	public static FileSystem deserializingFileSystem() {
+		return levelFile;
 	}
 	
 	public HashMap<String, Command> getCommands() {
@@ -214,6 +221,10 @@ public class Level {
 						@SuppressWarnings("unchecked")
 						Class<? extends Event> eventClass = (Class<? extends Event>) Class.forName(eventClassStr);
 
+						if (lua.startsWith("file://")) {
+							lua = Files.readAllLines(levelFile.getPath(lua.substring("file://".length()))).stream().collect(Collectors.joining("\n"));
+						}
+
 						LuaEventHandler handler = new LuaEventHandler(lua);
 
 						//Level event handlers are registered on the level to simplify deregistration later on
@@ -222,6 +233,8 @@ public class Level {
 						System.out.println("Failed to find event " + eventClassStr + " for event handler. Not loaded.");
 					} catch (ClassCastException e) {
 						System.out.println("Key " + eventClassStr + " must be a type of event.");
+					} catch (IOException e) {
+						System.out.println("Unable to load lua file " + lua.substring("file://".length()));
 					}
 				}
 			}
