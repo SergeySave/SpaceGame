@@ -71,7 +71,7 @@ public class BuildBuildingOrder implements IOrder {
 
 			building.add(buildingC);
 
-			level.getECS().getEngine().addEntity(building);
+			level.getECS().addEntity(building);
 			this.building = building;
 		} else {
 			//No planet fail to build
@@ -128,7 +128,7 @@ public class BuildBuildingOrder implements IOrder {
 	@Override
 	public void onCancel(Entity e, Level level) {
 		if (building != null) {
-			level.getECS().getEngine().removeEntity(building);
+			level.getECS().removeEntity(building);
 		}
 	}
 

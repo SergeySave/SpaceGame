@@ -48,15 +48,15 @@ public class GameScreen extends BaseScreen {
 		batch.setBlendFunction(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
 		
 		ecsManager = level.getECS();
-		ecsManager.getEngine().addSystem(orderSystem = new OrderSystem(level));
+		ecsManager.addSystem(orderSystem = new OrderSystem(level));
 		
-		ecsManager.getEngine().addSystem(mainRenderSystem = new MainRenderSystem(batch));
-		ecsManager.getEngine().addSystem(orderRenderSystem = new OrderRenderSystem(batch));
-		ecsManager.getEngine().addSystem(selectedRenderSystem = new SelectedRenderSystem(batch));
-		ecsManager.getEngine().addSystem(inConstructionRenderSystem = new InConstructionRenderSystem(batch));
-		ecsManager.getEngine().addSystem(commandUISystem = new CommandUISystem(camera, batch, level));
-		ecsManager.getEngine().addSystem(selectionControlSystem = new SelectionSystem(camera, batch, commandUISystem));
-		ecsManager.getEngine().addSystem(hudSystem = new HUDSystem(batch, commandUISystem));
+		ecsManager.addSystem(mainRenderSystem = new MainRenderSystem(batch));
+		ecsManager.addSystem(orderRenderSystem = new OrderRenderSystem(batch));
+		ecsManager.addSystem(selectedRenderSystem = new SelectedRenderSystem(batch));
+		ecsManager.addSystem(inConstructionRenderSystem = new InConstructionRenderSystem(batch));
+		ecsManager.addSystem(commandUISystem = new CommandUISystem(camera, batch, level));
+		ecsManager.addSystem(selectionControlSystem = new SelectionSystem(camera, batch, commandUISystem));
+		ecsManager.addSystem(hudSystem = new HUDSystem(batch, commandUISystem));
 
 		SpaceGame.getInstance().getEventBus().post(new BeginLevelEvent());
 	}
@@ -66,7 +66,7 @@ public class GameScreen extends BaseScreen {
 		camera.update();
 		batch.setProjectionMatrix(camera.combined);
 		batch.begin();
-		ecsManager.getEngine().update(Gdx.graphics.getDeltaTime());
+		ecsManager.update(Gdx.graphics.getDeltaTime());
 		batch.end();
 	}
 
@@ -85,14 +85,14 @@ public class GameScreen extends BaseScreen {
 
 	@Override
 	public void hide() {
-		ecsManager.getEngine().removeSystem(orderSystem);
-		ecsManager.getEngine().removeSystem(mainRenderSystem);
-		ecsManager.getEngine().removeSystem(orderRenderSystem);
-		ecsManager.getEngine().removeSystem(selectedRenderSystem);
-		ecsManager.getEngine().removeSystem(selectionControlSystem);
-		ecsManager.getEngine().removeSystem(inConstructionRenderSystem);
-		ecsManager.getEngine().removeSystem(commandUISystem);
-		ecsManager.getEngine().removeSystem(hudSystem);
+		ecsManager.removeSystem(orderSystem);
+		ecsManager.removeSystem(mainRenderSystem);
+		ecsManager.removeSystem(orderRenderSystem);
+		ecsManager.removeSystem(selectedRenderSystem);
+		ecsManager.removeSystem(selectionControlSystem);
+		ecsManager.removeSystem(inConstructionRenderSystem);
+		ecsManager.removeSystem(commandUISystem);
+		ecsManager.removeSystem(hudSystem);
 		
 		batch.dispose();
 	}

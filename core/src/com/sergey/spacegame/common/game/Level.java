@@ -95,12 +95,12 @@ public class Level {
 		_deserializing = this;
 		
 		ecsManager = new ECSManager();
-		ecsManager.getEngine().addSystem(new MovementSystem());
-		ecsManager.getEngine().addSystem(new RotationSystem());
-		ecsManager.getEngine().addSystem(new BuildingSystem());
-		ecsManager.getEngine().addSystem(new PlanetSystem());
+		ecsManager.addSystem(new MovementSystem());
+		ecsManager.addSystem(new RotationSystem());
+		ecsManager.addSystem(new BuildingSystem());
+		ecsManager.addSystem(new PlanetSystem());
 		
-		planets = ecsManager.getEngine().getEntitiesFor(Family.all(PlanetComponent.class).get());
+		planets = ecsManager.getEntitiesFor(Family.all(PlanetComponent.class).get());
 	}
 	
 	public void init(LevelEventRegistry ler) {
@@ -208,7 +208,7 @@ public class Level {
 			if (levelDefaults != null) {
 				for (JsonElement element : levelDefaults) {
 					Entity entity = context.deserialize(element, Entity.class);
-					level.getECS().getEngine().addEntity(entity);
+					level.getECS().addEntity(entity);
 				}
 			}
 
@@ -250,7 +250,7 @@ public class Level {
 
 			JsonArray state = new JsonArray();
 
-			for (Entity entity : src.getECS().getEngine().getEntities()) {
+			for (Entity entity : src.getECS().getEntities()) {
 				state.add(context.serialize(entity));
 			}
 

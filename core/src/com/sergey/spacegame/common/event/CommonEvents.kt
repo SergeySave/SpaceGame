@@ -27,3 +27,24 @@ class SelectionChangeEvent : Event() {
 }
 
 class BeginLevelEvent : Event()
+
+/**
+ * Entity Spawn Event done in a way that the event is created through a builder that uses a single instance
+ */
+class EntitySpawnEvent: Event() {
+    private var _entity: Entity? = null
+
+    var entity: Entity
+        get() {return _entity!!}
+        private set(v) {_entity = v}
+
+    class Builder {
+        private val event = EntitySpawnEvent()
+
+        operator fun get(entity: Entity): EntitySpawnEvent {
+            event.entity = entity
+
+            return event
+        }
+    }
+}

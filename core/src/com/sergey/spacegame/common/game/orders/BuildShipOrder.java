@@ -28,7 +28,7 @@ public class BuildShipOrder implements IOrder {
 				pos.y = curr.y;
 			}
 			
-			level.getECS().getEngine().addEntity(newEntity);
+			level.getECS().addEntity(newEntity);
 		}
 	}
 
