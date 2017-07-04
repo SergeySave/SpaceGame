@@ -3,6 +3,8 @@ package com.sergey.spacegame.common.ecs.component;
 import com.badlogic.ashley.core.Component;
 import com.badlogic.ashley.core.ComponentMapper;
 import com.badlogic.ashley.core.Entity;
+import com.sergey.spacegame.SpaceGame;
+import com.sergey.spacegame.common.event.OrderInitializedEvent;
 import com.sergey.spacegame.common.game.Level;
 import com.sergey.spacegame.common.game.orders.IOrder;
 import com.sergey.spacegame.common.util.ImmutableIterator;
@@ -15,6 +17,7 @@ import java.util.List;
 
 public class OrderComponent implements Component, Iterable<IOrder> {
 	public static final ComponentMapper<OrderComponent> MAPPER = ComponentMapper.getFor(OrderComponent.class);
+	private static final OrderInitializedEvent.Builder orderInitializedEvent = new OrderInitializedEvent.Builder();
 
 	private List<IOrder> orders;
 	private List<IOrder> needInitialization;
@@ -57,7 +60,10 @@ public class OrderComponent implements Component, Iterable<IOrder> {
 
 	public void initAll(Entity e, Level level) {
 		if (!needInitialization.isEmpty()) {
-			needInitialization.forEach((o)->o.init(e, level));
+			needInitialization.forEach((o)->{
+				o.init(e, level);
+				SpaceGame.getInstance().getEventBus().post(orderInitializedEvent.get(o));
+			});
 			needInitialization.clear();
 		}
 	}

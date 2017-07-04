@@ -29,3 +29,23 @@ class SelectionChangeEvent : Event() {
 
 class BeginLevelEvent : Event()
 
+/**
+ * Order Initialized Event done in a way that the event is created through a builder that uses a single instance
+ */
+class OrderInitializedEvent: Event() {
+    private var _order: IOrder? = null
+
+    var order: IOrder
+        get() {return _order!!}
+        private set(v) {_order = v}
+
+    class Builder {
+        private val event = OrderInitializedEvent()
+
+        operator fun get(order: IOrder): OrderInitializedEvent {
+            event.order = order
+
+            return event
+        }
+    }
+}
