@@ -5,11 +5,16 @@ import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.EntitySystem;
 import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.utils.ImmutableArray;
+import com.sergey.spacegame.SpaceGame;
 import com.sergey.spacegame.common.ecs.component.IDComponent;
+import com.sergey.spacegame.common.event.EntityAddedEvent;
+import com.sergey.spacegame.common.event.EntityRemovedEvent;
 
 public final class ECSManager {
 	private Engine engine;
-	
+	private EntityAddedEvent.Builder addedEvent = new EntityAddedEvent.Builder();
+	private EntityRemovedEvent.Builder removedEvent = new EntityRemovedEvent.Builder();
+
 	public ECSManager() {
 		engine = new Engine();
 	}
@@ -43,10 +48,12 @@ public final class ECSManager {
 	}
 
 	public void addEntity(Entity entity) {
+		SpaceGame.getInstance().getEventBus().post(addedEvent.get(entity));
 		engine.addEntity(entity);
 	}
 
 	public void removeEntity(Entity entity) {
+		SpaceGame.getInstance().getEventBus().post(removedEvent.get(entity));
 		engine.removeEntity(entity);
 	}
 }
