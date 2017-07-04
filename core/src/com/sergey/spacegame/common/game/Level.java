@@ -31,6 +31,7 @@ import com.sergey.spacegame.common.event.EventBus;
 import com.sergey.spacegame.common.event.EventHandle;
 import com.sergey.spacegame.common.event.LuaEventHandler;
 import com.sergey.spacegame.common.game.command.Command;
+import com.sergey.spacegame.common.lua.LuaUtils;
 
 import java.io.IOException;
 import java.lang.reflect.Type;
@@ -44,7 +45,6 @@ import java.nio.file.Path;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.HashMap;
 import java.util.Map.Entry;
-import java.util.stream.Collectors;
 
 public class Level {
 	private static Level _deserializing;
@@ -221,9 +221,7 @@ public class Level {
 						@SuppressWarnings("unchecked")
 						Class<? extends Event> eventClass = (Class<? extends Event>) Class.forName(eventClassStr);
 
-						if (lua.startsWith("file://")) {
-							lua = Files.readAllLines(levelFile.getPath(lua.substring("file://".length()))).stream().collect(Collectors.joining("\n"));
-						}
+						lua = LuaUtils.getLUACode(lua, levelFile);
 
 						LuaEventHandler handler = new LuaEventHandler(lua);
 
@@ -234,7 +232,7 @@ public class Level {
 					} catch (ClassCastException e) {
 						System.out.println("Key " + eventClassStr + " must be a type of event.");
 					} catch (IOException e) {
-						System.out.println("Unable to load lua file " + lua.substring("file://".length()));
+						System.out.println(e.getMessage());
 					}
 				}
 			}

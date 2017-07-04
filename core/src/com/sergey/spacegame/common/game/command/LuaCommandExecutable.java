@@ -3,7 +3,7 @@ package com.sergey.spacegame.common.game.command;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.math.Vector2;
 import com.sergey.spacegame.common.game.Level;
-import com.sergey.spacegame.common.game.command.lua.CommandLuaLib;
+import com.sergey.spacegame.common.lua.SpaceGameLuaLib;
 import com.sergey.spacegame.common.game.command.lua.EntityIterable;
 import com.sergey.spacegame.common.lua.LuaUtils;
 import org.luaj.vm2.Globals;
@@ -17,7 +17,7 @@ public final class LuaCommandExecutable implements CommandExecutable {
 	
 	static {
 		LUA_GLOBALS = LuaUtils.newStandard();
-		LUA_GLOBALS.load(new CommandLuaLib());
+		LUA_GLOBALS.load(new SpaceGameLuaLib());
 		
 		iterable = new EntityIterable();
 		

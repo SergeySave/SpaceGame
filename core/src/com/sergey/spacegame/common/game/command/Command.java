@@ -10,12 +10,11 @@ import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
 import com.sergey.spacegame.client.ui.cursor.CursorOverride;
 import com.sergey.spacegame.common.game.Level;
+import com.sergey.spacegame.common.lua.LuaUtils;
 
 import java.io.IOException;
 import java.lang.reflect.Type;
-import java.nio.file.Files;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 public final class Command {
 
@@ -107,13 +106,10 @@ public final class Command {
 
 				String lua = obj.get("lua").getAsString();
 
-				if (lua.startsWith("file://")) {
-					String luaFile = lua.substring("file://".length());
-					try {
-						lua = Files.readAllLines(Level.deserializingFileSystem().getPath(luaFile)).stream().collect(Collectors.joining("\n"));
-					} catch (IOException e) {
-						throw new JsonParseException("Failed to load lua file: " + luaFile, e);
-					}
+				try {
+					lua = LuaUtils.getLUACode(lua, Level.deserializingFileSystem());
+				} catch (IOException e) {
+					throw new JsonParseException(e.getMessage(), e);
 				}
 
 				executable = new LuaCommandExecutable(lua);
