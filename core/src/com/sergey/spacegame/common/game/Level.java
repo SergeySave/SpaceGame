@@ -52,7 +52,8 @@ public class Level {
 	
 	private HashMap<String, Command> commands = new HashMap<>();
 	private HashMap<String, EntityPrototype> entities = new HashMap<>();
-	
+	private HashMap<Class<? extends Event>, LuaEventHandler> events = new HashMap<>();
+
 	private transient ECSManager ecsManager;
 	
 	private transient ImmutableArray<Entity> planets;
@@ -215,18 +216,19 @@ public class Level {
 			if (obj.has("events")) {
 				for (Entry<String, JsonElement> event : obj.getAsJsonObject("events").entrySet()) {
 					String eventClassStr = event.getKey();
-					String lua = event.getValue().getAsString();
+					String string = event.getValue().getAsString();
 
 					try {
 						@SuppressWarnings("unchecked")
 						Class<? extends Event> eventClass = (Class<? extends Event>) Class.forName(eventClassStr);
 
-						lua = LuaUtils.getLUACode(lua, levelFile);
+						String lua = LuaUtils.getLUACode(string, levelFile);
 
-						LuaEventHandler handler = new LuaEventHandler(lua);
+						LuaEventHandler handler = new LuaEventHandler(lua, string);
 
 						//Level event handlers are registered on the level to simplify deregistration later on
 						SpaceGame.getInstance().getEventBus().registerSpecific(level, eventClass, handler::execute);
+						level.events.put(eventClass, handler);
 					} catch (ClassNotFoundException e) {
 						System.out.println("Failed to find event " + eventClassStr + " for event handler. Not loaded.");
 					} catch (ClassCastException e) {
@@ -255,6 +257,14 @@ public class Level {
 			}
 
 			obj.add("state", state);
+
+			JsonObject events = new JsonObject();
+
+			for (Entry<Class<? extends Event>, LuaEventHandler> eventHandler : src.events.entrySet()) {
+				events.addProperty(eventHandler.getKey().getName(), eventHandler.getValue().getOriginal());
+			}
+
+			obj.add("events", events);
 
 			return obj;
 		}

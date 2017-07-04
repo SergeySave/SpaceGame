@@ -31,10 +31,12 @@ public final class LuaCommandExecutable implements CommandExecutable {
 	
 	private LuaValue code;
 	private String lua;
+	private String original;
 	
-	public LuaCommandExecutable(String lua) {
+	public LuaCommandExecutable(String lua, String original) {
 		code = LUA_GLOBALS.load(lua);
 		this.lua = lua;
+		this.original = original;
 	}
 
 	@Override
@@ -50,5 +52,9 @@ public final class LuaCommandExecutable implements CommandExecutable {
 	
 	public String getLua() {
 		return lua;
+	}
+
+	public String getOriginal() {
+		return original;
 	}
 }

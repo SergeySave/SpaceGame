@@ -8,13 +8,16 @@ import org.luaj.vm2.lib.jse.CoerceJavaToLua
 
 class LuaEventHandler {
     private var code: LuaValue
+    var original: String
+        private set
     var lua: String
         get() = field
         private set(value) {field = value}
 
-    constructor(lua: String) {
+    constructor(lua: String, original: String) {
         this.code = LUA_GLOBALS.load(lua)
         this.lua = lua
+        this.original = original
     }
 
     fun execute(event: Event) {

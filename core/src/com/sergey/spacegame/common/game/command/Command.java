@@ -105,6 +105,7 @@ public final class Command {
 			if (type.equals("lua")) {
 
 				String lua = obj.get("lua").getAsString();
+				String original = lua;
 
 				try {
 					lua = LuaUtils.getLUACode(lua, Level.deserializingFileSystem());
@@ -112,7 +113,7 @@ public final class Command {
 					throw new JsonParseException(e.getMessage(), e);
 				}
 
-				executable = new LuaCommandExecutable(lua);
+				executable = new LuaCommandExecutable(lua, original);
 			} else {
 				String className = obj.getAsJsonPrimitive("class").getAsString();
 				try {
@@ -154,7 +155,7 @@ public final class Command {
 			JsonObject obj = new JsonObject();
 			if (src.getExecutable() instanceof LuaCommandExecutable) {
 				obj.addProperty("type", "lua");
-				obj.addProperty("lua", ((LuaCommandExecutable)src.getExecutable()).getLua());
+				obj.addProperty("lua", ((LuaCommandExecutable)src.getExecutable()).getOriginal());
 			} else {
 				obj.addProperty("type", "java");
 				obj.addProperty("class", src.getExecutable().getClass().getName());
