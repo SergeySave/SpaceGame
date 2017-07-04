@@ -76,6 +76,7 @@
 	],
 	"events": {
 		"com.sergey.spacegame.common.event.SelectionChangeEvent": "print(event:getSelected())",
-		"com.sergey.spacegame.common.event.BeginLevelEvent": "print('level begin')"
+		"com.sergey.spacegame.common.event.BeginLevelEvent": "file://lua/BeginLevelEvent.lua",
+		"com.sergey.spacegame.common.event.LuaDelayEvent": "file://lua/LuaDelayEvent.lua"
 	}
 }

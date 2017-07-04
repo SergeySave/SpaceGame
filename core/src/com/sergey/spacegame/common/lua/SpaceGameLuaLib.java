@@ -1,7 +1,9 @@
 package com.sergey.spacegame.common.lua;
 
 import com.badlogic.ashley.core.Entity;
+import com.sergey.spacegame.SpaceGame;
 import com.sergey.spacegame.common.ecs.component.OrderComponent;
+import com.sergey.spacegame.common.event.LuaDelayEvent;
 import com.sergey.spacegame.common.game.orders.BuildBuildingOrder;
 import com.sergey.spacegame.common.game.orders.BuildShipOrder;
 import com.sergey.spacegame.common.game.orders.FaceOrder;
@@ -35,12 +37,13 @@ public class SpaceGameLuaLib extends TwoArgFunction {
 
 	public LuaValue call(LuaValue modname, LuaValue env) {
 		env.set("addOrder", new AddOrder());
-		
+		env.set("postDelayEvent", new PostLuaDelayEvent());
+
 		LuaTable ordersTable = new LuaTable();
 		for (Class<? extends IOrder> clazz : ORDERS){
 			ordersTable.set(clazz.getSimpleName(), CoerceJavaToLua.coerce(clazz));
 		}env.set("orders", ordersTable);
-		
+
 		return LuaValue.NIL;
 	}
 
@@ -58,6 +61,15 @@ public class SpaceGameLuaLib extends TwoArgFunction {
 			}
 			IOrder orderObj = (IOrder) CoerceLuaToJava.coerce(order, (Class) CoerceLuaToJava.coerce(className, Class.class));
 			orderComp.addOrder(orderObj);
+			return LuaValue.NIL;
+		}
+	}
+
+	public class PostLuaDelayEvent extends ThreeArgFunction {
+
+		@Override
+		public LuaValue call(LuaValue millis, LuaValue id, LuaValue parameter) {
+			SpaceGame.getInstance().dispatchDelayedEvent(millis.checklong(), new LuaDelayEvent(id, parameter));
 			return LuaValue.NIL;
 		}
 	}

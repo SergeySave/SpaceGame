@@ -22,13 +22,17 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.sergey.spacegame.client.event.AtlasRegistryEvent;
 import com.sergey.spacegame.client.event.BaseClientEventHandler;
-import com.sergey.spacegame.common.event.BaseCommonEventHandler;
-import com.sergey.spacegame.common.event.GsonRegisterEvent;
 import com.sergey.spacegame.client.ui.BitmapFontWrapper;
 import com.sergey.spacegame.client.ui.screen.LoadingScreen;
 import com.sergey.spacegame.client.ui.screen.MainMenuScreen;
+import com.sergey.spacegame.common.event.BaseCommonEventHandler;
+import com.sergey.spacegame.common.event.Event;
 import com.sergey.spacegame.common.event.EventBus;
+import com.sergey.spacegame.common.event.GsonRegisterEvent;
 import com.sergey.spacegame.common.game.command.CommandExecutorService;
+import com.sergey.spacegame.common.util.DoubleObject;
+
+import java.util.PriorityQueue;
 
 public class SpaceGame extends Game {
 
@@ -40,7 +44,6 @@ public class SpaceGame extends Game {
 	private TextureAtlas atlas;
 	private Skin skin;
 	private FreeTypeFontGenerator fontGenerator;
-	//private boolean loaded;
 	
 	private BitmapFontWrapper smallFont, mediumFont, largeFont;
 	
@@ -48,6 +51,8 @@ public class SpaceGame extends Game {
 	private Gson gson;
 
 	private EventBus eventBus;
+
+	private PriorityQueue<DoubleObject<Long, Event>> delayedEvents;
 
 	public SpaceGame() {
 	}
@@ -57,6 +62,8 @@ public class SpaceGame extends Game {
 		instance = this;
 
 		setScreen(new LoadingScreen());
+
+		delayedEvents = new PriorityQueue<>();
 
 		eventBus = new EventBus();
 
@@ -174,6 +181,10 @@ public class SpaceGame extends Game {
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 		//Gdx.gl.
 		super.render();
+
+		while (!delayedEvents.isEmpty() && System.currentTimeMillis() >= delayedEvents.peek().component1()) {
+			eventBus.post(delayedEvents.poll().component2());
+		}
 	}
 
 	@Override
@@ -312,5 +323,9 @@ public class SpaceGame extends Game {
 
 	public EventBus getEventBus() {
 		return eventBus;
+	}
+
+	public void dispatchDelayedEvent(long millis, Event e) {
+		delayedEvents.add(new DoubleObject<Long, Event>(System.currentTimeMillis() + millis, e));
 	}
 }

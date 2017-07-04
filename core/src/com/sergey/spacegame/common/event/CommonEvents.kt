@@ -3,8 +3,19 @@ package com.sergey.spacegame.common.event
 import com.badlogic.ashley.core.Entity
 import com.google.gson.GsonBuilder
 import com.sergey.spacegame.common.game.orders.IOrder
+import org.luaj.vm2.LuaValue
+
+//-------------------------------------------
+//Simple events
 
 class GsonRegisterEvent(val gson: GsonBuilder) : Event()
+
+class BeginLevelEvent : Event()
+
+class LuaDelayEvent(val id:LuaValue, val parameter:LuaValue): Event()
+
+//-------------------------------------------
+//Single instance per builder events
 
 /**
  * Selection Change Event done in a way that the event is created through a builder that uses a single instance
@@ -27,8 +38,6 @@ class SelectionChangeEvent : Event() {
     }
 }
 
-class BeginLevelEvent : Event()
-
 /**
  * Order Initialized Event done in a way that the event is created through a builder that uses a single instance
  */
@@ -49,3 +58,6 @@ class OrderInitializedEvent: Event() {
         }
     }
 }
+
+//-------------------------------------------
+//Other events
