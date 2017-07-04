@@ -6,7 +6,6 @@ import com.badlogic.ashley.core.EntitySystem;
 import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.utils.ImmutableArray;
 import com.sergey.spacegame.SpaceGame;
-import com.sergey.spacegame.common.ecs.component.IDComponent;
 import com.sergey.spacegame.common.event.EntityAddedEvent;
 import com.sergey.spacegame.common.event.EntityRemovedEvent;
 
@@ -33,9 +32,6 @@ public final class ECSManager {
 	
 	public Entity newEntity() {
 		Entity entity = new Entity();
-		IDComponent comp = new IDComponent();
-		entity.add(comp);
-		IDComponent.entities.put(comp.id, entity);
 		return entity;
 	}
 
