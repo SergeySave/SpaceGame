@@ -1,0 +1,9 @@
+
+#Objective IDs
+obj.one-ship.id=select-one-ship
+
+#Objective Titles
+obj.one-ship.title=Select a single ship
+
+#Objective Description
+#obj.one-ship.desc=

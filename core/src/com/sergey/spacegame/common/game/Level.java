@@ -19,6 +19,7 @@ import com.google.gson.JsonSerializer;
 import com.google.gson.reflect.TypeToken;
 import com.sergey.spacegame.SpaceGame;
 import com.sergey.spacegame.client.event.AtlasRegistryEvent;
+import com.sergey.spacegame.client.event.LocalizationRegistryEvent;
 import com.sergey.spacegame.common.ecs.ECSManager;
 import com.sergey.spacegame.common.ecs.EntityPrototype;
 import com.sergey.spacegame.common.ecs.component.PlanetComponent;
@@ -53,11 +54,10 @@ public class Level {
 	private HashMap<String, Command> commands = new HashMap<>();
 	private HashMap<String, EntityPrototype> entities = new HashMap<>();
 	private HashMap<Class<? extends Event>, LuaEventHandler> events = new HashMap<>();
+	private HashMap<String, String> localization = new HashMap<>();
 
 	private transient ECSManager ecsManager;
-	
 	private transient ImmutableArray<Entity> planets;
-
 	private transient LevelEventRegistry levelEventRegistry;
 	
 	public static Level tempLevelGet() {
@@ -80,10 +80,11 @@ public class Level {
 		Path jsonPath = fileSystem.getPath("level.json");
 
 		EventBus eventBus = SpaceGame.getInstance().getEventBus();
-		LevelEventRegistry ler = new LevelEventRegistry(fileSystem.getPath("images"));
+		LevelEventRegistry ler = new LevelEventRegistry(fileSystem);
 		eventBus.registerAnnotated(ler);
 
 		SpaceGame.getInstance().regenerateAtlasNow();
+		SpaceGame.getInstance().reloadLocalizations();
 
 		Level level = SpaceGame.getInstance().getGson().fromJson(Files.newBufferedReader(jsonPath), Level.class);
 		_deserializing = null;
@@ -140,18 +141,30 @@ public class Level {
 	}
 
 	public static class LevelEventRegistry {
-		private Path imagesFolder;
+		private FileSystem fileSystem;
 
-		public LevelEventRegistry(Path imagesFolder) {
-			this.imagesFolder = imagesFolder;
+		public LevelEventRegistry(FileSystem fileSystem) {
+			this.fileSystem = fileSystem;
 		}
 
 		@EventHandle
 		public void onAtlasRegistry(AtlasRegistryEvent event) {
 			try {
-				Files.walkFileTree(imagesFolder, new FileWalker(event.getPacker()));
+				Files.walkFileTree(fileSystem.getPath("images"), new FileWalker(event.getPacker()));
 			} catch (IOException e) {
 				e.printStackTrace();
+			}
+		}
+
+		@EventHandle
+		public void onLocalizationRegistry(LocalizationRegistryEvent event) {
+			try {
+				Files.lines(fileSystem.getPath("localization", event.getLocale()+".loc")).filter(s -> !s.startsWith("#") && s.matches("([^=]+)=([^=]+)")).forEach(s -> {
+					String[] parts = s.split("=");
+					event.getLocalizationMap().put(parts[0], parts[1]);
+				});
+			} catch (IOException e) {
+				System.out.println("Localization file not found: " + event.getLocale());
 			}
 		}
 

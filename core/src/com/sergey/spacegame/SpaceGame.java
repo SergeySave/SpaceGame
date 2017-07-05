@@ -22,6 +22,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.sergey.spacegame.client.event.AtlasRegistryEvent;
 import com.sergey.spacegame.client.event.BaseClientEventHandler;
+import com.sergey.spacegame.client.event.LocalizationRegistryEvent;
 import com.sergey.spacegame.client.ui.BitmapFontWrapper;
 import com.sergey.spacegame.client.ui.screen.LoadingScreen;
 import com.sergey.spacegame.client.ui.screen.MainMenuScreen;
@@ -32,6 +33,7 @@ import com.sergey.spacegame.common.event.GsonRegisterEvent;
 import com.sergey.spacegame.common.game.command.CommandExecutorService;
 import com.sergey.spacegame.common.util.DoubleObject;
 
+import java.util.HashMap;
 import java.util.PriorityQueue;
 
 public class SpaceGame extends Game {
@@ -53,6 +55,8 @@ public class SpaceGame extends Game {
 	private EventBus eventBus;
 
 	private PriorityQueue<DoubleObject<Long, Event>> delayedEvents;
+
+	private HashMap<String, String> localizations = new HashMap<>();
 
 	public SpaceGame() {
 	}
@@ -326,6 +330,19 @@ public class SpaceGame extends Game {
 	}
 
 	public void dispatchDelayedEvent(long millis, Event e) {
-		delayedEvents.add(new DoubleObject<Long, Event>(System.currentTimeMillis() + millis, e));
+		delayedEvents.add(new DoubleObject<>(System.currentTimeMillis() + millis, e));
+	}
+
+	public void reloadLocalizations() {
+		HashMap<String, String> localization = new HashMap<>();
+
+		LocalizationRegistryEvent localizationRegistryEvent = new LocalizationRegistryEvent(localization, "en_US");
+		getEventBus().post(localizationRegistryEvent);
+
+		this.localizations = localization;
+	}
+
+	public HashMap<String, String> getLocalizations() {
+		return localizations;
 	}
 }

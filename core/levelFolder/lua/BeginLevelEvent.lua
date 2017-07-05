@@ -1,4 +1,4 @@
 
 -- @author sergeys
 
-postDelayEvent(10000, 0, 0)
+postDelayEvent(1500, 0, 0)
