@@ -10,7 +10,7 @@ import com.sergey.spacegame.common.game.command.Command
 
 
 class BaseCommonEventHandler {
-
+    
     @EventHandle
     fun onGsonRegister(event: GsonRegisterEvent) {
         val gson = event.gson

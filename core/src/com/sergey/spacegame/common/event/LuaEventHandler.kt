@@ -12,22 +12,24 @@ class LuaEventHandler {
         private set
     var lua: String
         get() = field
-        private set(value) {field = value}
-
+        private set(value) {
+            field = value
+        }
+    
     constructor(lua: String, original: String) {
         this.code = LUA_GLOBALS.load(lua)
         this.lua = lua
         this.original = original
     }
-
+    
     fun execute(event: Event) {
         LUA_GLOBALS.set("event", CoerceJavaToLua.coerce(event))
         code.call()
     }
-
+    
     private companion object {
         private val LUA_GLOBALS: Globals = LuaUtils.newStandard()
-
+        
         init {
             LUA_GLOBALS.load(SpaceGameLuaLib())
         }

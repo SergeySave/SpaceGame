@@ -5,13 +5,12 @@ import com.badlogic.gdx.math.Vector2;
 import com.sergey.spacegame.common.game.Level;
 
 /**
- * 
  * All CommandExecutables MUST have a no argument constructor
- * 
- * @author sergeys
  *
+ * @author sergeys
  */
 @FunctionalInterface
 public interface CommandExecutable {
-	void issue(Iterable<Entity> entitySource, int numEntities, Vector2 start, Vector2 end, Level level);
+    
+    void issue(Iterable<Entity> entitySource, int numEntities, Vector2 start, Vector2 end, Level level);
 }

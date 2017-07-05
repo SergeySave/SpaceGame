@@ -21,56 +21,59 @@ import java.util.HashSet;
 import java.util.Set;
 
 public class SpaceGameLuaLib extends TwoArgFunction {
-
-	private static final Set<Class<? extends IOrder>> ORDERS;
-
-	static {
-		ORDERS = new HashSet<>();
-		ORDERS.add(BuildShipOrder.class);
-		ORDERS.add(BuildBuildingOrder.class);
-		ORDERS.add(FaceOrder.class);
-		ORDERS.add(MoveOrder.class);
-		ORDERS.add(TimeMoveOrder.class);
-	}
-
-	public SpaceGameLuaLib() {}
-
-	public LuaValue call(LuaValue modname, LuaValue env) {
-		env.set("addOrder", new AddOrder());
-		env.set("postDelayEvent", new PostLuaDelayEvent());
-
-		LuaTable ordersTable = new LuaTable();
-		for (Class<? extends IOrder> clazz : ORDERS){
-			ordersTable.set(clazz.getSimpleName(), CoerceJavaToLua.coerce(clazz));
-		}env.set("orders", ordersTable);
-
-		return LuaValue.NIL;
-	}
-
-	public class AddOrder extends ThreeArgFunction {
-		@SuppressWarnings("rawtypes")
-		@Override
-		public LuaValue call(LuaValue entityLua, LuaValue order, LuaValue className) {
-			Entity entity = (Entity) CoerceLuaToJava.coerce(entityLua, Entity.class);
-			OrderComponent orderComp;
-			if (OrderComponent.MAPPER.has(entity)) {
-				orderComp = OrderComponent.MAPPER.get(entity);
-			} else {
-				orderComp = new OrderComponent();
-				entity.add(orderComp);
-			}
-			IOrder orderObj = (IOrder) CoerceLuaToJava.coerce(order, (Class) CoerceLuaToJava.coerce(className, Class.class));
-			orderComp.addOrder(orderObj);
-			return LuaValue.NIL;
-		}
-	}
-
-	public class PostLuaDelayEvent extends ThreeArgFunction {
-
-		@Override
-		public LuaValue call(LuaValue millis, LuaValue id, LuaValue parameter) {
-			SpaceGame.getInstance().dispatchDelayedEvent(millis.checklong(), new LuaDelayEvent(id, parameter));
-			return LuaValue.NIL;
-		}
-	}
+    
+    private static final Set<Class<? extends IOrder>> ORDERS;
+    
+    static {
+        ORDERS = new HashSet<>();
+        ORDERS.add(BuildShipOrder.class);
+        ORDERS.add(BuildBuildingOrder.class);
+        ORDERS.add(FaceOrder.class);
+        ORDERS.add(MoveOrder.class);
+        ORDERS.add(TimeMoveOrder.class);
+    }
+    
+    public SpaceGameLuaLib() {}
+    
+    public LuaValue call(LuaValue modname, LuaValue env) {
+        env.set("addOrder", new AddOrder());
+        env.set("postDelayEvent", new PostLuaDelayEvent());
+        
+        LuaTable ordersTable = new LuaTable();
+        for (Class<? extends IOrder> clazz : ORDERS) {
+            ordersTable.set(clazz.getSimpleName(), CoerceJavaToLua.coerce(clazz));
+        }
+        env.set("orders", ordersTable);
+        
+        return LuaValue.NIL;
+    }
+    
+    public class AddOrder extends ThreeArgFunction {
+        
+        @SuppressWarnings("rawtypes")
+        @Override
+        public LuaValue call(LuaValue entityLua, LuaValue order, LuaValue className) {
+            Entity         entity = (Entity) CoerceLuaToJava.coerce(entityLua, Entity.class);
+            OrderComponent orderComp;
+            if (OrderComponent.MAPPER.has(entity)) {
+                orderComp = OrderComponent.MAPPER.get(entity);
+            } else {
+                orderComp = new OrderComponent();
+                entity.add(orderComp);
+            }
+            IOrder orderObj = (IOrder) CoerceLuaToJava.coerce(order, (Class) CoerceLuaToJava.coerce(className, Class.class));
+            orderComp.addOrder(orderObj);
+            return LuaValue.NIL;
+        }
+    }
+    
+    
+    public class PostLuaDelayEvent extends ThreeArgFunction {
+        
+        @Override
+        public LuaValue call(LuaValue millis, LuaValue id, LuaValue parameter) {
+            SpaceGame.getInstance().dispatchDelayedEvent(millis.checklong(), new LuaDelayEvent(id, parameter));
+            return LuaValue.NIL;
+        }
+    }
 }

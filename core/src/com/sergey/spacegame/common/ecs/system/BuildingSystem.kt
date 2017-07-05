@@ -10,24 +10,24 @@ import com.sergey.spacegame.common.ecs.component.RotationComponent
 import com.sergey.spacegame.common.ecs.component.SizeComponent
 
 class BuildingSystem : IteratingSystem((Family.all(BuildingComponent::class.java, PositionComponent::class.java, SizeComponent::class.java).get())) {
-
-	override fun processEntity(entity:Entity, deltaTime:Float) {
-		val building = BuildingComponent.MAPPER.get(entity)
-		doSetBuildingPosition(entity, building.planet, building.position)
-	}
-	
-	companion object Helper {
-		@JvmStatic
-		fun doSetBuildingPosition(entity:Entity, planet:Entity, position:Float) {
-			val pos = PositionComponent.MAPPER.get(entity)
-			val size = SizeComponent.MAPPER.get(entity)
-			val rot = if (RotationComponent.MAPPER.has(entity)) RotationComponent.MAPPER.get(entity) else null
-			
-			val planetPos = PositionComponent.MAPPER.get(planet)
-			val planetSize = SizeComponent.MAPPER.get(planet)
-			val rotatedBuildingVector = Vector2(1f,0f).rotate(position)
-			pos.setFrom(planetPos.createVector().add(rotatedBuildingVector.cpy().scl(planetSize.w/2+size.w/3, planetSize.h/2+size.w/3)))
-			rot?.r = rotatedBuildingVector.scl(planetSize.h, planetSize.w).angle() //Don't care about modifying rotatedBuildingVector here
-		}
-	}
+    
+    override fun processEntity(entity: Entity, deltaTime: Float) {
+        val building = BuildingComponent.MAPPER.get(entity)
+        doSetBuildingPosition(entity, building.planet, building.position)
+    }
+    
+    companion object Helper {
+        @JvmStatic
+        fun doSetBuildingPosition(entity: Entity, planet: Entity, position: Float) {
+            val pos = PositionComponent.MAPPER.get(entity)
+            val size = SizeComponent.MAPPER.get(entity)
+            val rot = if (RotationComponent.MAPPER.has(entity)) RotationComponent.MAPPER.get(entity) else null
+            
+            val planetPos = PositionComponent.MAPPER.get(planet)
+            val planetSize = SizeComponent.MAPPER.get(planet)
+            val rotatedBuildingVector = Vector2(1f, 0f).rotate(position)
+            pos.setFrom(planetPos.createVector().add(rotatedBuildingVector.cpy().scl(planetSize.w / 2 + size.w / 3, planetSize.h / 2 + size.w / 3)))
+            rot?.r = rotatedBuildingVector.scl(planetSize.h, planetSize.w).angle() //Don't care about modifying rotatedBuildingVector here
+        }
+    }
 }

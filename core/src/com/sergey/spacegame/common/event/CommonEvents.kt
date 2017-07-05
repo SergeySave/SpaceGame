@@ -12,7 +12,7 @@ class GsonRegisterEvent(val gson: GsonBuilder) : Event()
 
 class BeginLevelEvent : Event()
 
-class LuaDelayEvent(val id:LuaValue, val parameter:LuaValue): Event()
+class LuaDelayEvent(val id: LuaValue, val parameter: LuaValue) : Event()
 
 //-------------------------------------------
 //Single instance per builder events
@@ -22,17 +22,19 @@ class LuaDelayEvent(val id:LuaValue, val parameter:LuaValue): Event()
  */
 class SelectionChangeEvent : Event() {
     private var _selected: List<Entity>? = null
-
+    
     var selected: List<Entity>
-        get() {return _selected!!}
-        private set(v) {_selected = v}
-
+        get() = _selected!!
+        private set(v) {
+            _selected = v
+        }
+    
     class Builder {
         private val selectionChangeEvent = SelectionChangeEvent()
-
+    
         operator fun get(selected: List<Entity>): SelectionChangeEvent {
             selectionChangeEvent.selected = selected
-
+        
             return selectionChangeEvent
         }
     }
@@ -41,19 +43,21 @@ class SelectionChangeEvent : Event() {
 /**
  * Order Initialized Event done in a way that the event is created through a builder that uses a single instance
  */
-class OrderInitializedEvent: Event() {
+class OrderInitializedEvent : Event() {
     private var _order: IOrder? = null
-
+    
     var order: IOrder
-        get() {return _order!!}
-        private set(v) {_order = v}
-
+        get() = _order!!
+        private set(v) {
+            _order = v
+        }
+    
     class Builder {
         private val event = OrderInitializedEvent()
-
+    
         operator fun get(order: IOrder): OrderInitializedEvent {
             event.order = order
-
+        
             return event
         }
     }

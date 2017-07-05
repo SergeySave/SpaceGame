@@ -15,94 +15,94 @@ import com.sergey.spacegame.SpaceGame
 import com.sergey.spacegame.common.game.Level
 
 class MainMenuScreen : BaseScreen() {
-	
-	private var _stage:Stage? = null
-	private var stage:Stage
-			get() = _stage!!
-			set(value) {
-				_stage = value
-			}
-	
-	private var needsValidation:ArrayList<Layout> = ArrayList()
-	
-	override fun show() {
-		stage = Stage(ScreenViewport())
-		
-		SpaceGame.getInstance().inputMultiplexer.addProcessor(stage)
-		
-		val skin = SpaceGame.getInstance().skin
-		
-		val table = Table()
-		table.setFillParent(true)
-		//table.setDebug(true)
-		stage.addActor(table)
-		table.defaults().padTop(Value.percentHeight(0.005f, table))
-		table.defaults().padBottom(Value.percentHeight(0.005f, table))
-		table.defaults().padLeft(Value.percentWidth(0.005f, table))
-		table.defaults().padRight(Value.percentWidth(0.005f, table))
-		
-		val image = Image(SpaceGame.getInstance().getRegion("screen/mainMenu_title"))
-		image.setScaling(Scaling.fit)
-		table.add(image).grow().padTop(Value.percentHeight(0.01f, table))
-		
-		
-		val play = TextButton("Play", skin, "noBackgroundLarge")
-		play.pad(Value.percentHeight(0.1f))
-		play.addListener(object : ChangeListener() {
-			override fun changed(event:ChangeEvent, actor:Actor) {
-				SpaceGame.getInstance().screen = GameScreen(Level.tempLevelGet())
-			}
-		})
-		table.row()
-		table.add(play).expandX().fillX()
-		
-		val options = TextButton("Options", skin, "noBackgroundLarge")
-		options.pad(Value.percentHeight(0.1f))
-		options.addListener(object : ChangeListener() {
-			override fun changed(event:ChangeEvent, actor:Actor) {
-				println("Options Button")
-			}
-		})
-		table.row()
-		table.add(options).expandX().fillX()
-		
-		table.row()
-		table.add().expandY()
-		
-		table.row()
-		val exit = TextButton("Exit", skin, "noBackgroundLarge")
-		exit.pad(Value.percentHeight(0.1f))
-		exit.addListener(object : ChangeListener() {
-			override fun changed(event:ChangeEvent, actor:Actor) {
-				Gdx.app.exit()
-			}
-		})
-		table.add(exit).expandX().fillX().padBottom(Value.percentHeight(0.01f, table))
-	}
-
-	override fun render(delta:Float) {
-		stage.act(delta)
-		stage.draw()
-	}
-
-	override fun resize(width:Int, height:Int) {
-		dispose()
-		show()
-		//super.resize(width, height)
-		//stage.getViewport().update(width, height, true)
-	}
-
-	override fun pause() {
-	}
-
-	override fun resume() {
-	}
-
-	override fun hide() {
-		SpaceGame.getInstance().inputMultiplexer.removeProcessor(stage)
-	}
-
-	override fun dispose() {
-		stage.dispose()
-	}
+    
+    private var _stage: Stage? = null
+    private var stage: Stage
+        get() = _stage!!
+        set(value) {
+            _stage = value
+        }
+    
+    private var needsValidation: ArrayList<Layout> = ArrayList()
+    
+    override fun show() {
+        stage = Stage(ScreenViewport())
+        
+        SpaceGame.getInstance().inputMultiplexer.addProcessor(stage)
+        
+        val skin = SpaceGame.getInstance().skin
+        
+        val table = Table()
+        table.setFillParent(true)
+        //table.setDebug(true)
+        stage.addActor(table)
+        table.defaults().padTop(Value.percentHeight(0.005f, table))
+        table.defaults().padBottom(Value.percentHeight(0.005f, table))
+        table.defaults().padLeft(Value.percentWidth(0.005f, table))
+        table.defaults().padRight(Value.percentWidth(0.005f, table))
+        
+        val image = Image(SpaceGame.getInstance().getRegion("screen/mainMenu_title"))
+        image.setScaling(Scaling.fit)
+        table.add(image).grow().padTop(Value.percentHeight(0.01f, table))
+        
+        
+        val play = TextButton("Play", skin, "noBackgroundLarge")
+        play.pad(Value.percentHeight(0.1f))
+        play.addListener(object : ChangeListener() {
+            override fun changed(event: ChangeEvent, actor: Actor) {
+                SpaceGame.getInstance().screen = GameScreen(Level.tempLevelGet())
+            }
+        })
+        table.row()
+        table.add(play).expandX().fillX()
+        
+        val options = TextButton("Options", skin, "noBackgroundLarge")
+        options.pad(Value.percentHeight(0.1f))
+        options.addListener(object : ChangeListener() {
+            override fun changed(event: ChangeEvent, actor: Actor) {
+                println("Options Button")
+            }
+        })
+        table.row()
+        table.add(options).expandX().fillX()
+        
+        table.row()
+        table.add().expandY()
+        
+        table.row()
+        val exit = TextButton("Exit", skin, "noBackgroundLarge")
+        exit.pad(Value.percentHeight(0.1f))
+        exit.addListener(object : ChangeListener() {
+            override fun changed(event: ChangeEvent, actor: Actor) {
+                Gdx.app.exit()
+            }
+        })
+        table.add(exit).expandX().fillX().padBottom(Value.percentHeight(0.01f, table))
+    }
+    
+    override fun render(delta: Float) {
+        stage.act(delta)
+        stage.draw()
+    }
+    
+    override fun resize(width: Int, height: Int) {
+        dispose()
+        show()
+        //super.resize(width, height)
+        //stage.getViewport().update(width, height, true)
+    }
+    
+    override fun pause() {
+    }
+    
+    override fun resume() {
+    }
+    
+    override fun hide() {
+        SpaceGame.getInstance().inputMultiplexer.removeProcessor(stage)
+    }
+    
+    override fun dispose() {
+        stage.dispose()
+    }
 }

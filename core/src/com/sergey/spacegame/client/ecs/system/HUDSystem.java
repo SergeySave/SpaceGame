@@ -32,155 +32,176 @@ import java.util.LinkedList;
 import java.util.List;
 
 public class HUDSystem extends EntitySystem implements EntityListener {
-
-	private CommandUISystem commandUI;
-	private ImmutableArray<Entity> selectedEntities;
-	private Skin skin = SpaceGame.getInstance().getSkin();
-
-	private TooltipManager tooltipManager;
-	
-	private DrawingBatch batch;
-
-	private Stage stage;
-	private Table topTable;
-	private Table leftTable;
-	private Table rightTable;
-	private Table actionBar;
-	private TextButton collapseMinimap;
-
-	public HUDSystem(DrawingBatch batch, CommandUISystem commandUI) {
-		super(6);
-		this.batch = batch;
-		this.commandUI = commandUI;
-		tooltipManager = new TooltipManager();
-		tooltipManager.initialTime 		= 0.50f;
-		tooltipManager.subsequentTime 	= 0.00f;
-		tooltipManager.resetTime 		= 0.00f;
-	}
-
-	@Override
-	public void addedToEngine (Engine engine) {
-		Family family = Family.all(SelectedComponent.class, ControllableComponent.class).get();
-		selectedEntities = engine.getEntitiesFor(family);
-		engine.addEntityListener(family, this);
-
-
-		stage = new Stage(new ScreenViewport());
-		SpaceGame.getInstance().getInputMultiplexer().addProcessor(0,stage);
-
-		Table table = new Table();
-		table.setFillParent(true);
-
-		stage.addActor(table);
-
-		{
-			topTable = new Table();
-			table.add(topTable).fillX().expandX().height(Value.percentHeight(0.035f, table)).align(Align.top).colspan(3);
-		}
-		table.row();
-		{
-			leftTable = new Table();
-			table.add(leftTable).fillY().expandY().width(Value.percentWidth(0.20f, table)).align(Align.left);
-
-			table.add().fill().expand();
-
-			rightTable = new Table();
-			table.add(rightTable).height(Value.percentWidth(0.20f, table)).width(Value.percentWidth(0.20f, table)).align(Align.bottomRight);
-		}
-		table.row();
-		{
-			Table bottomTable = new Table();
-			table.add(bottomTable).fillX().expandX().height(Value.percentHeight(0.075f, table)).align(Align.bottom).colspan(3);
-
-			actionBar = new Table();
-			ScrollPane scroll = new ScrollPane(actionBar, skin, "noBg");
-			actionBar.align(Align.left);
-			bottomTable.add(scroll).expand().fill().align(Align.left);
-			collapseMinimap = new TextButton("V", skin);
-			bottomTable.add(collapseMinimap).expandY().fillY().width(Value.percentHeight(1f, bottomTable)).align(Align.left);
-		}
-		table.setDebug(true); // This is optional, but enables debug lines for tables.
-
-		recalculateUI();
-	}
-
-	@Override
-	public void removedFromEngine (Engine engine) {
-		selectedEntities = null;
-		engine.removeEntityListener(this);
-
-		SpaceGame.getInstance().getInputMultiplexer().removeProcessor(stage);
-		stage.dispose();
-	}
-
-	@Override
-	public void update(float deltaTime) {
-		batch.end();
-		stage.act(deltaTime);
-		stage.draw();
-		batch.begin();
-	}
-
-	private void recalculateUI() {
-
-		LinkedHashSet<Command> commands = null;
-		for (Entity e : selectedEntities) {
-			if (commands == null) {
-				commands = new LinkedHashSet<>();
-				commands.addAll(ControllableComponent.MAPPER.get(e).commands);
-			} else {
-				commands.removeIf(command -> !ControllableComponent.MAPPER.get(e).commands.contains(command));
-			}
-		}
-
-		actionBar.clear();
-		if (commands != null) {
-			Command uiCmd = commandUI.getCommand();
-			List<ImageButton> buttons = new LinkedList<>();
-			for (Command cmd : commands) {
-				ImageButtonStyle ibs = skin.get(ImageButtonStyle.class);
-				ibs = new ImageButtonStyle(ibs);
-				ibs.imageUp = skin.getDrawable(cmd.getDrawableName());
-				if (cmd.getDrawableCheckedName() != null) {
-					ibs.imageOver = skin.getDrawable(cmd.getDrawableCheckedName());
-				}
-				//ibs.imageChecked = skin.getDrawable(cmd.getDrawableCheckedName());
-				//ibs.checkedOffsetX = 10;
-				//ibs.checkedOffsetY = 20;
-				ImageButton butt = new ImageButton(ibs);
-				buttons.add(butt);
-				butt.getImageCell().grow();
-				butt.setChecked(cmd.equals(uiCmd));
-				butt.addListener(new ChangeListener() {
-					@Override
-					public void changed(ChangeEvent event, Actor actor) {
-						if (butt.isChecked()) {
-							//Set this as the command
-							commandUI.setCommand(cmd);
-							//Disable other buttons
-							buttons.forEach((b)->{ if (b != butt) b.setChecked(false); });
-						} else {
-							//If trying to uncheck recheck
-							if (commandUI.getCommand() == cmd) {
-								butt.setChecked(true);
-							}
-						}
-					}
-				});
-				butt.addListener(new Tooltip<Actor>(new Label(cmd.getName(), skin), tooltipManager));
-				actionBar.add(butt).height(Value.percentHeight(1f, actionBar)).width(Value.percentHeight(1f, actionBar)).align(Align.left).pad(0, 5, 0, 5);
-			}
-		}
-
-	}
-
-	@Override
-	public void entityAdded(Entity entity) {
-		recalculateUI();
-	}
-
-	@Override
-	public void entityRemoved(Entity entity) {
-		recalculateUI();
-	}
+    
+    private CommandUISystem        commandUI;
+    private ImmutableArray<Entity> selectedEntities;
+    private Skin skin = SpaceGame.getInstance().getSkin();
+    
+    private TooltipManager tooltipManager;
+    
+    private DrawingBatch batch;
+    
+    private Stage      stage;
+    private Table      topTable;
+    private Table      leftTable;
+    private Table      rightTable;
+    private Table      actionBar;
+    private TextButton collapseMinimap;
+    
+    public HUDSystem(DrawingBatch batch, CommandUISystem commandUI) {
+        super(6);
+        this.batch = batch;
+        this.commandUI = commandUI;
+        tooltipManager = new TooltipManager();
+        tooltipManager.initialTime = 0.50f;
+        tooltipManager.subsequentTime = 0.00f;
+        tooltipManager.resetTime = 0.00f;
+    }
+    
+    @Override
+    public void addedToEngine(Engine engine) {
+        Family family = Family.all(SelectedComponent.class, ControllableComponent.class).get();
+        selectedEntities = engine.getEntitiesFor(family);
+        engine.addEntityListener(family, this);
+        
+        
+        stage = new Stage(new ScreenViewport());
+        SpaceGame.getInstance().getInputMultiplexer().addProcessor(0, stage);
+        
+        Table table = new Table();
+        table.setFillParent(true);
+        
+        stage.addActor(table);
+        
+        {
+            topTable = new Table();
+            table.add(topTable)
+                    .fillX()
+                    .expandX()
+                    .height(Value.percentHeight(0.035f, table))
+                    .align(Align.top)
+                    .colspan(3);
+        }
+        table.row();
+        {
+            leftTable = new Table();
+            table.add(leftTable).fillY().expandY().width(Value.percentWidth(0.20f, table)).align(Align.left);
+            
+            table.add().fill().expand();
+            
+            rightTable = new Table();
+            table.add(rightTable)
+                    .height(Value.percentWidth(0.20f, table))
+                    .width(Value.percentWidth(0.20f, table))
+                    .align(Align.bottomRight);
+        }
+        table.row();
+        {
+            Table bottomTable = new Table();
+            table.add(bottomTable)
+                    .fillX()
+                    .expandX()
+                    .height(Value.percentHeight(0.075f, table))
+                    .align(Align.bottom)
+                    .colspan(3);
+            
+            actionBar = new Table();
+            ScrollPane scroll = new ScrollPane(actionBar, skin, "noBg");
+            actionBar.align(Align.left);
+            bottomTable.add(scroll).expand().fill().align(Align.left);
+            collapseMinimap = new TextButton("V", skin);
+            bottomTable.add(collapseMinimap)
+                    .expandY()
+                    .fillY()
+                    .width(Value.percentHeight(1f, bottomTable))
+                    .align(Align.left);
+        }
+        table.setDebug(true); // This is optional, but enables debug lines for tables.
+        
+        recalculateUI();
+    }
+    
+    private void recalculateUI() {
+        
+        LinkedHashSet<Command> commands = null;
+        for (Entity e : selectedEntities) {
+            if (commands == null) {
+                commands = new LinkedHashSet<>();
+                commands.addAll(ControllableComponent.MAPPER.get(e).commands);
+            } else {
+                commands.removeIf(command -> !ControllableComponent.MAPPER.get(e).commands.contains(command));
+            }
+        }
+        
+        actionBar.clear();
+        if (commands != null) {
+            Command           uiCmd   = commandUI.getCommand();
+            List<ImageButton> buttons = new LinkedList<>();
+            for (Command cmd : commands) {
+                ImageButtonStyle ibs = skin.get(ImageButtonStyle.class);
+                ibs = new ImageButtonStyle(ibs);
+                ibs.imageUp = skin.getDrawable(cmd.getDrawableName());
+                if (cmd.getDrawableCheckedName() != null) {
+                    ibs.imageOver = skin.getDrawable(cmd.getDrawableCheckedName());
+                }
+                //ibs.imageChecked = skin.getDrawable(cmd.getDrawableCheckedName());
+                //ibs.checkedOffsetX = 10;
+                //ibs.checkedOffsetY = 20;
+                ImageButton butt = new ImageButton(ibs);
+                buttons.add(butt);
+                butt.getImageCell().grow();
+                butt.setChecked(cmd.equals(uiCmd));
+                butt.addListener(new ChangeListener() {
+                    @Override
+                    public void changed(ChangeEvent event, Actor actor) {
+                        if (butt.isChecked()) {
+                            //Set this as the command
+                            commandUI.setCommand(cmd);
+                            //Disable other buttons
+                            buttons.forEach((b) -> { if (b != butt) b.setChecked(false); });
+                        } else {
+                            //If trying to uncheck recheck
+                            if (commandUI.getCommand() == cmd) {
+                                butt.setChecked(true);
+                            }
+                        }
+                    }
+                });
+                butt.addListener(new Tooltip<Actor>(new Label(cmd.getName(), skin), tooltipManager));
+                actionBar.add(butt)
+                        .height(Value.percentHeight(1f, actionBar))
+                        .width(Value.percentHeight(1f, actionBar))
+                        .align(Align.left)
+                        .pad(0, 5, 0, 5);
+            }
+        }
+        
+    }
+    
+    @Override
+    public void removedFromEngine(Engine engine) {
+        selectedEntities = null;
+        engine.removeEntityListener(this);
+        
+        SpaceGame.getInstance().getInputMultiplexer().removeProcessor(stage);
+        stage.dispose();
+    }
+    
+    @Override
+    public void update(float deltaTime) {
+        batch.end();
+        stage.act(deltaTime);
+        stage.draw();
+        batch.begin();
+    }
+    
+    @Override
+    public void entityAdded(Entity entity) {
+        recalculateUI();
+    }
+    
+    @Override
+    public void entityRemoved(Entity entity) {
+        recalculateUI();
+    }
 }

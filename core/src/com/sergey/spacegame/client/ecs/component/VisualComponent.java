@@ -16,51 +16,53 @@ import com.sergey.spacegame.common.ecs.component.ClonableComponent;
 import java.lang.reflect.Type;
 
 public class VisualComponent implements ClonableComponent {
-	public static final ComponentMapper<VisualComponent> MAPPER = ComponentMapper.getFor(VisualComponent.class);
-	
-	private TextureRegion region;
-	private String name;
-	
-	public VisualComponent() {}
-
-	public VisualComponent(String name) {
-		setRegion(name);
-	}
-
-	@Override
-	public Component copy() {
-		return new VisualComponent(name);
-	}
-	
-	public TextureRegion getRegion() {
-		return region;
-	}
-	
-	public void setRegion(String name) {
-		this.region = SpaceGame.getInstance().getRegion(name);
-		this.name = name;
-	}
-	
-	public String getName() {
-		return name;
-	}
-	
-	public static class Adapter implements JsonSerializer<VisualComponent>, JsonDeserializer<VisualComponent> {
-
-		@Override
-		public VisualComponent deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
-			JsonObject obj = json.getAsJsonObject();
-			
-			return new VisualComponent(obj.get("image").getAsString());
-		}
-
-		@Override
-		public JsonElement serialize(VisualComponent src, Type typeOfSrc, JsonSerializationContext context) {
-			JsonObject obj = new JsonObject();
-			
-			obj.addProperty("image", src.name);
-
-			return obj;
-		}
-	}
+    
+    public static final ComponentMapper<VisualComponent> MAPPER = ComponentMapper.getFor(VisualComponent.class);
+    
+    private TextureRegion region;
+    private String        name;
+    
+    public VisualComponent() {}
+    
+    public VisualComponent(String name) {
+        setRegion(name);
+    }
+    
+    @Override
+    public Component copy() {
+        return new VisualComponent(name);
+    }
+    
+    public TextureRegion getRegion() {
+        return region;
+    }
+    
+    public void setRegion(String name) {
+        this.region = SpaceGame.getInstance().getRegion(name);
+        this.name = name;
+    }
+    
+    public String getName() {
+        return name;
+    }
+    
+    public static class Adapter implements JsonSerializer<VisualComponent>, JsonDeserializer<VisualComponent> {
+        
+        @Override
+        public VisualComponent deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws
+                JsonParseException {
+            JsonObject obj = json.getAsJsonObject();
+            
+            return new VisualComponent(obj.get("image").getAsString());
+        }
+        
+        @Override
+        public JsonElement serialize(VisualComponent src, Type typeOfSrc, JsonSerializationContext context) {
+            JsonObject obj = new JsonObject();
+            
+            obj.addProperty("image", src.name);
+            
+            return obj;
+        }
+    }
 }
