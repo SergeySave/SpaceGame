@@ -8,10 +8,10 @@ import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.utils.ImmutableArray;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
 import com.badlogic.gdx.scenes.scene2d.ui.ImageButton.ImageButtonStyle;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
+import com.badlogic.gdx.scenes.scene2d.ui.Label.LabelStyle;
 import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
@@ -33,7 +33,6 @@ import com.sergey.spacegame.common.game.command.Command;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class HUDSystem extends EntitySystem implements EntityListener {
     
@@ -46,12 +45,14 @@ public class HUDSystem extends EntitySystem implements EntityListener {
     private DrawingBatch   batch;
     private int            lastObjectives;
     
-    private Stage                                           stage;
-    private Table                                           topTable;
-    private com.badlogic.gdx.scenes.scene2d.ui.List<String> objectivesList;
-    private Table                                           rightTable;
-    private Table                                           actionBar;
-    private TextButton                                      collapseMinimap;
+    private Stage      stage;
+    private Table      topTable;
+    private Table      objectivesTable;
+    private LabelStyle notCompletedStyle;
+    private LabelStyle completedStyle;
+    private Table      rightTable;
+    private Table      actionBar;
+    private TextButton collapseMinimap;
     
     public HUDSystem(DrawingBatch batch, CommandUISystem commandUI, Level level) {
         super(6);
@@ -91,14 +92,15 @@ public class HUDSystem extends EntitySystem implements EntityListener {
         table.row();
         {  //Left
             Table leftTable = new Table();
-            table.add(leftTable).fillY().expandY().width(Value.percentWidth(0.20f, table)).align(Align.left);
-        
-            objectivesList = new com.badlogic.gdx.scenes.scene2d.ui.List<>(skin);
-            objectivesList.setTouchable(Touchable.disabled);
-            leftTable.add(objectivesList).fill().expand();
-            
-            table.add().fill().expand();
+            table.add(leftTable).fillY().expandY().width(Value.percentWidth(0.20f, table)).align(Align.topLeft);
+    
+            objectivesTable = new Table();
+            leftTable.add(objectivesTable).fill().expand().align(Align.topLeft);
+    
+            notCompletedStyle = skin.get("small", LabelStyle.class);
+            completedStyle = skin.get("smallCompleted", LabelStyle.class);
         }
+        table.add().fill().expand();
         { //Right
             rightTable = new Table();
             table.add(rightTable)
@@ -143,8 +145,8 @@ public class HUDSystem extends EntitySystem implements EntityListener {
                 commands.removeIf(command -> !ControllableComponent.MAPPER.get(e).commands.contains(command));
             }
         }
-        
-        actionBar.clear();
+    
+        actionBar.clearChildren();
         if (commands != null) {
             Command           uiCmd   = commandUI.getCommand();
             List<ImageButton> buttons = new LinkedList<>();
@@ -206,12 +208,17 @@ public class HUDSystem extends EntitySystem implements EntityListener {
         int hash = level.getObjectives().hashCode();
         if (lastObjectives != hash) {
             lastObjectives = hash;
-            objectivesList.setItems(level.getObjectives()
-                                            .stream()
-                                            .map(Objective::getTitle)
-                                            .map(SpaceGame.getInstance()::localize)
-                                            .collect(Collectors.toList())
-                                            .toArray(new String[]{}));
+            objectivesTable.clearChildren();
+            for (Objective objective : level.getObjectives()) {
+                Label label = new Label(SpaceGame.getInstance()
+                                                .localize(objective.getTitle()), objective.getCompleted() ?
+                                                completedStyle :
+                                                notCompletedStyle);
+                label.addListener(new Tooltip<Actor>(new Label(SpaceGame.getInstance()
+                                                                       .localize(objective.getDescription()), skin, "small"), tooltipManager));
+                objectivesTable.add(label).expandX().fillX().align(Align.topLeft).pad(1, 5, 1, 1);
+            }
+            objectivesTable.add().expand();
         }
         
         stage.act(deltaTime);
