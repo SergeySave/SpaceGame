@@ -31,6 +31,7 @@ import com.sergey.spacegame.common.event.Event;
 import com.sergey.spacegame.common.event.EventBus;
 import com.sergey.spacegame.common.event.GsonRegisterEvent;
 import com.sergey.spacegame.common.game.command.CommandExecutorService;
+import com.sergey.spacegame.common.lua.SpaceGameLuaLib;
 import com.sergey.spacegame.common.util.DoubleObject;
 
 import java.util.HashMap;
@@ -94,6 +95,7 @@ public class SpaceGame extends Game {
         //Register event handlers
         getEventBus().registerAnnotated(new BaseClientEventHandler());
         getEventBus().registerAnnotated(new BaseCommonEventHandler());
+        getEventBus().registerAnnotated(SpaceGameLuaLib.INSTANCE);
         regenerateAtlas();
         reloadLocalizations();
         
@@ -344,5 +346,9 @@ public class SpaceGame extends Game {
     
     public HashMap<String, String> getLocalizations() {
         return localizations;
+    }
+    
+    public String localize(String str) {
+        return localizations.getOrDefault(str, str);
     }
 }

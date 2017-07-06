@@ -6,5 +6,5 @@ obj.one-ship.title=Select a single ship
 #obj.one-ship.desc=Select a single ship description
 
 #Commands
-command.default.name=Move
+command.move.name=Move
 command.test.name=Test

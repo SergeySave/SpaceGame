@@ -58,7 +58,7 @@
 		default: { checkboxOn: check-on, checkboxOff: check-off, font: font_medium, fontColor: white }
 	},
 	com.badlogic.gdx.scenes.scene2d.ui.List$ListStyle: {
-		default: { fontColorUnselected: white, selection: selection, fontColorSelected: white, font: font_medium }
+		default: { fontColorUnselected: white, selection: transparent, fontColorSelected: white, font: font_small }
 	},
 	com.badlogic.gdx.scenes.scene2d.ui.Touchpad$TouchpadStyle: {
 		default: { background: default-pane, knob: default-round-large }

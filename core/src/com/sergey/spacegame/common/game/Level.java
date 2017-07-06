@@ -44,7 +44,9 @@ import java.nio.file.Files;
 import java.nio.file.LinkOption;
 import java.nio.file.Path;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map.Entry;
 
 public class Level {
@@ -57,12 +59,15 @@ public class Level {
     private HashMap<Class<? extends Event>, LuaEventHandler> events       = new HashMap<>();
     private HashMap<String, String>                          localization = new HashMap<>();
     
+    private transient List<Objective>        objectives;
     private transient ECSManager             ecsManager;
     private transient ImmutableArray<Entity> planets;
     private transient LevelEventRegistry     levelEventRegistry;
     
     private Level() {
         _deserializing = this;
+    
+        objectives = new ArrayList<>();
         
         ecsManager = new ECSManager();
         ecsManager.addSystem(new MovementSystem());
@@ -140,6 +145,10 @@ public class Level {
     
     public ImmutableArray<Entity> getPlanets() {
         return planets;
+    }
+    
+    public List<Objective> getObjectives() {
+        return objectives;
     }
     
     public static class LevelEventRegistry {

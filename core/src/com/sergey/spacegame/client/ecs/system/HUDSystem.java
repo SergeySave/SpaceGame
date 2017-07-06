@@ -8,6 +8,7 @@ import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.utils.ImmutableArray;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
 import com.badlogic.gdx.scenes.scene2d.ui.ImageButton.ImageButtonStyle;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
@@ -25,11 +26,14 @@ import com.sergey.spacegame.SpaceGame;
 import com.sergey.spacegame.client.ecs.component.SelectedComponent;
 import com.sergey.spacegame.client.gl.DrawingBatch;
 import com.sergey.spacegame.common.ecs.component.ControllableComponent;
+import com.sergey.spacegame.common.game.Level;
+import com.sergey.spacegame.common.game.Objective;
 import com.sergey.spacegame.common.game.command.Command;
 
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class HUDSystem extends EntitySystem implements EntityListener {
     
@@ -38,20 +42,22 @@ public class HUDSystem extends EntitySystem implements EntityListener {
     private Skin skin = SpaceGame.getInstance().getSkin();
     
     private TooltipManager tooltipManager;
+    private Level          level;
+    private DrawingBatch   batch;
+    private int            lastObjectives;
     
-    private DrawingBatch batch;
+    private Stage                                           stage;
+    private Table                                           topTable;
+    private com.badlogic.gdx.scenes.scene2d.ui.List<String> objectivesList;
+    private Table                                           rightTable;
+    private Table                                           actionBar;
+    private TextButton                                      collapseMinimap;
     
-    private Stage      stage;
-    private Table      topTable;
-    private Table      leftTable;
-    private Table      rightTable;
-    private Table      actionBar;
-    private TextButton collapseMinimap;
-    
-    public HUDSystem(DrawingBatch batch, CommandUISystem commandUI) {
+    public HUDSystem(DrawingBatch batch, CommandUISystem commandUI, Level level) {
         super(6);
         this.batch = batch;
         this.commandUI = commandUI;
+        this.level = level;
         tooltipManager = new TooltipManager();
         tooltipManager.initialTime = 0.50f;
         tooltipManager.subsequentTime = 0.00f;
@@ -72,8 +78,8 @@ public class HUDSystem extends EntitySystem implements EntityListener {
         table.setFillParent(true);
         
         stage.addActor(table);
-        
-        {
+    
+        { //Top
             topTable = new Table();
             table.add(topTable)
                     .fillX()
@@ -83,12 +89,17 @@ public class HUDSystem extends EntitySystem implements EntityListener {
                     .colspan(3);
         }
         table.row();
-        {
-            leftTable = new Table();
+        {  //Left
+            Table leftTable = new Table();
             table.add(leftTable).fillY().expandY().width(Value.percentWidth(0.20f, table)).align(Align.left);
+        
+            objectivesList = new com.badlogic.gdx.scenes.scene2d.ui.List<>(skin);
+            objectivesList.setTouchable(Touchable.disabled);
+            leftTable.add(objectivesList).fill().expand();
             
             table.add().fill().expand();
-            
+        }
+        { //Right
             rightTable = new Table();
             table.add(rightTable)
                     .height(Value.percentWidth(0.20f, table))
@@ -96,7 +107,7 @@ public class HUDSystem extends EntitySystem implements EntityListener {
                     .align(Align.bottomRight);
         }
         table.row();
-        {
+        { //Bottom
             Table bottomTable = new Table();
             table.add(bottomTable)
                     .fillX()
@@ -177,7 +188,6 @@ public class HUDSystem extends EntitySystem implements EntityListener {
                         .pad(0, 5, 0, 5);
             }
         }
-        
     }
     
     @Override
@@ -192,8 +202,21 @@ public class HUDSystem extends EntitySystem implements EntityListener {
     @Override
     public void update(float deltaTime) {
         batch.end();
+    
+        int hash = level.getObjectives().hashCode();
+        if (lastObjectives != hash) {
+            lastObjectives = hash;
+            objectivesList.setItems(level.getObjectives()
+                                            .stream()
+                                            .map(Objective::getTitle)
+                                            .map(SpaceGame.getInstance()::localize)
+                                            .collect(Collectors.toList())
+                                            .toArray(new String[]{}));
+        }
+        
         stage.act(deltaTime);
         stage.draw();
+    
         batch.begin();
     }
     

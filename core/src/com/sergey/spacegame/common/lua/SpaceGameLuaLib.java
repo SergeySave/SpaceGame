@@ -3,7 +3,11 @@ package com.sergey.spacegame.common.lua;
 import com.badlogic.ashley.core.Entity;
 import com.sergey.spacegame.SpaceGame;
 import com.sergey.spacegame.common.ecs.component.OrderComponent;
+import com.sergey.spacegame.common.event.BeginLevelEvent;
+import com.sergey.spacegame.common.event.EventHandle;
 import com.sergey.spacegame.common.event.LuaDelayEvent;
+import com.sergey.spacegame.common.game.Level;
+import com.sergey.spacegame.common.game.Objective;
 import com.sergey.spacegame.common.game.orders.BuildBuildingOrder;
 import com.sergey.spacegame.common.game.orders.BuildShipOrder;
 import com.sergey.spacegame.common.game.orders.FaceOrder;
@@ -12,6 +16,7 @@ import com.sergey.spacegame.common.game.orders.MoveOrder;
 import com.sergey.spacegame.common.game.orders.TimeMoveOrder;
 import org.luaj.vm2.LuaTable;
 import org.luaj.vm2.LuaValue;
+import org.luaj.vm2.lib.OneArgFunction;
 import org.luaj.vm2.lib.ThreeArgFunction;
 import org.luaj.vm2.lib.TwoArgFunction;
 import org.luaj.vm2.lib.jse.CoerceJavaToLua;
@@ -21,6 +26,8 @@ import java.util.HashSet;
 import java.util.Set;
 
 public class SpaceGameLuaLib extends TwoArgFunction {
+    
+    public static final SpaceGameLuaLib INSTANCE = new SpaceGameLuaLib();
     
     private static final Set<Class<? extends IOrder>> ORDERS;
     
@@ -33,20 +40,47 @@ public class SpaceGameLuaLib extends TwoArgFunction {
         ORDERS.add(TimeMoveOrder.class);
     }
     
-    public SpaceGameLuaLib() {}
+    private Level currLevel;
+    
+    private SpaceGameLuaLib() {}
     
     public LuaValue call(LuaValue modname, LuaValue env) {
         env.set("addOrder", new AddOrder());
-        env.set("postDelayEvent", new PostLuaDelayEvent());
+        env.set("postDelayEvent", new Lua3Arg((millis, id, parameter) -> {
+            SpaceGame.getInstance().dispatchDelayedEvent(millis.checklong(), new LuaDelayEvent(id, parameter));
+            return NIL;
+        }));
+        env.set("addObjective", new Lua3Arg((id, title, description) -> {
+            currLevel.getObjectives()
+                    .add(new Objective(id.checkjstring(), title.checkjstring(), description.checkjstring(), false));
+            return NIL;
+        }));
+        env.set("getObjective", new Lua1Arg((id) -> currLevel.getObjectives()
+                .stream()
+                .filter((c) -> c.getId().equals(id.checkjstring()))
+                .findAny()
+                .map(CoerceJavaToLua::coerce)
+                .orElse(NIL)));
+        env.set("removeObjective", new Lua1Arg((objective) -> {
+            //noinspection RedundantCast
+            currLevel.getObjectives().remove((Objective) CoerceLuaToJava.coerce(objective, Objective.class));
+            return NIL;
+        }));
         
         LuaTable ordersTable = new LuaTable();
         for (Class<? extends IOrder> clazz : ORDERS) {
             ordersTable.set(clazz.getSimpleName(), CoerceJavaToLua.coerce(clazz));
         }
         env.set("orders", ordersTable);
-        
-        return LuaValue.NIL;
+    
+        return NIL;
     }
+    
+    @EventHandle
+    public void onLevelStart(BeginLevelEvent event) {
+        currLevel = event.getLevel();
+    }
+    
     
     public class AddOrder extends ThreeArgFunction {
         
@@ -63,17 +97,49 @@ public class SpaceGameLuaLib extends TwoArgFunction {
             }
             IOrder orderObj = (IOrder) CoerceLuaToJava.coerce(order, (Class) CoerceLuaToJava.coerce(className, Class.class));
             orderComp.addOrder(orderObj);
-            return LuaValue.NIL;
+            return NIL;
         }
     }
     
     
-    public class PostLuaDelayEvent extends ThreeArgFunction {
+    public static class Lua1Arg extends OneArgFunction {
+        
+        private Function function;
+        
+        public Lua1Arg(Function function) {
+            this.function = function;
+        }
         
         @Override
-        public LuaValue call(LuaValue millis, LuaValue id, LuaValue parameter) {
-            SpaceGame.getInstance().dispatchDelayedEvent(millis.checklong(), new LuaDelayEvent(id, parameter));
-            return LuaValue.NIL;
+        public LuaValue call(LuaValue v) {
+            return function.call(v);
+        }
+        
+        @FunctionalInterface
+        private interface Function {
+            
+            LuaValue call(LuaValue v);
+        }
+    }
+    
+    
+    public static class Lua3Arg extends ThreeArgFunction {
+        
+        private Function function;
+        
+        public Lua3Arg(Function function) {
+            this.function = function;
+        }
+        
+        @Override
+        public LuaValue call(LuaValue v1, LuaValue v2, LuaValue v3) {
+            return function.call(v1, v2, v3);
+        }
+        
+        @FunctionalInterface
+        private interface Function {
+            
+            LuaValue call(LuaValue v1, LuaValue v2, LuaValue v3);
         }
     }
 }

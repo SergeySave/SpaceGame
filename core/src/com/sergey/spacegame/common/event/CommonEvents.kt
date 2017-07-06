@@ -2,6 +2,7 @@ package com.sergey.spacegame.common.event
 
 import com.badlogic.ashley.core.Entity
 import com.google.gson.GsonBuilder
+import com.sergey.spacegame.common.game.Level
 import com.sergey.spacegame.common.game.orders.IOrder
 import org.luaj.vm2.LuaValue
 
@@ -10,7 +11,7 @@ import org.luaj.vm2.LuaValue
 
 class GsonRegisterEvent(val gson: GsonBuilder) : Event()
 
-class BeginLevelEvent : Event()
+class BeginLevelEvent(val level: Level) : Event()
 
 class LuaDelayEvent(val id: LuaValue, val parameter: LuaValue) : Event()
 

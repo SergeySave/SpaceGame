@@ -17,7 +17,7 @@ public final class LuaCommandExecutable implements CommandExecutable {
     
     static {
         LUA_GLOBALS = LuaUtils.newStandard();
-        LUA_GLOBALS.load(new SpaceGameLuaLib());
+        LUA_GLOBALS.load(SpaceGameLuaLib.INSTANCE);
         
         iterable = new EntityIterable();
         

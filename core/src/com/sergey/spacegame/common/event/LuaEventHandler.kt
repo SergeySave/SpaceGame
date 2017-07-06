@@ -31,7 +31,7 @@ class LuaEventHandler {
         private val LUA_GLOBALS: Globals = LuaUtils.newStandard()
         
         init {
-            LUA_GLOBALS.load(SpaceGameLuaLib())
+            LUA_GLOBALS.load(SpaceGameLuaLib.INSTANCE)
         }
     }
 }
