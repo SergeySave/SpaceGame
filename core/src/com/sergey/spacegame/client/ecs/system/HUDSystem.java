@@ -167,7 +167,9 @@ public class HUDSystem extends EntitySystem implements EntityListener {
                         }
                     }
                 });
-                butt.addListener(new Tooltip<Actor>(new Label(cmd.getName(), skin), tooltipManager));
+                butt.addListener(new Tooltip<Actor>(new Label(SpaceGame.getInstance()
+                                                                      .getLocalizations()
+                                                                      .get(cmd.getName()), skin), tooltipManager));
                 actionBar.add(butt)
                         .height(Value.percentHeight(1f, actionBar))
                         .width(Value.percentHeight(1f, actionBar))

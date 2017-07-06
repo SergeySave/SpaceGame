@@ -44,9 +44,10 @@ class MainMenuScreen : BaseScreen() {
         val image = Image(SpaceGame.getInstance().getRegion("screen/mainMenu_title"))
         image.setScaling(Scaling.fit)
         table.add(image).grow().padTop(Value.percentHeight(0.01f, table))
-        
-        
-        val play = TextButton("Play", skin, "noBackgroundLarge")
+    
+        val loc = SpaceGame.getInstance().localizations
+    
+        val play = TextButton(loc["mainmenu.button.play"], skin, "noBackgroundLarge")
         play.pad(Value.percentHeight(0.1f))
         play.addListener(object : ChangeListener() {
             override fun changed(event: ChangeEvent, actor: Actor) {
@@ -55,8 +56,8 @@ class MainMenuScreen : BaseScreen() {
         })
         table.row()
         table.add(play).expandX().fillX()
-        
-        val options = TextButton("Options", skin, "noBackgroundLarge")
+    
+        val options = TextButton(loc["mainmenu.button.options"], skin, "noBackgroundLarge")
         options.pad(Value.percentHeight(0.1f))
         options.addListener(object : ChangeListener() {
             override fun changed(event: ChangeEvent, actor: Actor) {
@@ -70,7 +71,7 @@ class MainMenuScreen : BaseScreen() {
         table.add().expandY()
         
         table.row()
-        val exit = TextButton("Exit", skin, "noBackgroundLarge")
+        val exit = TextButton(loc["mainmenu.button.exit"], skin, "noBackgroundLarge")
         exit.pad(Value.percentHeight(0.1f))
         exit.addListener(object : ChangeListener() {
             override fun changed(event: ChangeEvent, actor: Actor) {

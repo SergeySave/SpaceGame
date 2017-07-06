@@ -95,6 +95,7 @@ public class SpaceGame extends Game {
         getEventBus().registerAnnotated(new BaseClientEventHandler());
         getEventBus().registerAnnotated(new BaseCommonEventHandler());
         regenerateAtlas();
+        reloadLocalizations();
         
         inputMultiplexer = new InputMultiplexer();
         Gdx.input.setInputProcessor(inputMultiplexer);
@@ -160,6 +161,15 @@ public class SpaceGame extends Game {
             
             packer.dispose();
         });
+    }
+    
+    public void reloadLocalizations() {
+        HashMap<String, String> localization = new HashMap<>();
+        
+        LocalizationRegistryEvent localizationRegistryEvent = new LocalizationRegistryEvent(localization, "en_US");
+        getEventBus().post(localizationRegistryEvent);
+        
+        this.localizations = localization;
     }
     
     private void generateFonts() {
@@ -330,15 +340,6 @@ public class SpaceGame extends Game {
     
     public void dispatchDelayedEvent(long millis, Event e) {
         delayedEvents.add(new DoubleObject<>(System.currentTimeMillis() + millis, e));
-    }
-    
-    public void reloadLocalizations() {
-        HashMap<String, String> localization = new HashMap<>();
-        
-        LocalizationRegistryEvent localizationRegistryEvent = new LocalizationRegistryEvent(localization, "en_US");
-        getEventBus().post(localizationRegistryEvent);
-        
-        this.localizations = localization;
     }
     
     public HashMap<String, String> getLocalizations() {

@@ -5,7 +5,7 @@
 			"class": "com.sergey.spacegame.common.game.command.MoveCommandExecutable",
 			"requiresInput": true,
 			"requiresTwoInput": true,
-			"name": "Move",
+			"name": "command.default.name",
 			"iconName": "icons/gotoarrow",
 			"pressedIconName": "missingTexture"
 		},
@@ -14,7 +14,7 @@
 			"lua": "file://lua/testCommand.lua",
 			"requiresInput": true,
 			"requiresTwoInput": false,
-			"name": "Test",
+			"name": "command.test.name",
 			"iconName": "building/factory",
 			"pressedIconName": "missingTexture",
 			"cursor": {

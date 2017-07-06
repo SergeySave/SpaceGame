@@ -1,9 +1,10 @@
 
-#Objective IDs
-obj.one-ship.id=select-one-ship
-
 #Objective Titles
 obj.one-ship.title=Select a single ship
 
 #Objective Description
-#obj.one-ship.desc=
+#obj.one-ship.desc=Select a single ship description
+
+#Commands
+command.default.name=Move
+command.test.name=Test

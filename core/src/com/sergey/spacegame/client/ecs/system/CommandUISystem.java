@@ -58,7 +58,7 @@ public class CommandUISystem extends EntitySystem {
     @Override
     public void update(float deltaTime) {
         if (command == null) {
-            command = level.getCommands().get("move");
+            command = level.getCommands().get("command.default.name");
             if (command == null) {
                 return;
             }
