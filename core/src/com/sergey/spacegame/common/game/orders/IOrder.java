@@ -1,6 +1,7 @@
 package com.sergey.spacegame.common.game.orders;
 
 import com.badlogic.ashley.core.Entity;
+import com.sergey.spacegame.common.ecs.system.OrderSystem;
 import com.sergey.spacegame.common.game.Level;
 
 public interface IOrder {
@@ -11,7 +12,7 @@ public interface IOrder {
     
     boolean completed();
     
-    default void init(Entity e, Level level)     {}
+    default void init(Entity e, Level level, OrderSystem orderSystem) {}
     
-    default void onCancel(Entity e, Level level) {}
+    default void onCancel(Entity e, Level level)                      {}
 }

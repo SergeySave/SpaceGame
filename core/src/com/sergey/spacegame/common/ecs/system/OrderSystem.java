@@ -1,21 +1,47 @@
 package com.sergey.spacegame.common.ecs.system;
 
+import com.badlogic.ashley.core.Engine;
 import com.badlogic.ashley.core.Entity;
+import com.badlogic.ashley.core.EntitySystem;
 import com.badlogic.ashley.core.Family;
-import com.badlogic.ashley.systems.IteratingSystem;
+import com.badlogic.ashley.utils.ImmutableArray;
 import com.sergey.spacegame.common.ecs.component.OrderComponent;
 import com.sergey.spacegame.common.game.Level;
 
-public class OrderSystem extends IteratingSystem {
+import java.util.ArrayList;
+import java.util.List;
+
+public class OrderSystem extends EntitySystem {
     
-    private Level level;
+    
+    private Level                  level;
+    private ImmutableArray<Entity> entities;
+    private List<Entity>           newlyConstructingBuildings;
     
     public OrderSystem(Level level) {
-        super(Family.all(OrderComponent.class).get());
         this.level = level;
+        newlyConstructingBuildings = new ArrayList<>();
+    }
+    
+    
+    @Override
+    public void addedToEngine(Engine engine) {
+        entities = engine.getEntitiesFor(Family.all(OrderComponent.class).get());
     }
     
     @Override
+    public void removedFromEngine(Engine engine) {
+        entities = null;
+    }
+    
+    @Override
+    public void update(float deltaTime) {
+        for (int i = 0; i < entities.size(); ++i) {
+            processEntity(entities.get(i), deltaTime);
+        }
+        newlyConstructingBuildings.clear();
+    }
+    
     protected void processEntity(Entity entity, float deltaTime) {
         OrderComponent order = OrderComponent.MAPPER.get(entity);
         
@@ -24,7 +50,7 @@ public class OrderSystem extends IteratingSystem {
             return;
         }
         
-        order.initAll(entity, level);
+        order.initAll(entity, level, this);
         
         while (order.size() > 0 && !order.peek().isValidFor(entity)) {
             order.pop();
@@ -42,5 +68,13 @@ public class OrderSystem extends IteratingSystem {
         if (order.size() == 0) {
             entity.remove(OrderComponent.class);
         }
+    }
+    
+    public void registerNewInConstruction(Entity e) {
+        newlyConstructingBuildings.add(e);
+    }
+    
+    public List<Entity> getConstructingBuildings() {
+        return newlyConstructingBuildings;
     }
 }

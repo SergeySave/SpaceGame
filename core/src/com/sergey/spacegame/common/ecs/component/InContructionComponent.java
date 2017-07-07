@@ -6,4 +6,6 @@ import com.badlogic.ashley.core.ComponentMapper;
 public class InContructionComponent implements Component {
     
     public static final ComponentMapper<InContructionComponent> MAPPER = ComponentMapper.getFor(InContructionComponent.class);
+    
+    public float timeRemaining;
 }

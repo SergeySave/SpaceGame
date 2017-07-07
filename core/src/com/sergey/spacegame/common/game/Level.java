@@ -22,6 +22,8 @@ import com.sergey.spacegame.client.event.AtlasRegistryEvent;
 import com.sergey.spacegame.client.event.LocalizationRegistryEvent;
 import com.sergey.spacegame.common.ecs.ECSManager;
 import com.sergey.spacegame.common.ecs.EntityPrototype;
+import com.sergey.spacegame.common.ecs.component.BuildingComponent;
+import com.sergey.spacegame.common.ecs.component.InContructionComponent;
 import com.sergey.spacegame.common.ecs.component.PlanetComponent;
 import com.sergey.spacegame.common.ecs.system.BuildingSystem;
 import com.sergey.spacegame.common.ecs.system.MovementSystem;
@@ -63,6 +65,7 @@ public class Level {
     private transient List<Objective>        objectives;
     private transient ECSManager             ecsManager;
     private transient ImmutableArray<Entity> planets;
+    private transient ImmutableArray<Entity> buildingsInConstruction;
     private transient LevelEventRegistry     levelEventRegistry;
     
     private Level() {
@@ -77,6 +80,8 @@ public class Level {
         ecsManager.addSystem(new PlanetSystem());
         
         planets = ecsManager.getEntitiesFor(Family.all(PlanetComponent.class).get());
+        buildingsInConstruction = ecsManager.getEntitiesFor(Family.all(BuildingComponent.class, InContructionComponent.class)
+                                                                    .get());
     }
     
     public static Level tempLevelGet() {
@@ -146,6 +151,10 @@ public class Level {
     
     public ImmutableArray<Entity> getPlanets() {
         return planets;
+    }
+    
+    public ImmutableArray<Entity> getBuildingsInConstruction() {
+        return buildingsInConstruction;
     }
     
     public List<Objective> getObjectives() {

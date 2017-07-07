@@ -4,6 +4,7 @@ import com.badlogic.ashley.core.Component;
 import com.badlogic.ashley.core.ComponentMapper;
 import com.badlogic.ashley.core.Entity;
 import com.sergey.spacegame.SpaceGame;
+import com.sergey.spacegame.common.ecs.system.OrderSystem;
 import com.sergey.spacegame.common.event.OrderInitializedEvent;
 import com.sergey.spacegame.common.game.Level;
 import com.sergey.spacegame.common.game.orders.IOrder;
@@ -59,10 +60,10 @@ public class OrderComponent implements Component, Iterable<IOrder> {
         return orders.size();
     }
     
-    public void initAll(Entity e, Level level) {
+    public void initAll(Entity e, Level level, OrderSystem orderSystem) {
         if (!needInitialization.isEmpty()) {
             needInitialization.forEach((o) -> {
-                o.init(e, level);
+                o.init(e, level, orderSystem);
                 SpaceGame.getInstance().getEventBus().post(orderInitializedEvent.get(o));
             });
             needInitialization.clear();

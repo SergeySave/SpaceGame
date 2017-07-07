@@ -59,7 +59,7 @@ public final class AngleRange {
         //Fixes angle in case its wrong
         if (angle < min) angle += (Angle.USE_DEGREES ? 360 : Angle.PI2);
         if (angle > max) angle -= (Angle.USE_DEGREES ? 360 : Angle.PI2);
-        
-        return angle >= min && angle <= max;
+    
+        return angle > min && angle < max;
     }
 }
