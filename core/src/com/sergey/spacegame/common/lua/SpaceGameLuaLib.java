@@ -19,6 +19,7 @@ import org.luaj.vm2.LuaValue;
 import org.luaj.vm2.lib.OneArgFunction;
 import org.luaj.vm2.lib.ThreeArgFunction;
 import org.luaj.vm2.lib.TwoArgFunction;
+import org.luaj.vm2.lib.ZeroArgFunction;
 import org.luaj.vm2.lib.jse.CoerceJavaToLua;
 import org.luaj.vm2.lib.jse.CoerceLuaToJava;
 
@@ -66,6 +67,11 @@ public class SpaceGameLuaLib extends TwoArgFunction {
             currLevel.getObjectives().remove((Objective) CoerceLuaToJava.coerce(objective, Objective.class));
             return NIL;
         }));
+        env.set("getMoney", new Lua0Arg(() -> LuaValue.valueOf(currLevel.getMoney())));
+        env.set("setMoney", new Lua1Arg((money) -> {
+            currLevel.setMoney(money.checkdouble());
+            return NIL;
+        }));
         
         LuaTable ordersTable = new LuaTable();
         for (Class<? extends IOrder> clazz : ORDERS) {
@@ -101,6 +107,26 @@ public class SpaceGameLuaLib extends TwoArgFunction {
         }
     }
     
+    
+    public static class Lua0Arg extends ZeroArgFunction {
+        
+        private Function function;
+        
+        public Lua0Arg(Function function) {
+            this.function = function;
+        }
+        
+        @Override
+        public LuaValue call() {
+            return function.call();
+        }
+        
+        @FunctionalInterface
+        private interface Function {
+            
+            LuaValue call();
+        }
+    }
     
     public static class Lua1Arg extends OneArgFunction {
         

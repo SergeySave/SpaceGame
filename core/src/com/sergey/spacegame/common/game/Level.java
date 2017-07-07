@@ -59,6 +59,7 @@ public class Level {
     private HashMap<Class<? extends Event>, LuaEventHandler> events       = new HashMap<>();
     private HashMap<String, String>                          localization = new HashMap<>();
     
+    private transient double                 money;
     private transient List<Objective>        objectives;
     private transient ECSManager             ecsManager;
     private transient ImmutableArray<Entity> planets;
@@ -149,6 +150,14 @@ public class Level {
     
     public List<Objective> getObjectives() {
         return objectives;
+    }
+    
+    public double getMoney() {
+        return money;
+    }
+    
+    public void setMoney(double money) {
+        this.money = money;
     }
     
     public static class LevelEventRegistry {

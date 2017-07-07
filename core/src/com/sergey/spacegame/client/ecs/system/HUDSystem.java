@@ -47,6 +47,7 @@ public class HUDSystem extends EntitySystem implements EntityListener {
     
     private Stage      stage;
     private Table      topTable;
+    private Label      moneyLabel;
     private Table      objectivesTable;
     private LabelStyle notCompletedStyle;
     private LabelStyle completedStyle;
@@ -86,8 +87,17 @@ public class HUDSystem extends EntitySystem implements EntityListener {
                     .fillX()
                     .expandX()
                     .height(Value.percentHeight(0.035f, table))
-                    .align(Align.top)
+                    .align(Align.topLeft)
                     .colspan(3);
+    
+            topTable.add(new Label(SpaceGame.getInstance().localize("game.label.money"), skin, "small"))
+                    .align(Align.left)
+                    .pad(1, 5, 1, 1);
+    
+            moneyLabel = new Label("", skin, "small");
+            topTable.add(moneyLabel).align(Align.left).pad(1, 5, 1, 1);
+    
+            topTable.add().expand();
         }
         table.row();
         {  //Left
@@ -220,6 +230,8 @@ public class HUDSystem extends EntitySystem implements EntityListener {
             }
             objectivesTable.add().expand();
         }
+    
+        moneyLabel.setText("" + level.getMoney());
         
         stage.act(deltaTime);
         stage.draw();

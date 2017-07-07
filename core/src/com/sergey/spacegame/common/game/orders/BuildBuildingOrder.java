@@ -139,7 +139,7 @@ public class BuildBuildingOrder implements IOrder {
     }
     
     public Optional<Vector2> getPosition() {
-        if (building == null) return Optional.empty();
+        if (building == null || desired == null) return Optional.empty();
         return Optional.of(desired);
     }
 }

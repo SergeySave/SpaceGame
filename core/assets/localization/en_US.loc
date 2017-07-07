@@ -3,3 +3,6 @@
 mainmenu.button.play=Play Game
 mainmenu.button.options=Options
 mainmenu.button.exit=Exit
+
+#Game labels
+game.label.money=Money:
