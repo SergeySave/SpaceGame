@@ -11,6 +11,12 @@ public final class Angle {
         this.angle = angle;
     }
     
+    public static double getThroughRotateDistance(double angle1, double angle2) {
+        double dr = Math.abs(angle1 - angle2) % (Angle.USE_DEGREES ? 360 : Angle.PI2);
+        if (dr > (Angle.USE_DEGREES ? 180 : Math.PI)) return (Angle.USE_DEGREES ? 360 : Angle.PI2) - dr;
+        return dr;
+    }
+    
     public double getAngle() {
         return angle;
     }

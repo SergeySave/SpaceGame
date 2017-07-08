@@ -6,11 +6,14 @@ import com.sergey.spacegame.common.ecs.component.BuildingComponent;
 import com.sergey.spacegame.common.ecs.component.InContructionComponent;
 import com.sergey.spacegame.common.ecs.component.PlanetComponent;
 import com.sergey.spacegame.common.ecs.component.PositionComponent;
+import com.sergey.spacegame.common.ecs.component.RotationComponent;
+import com.sergey.spacegame.common.ecs.component.RotationVelocityComponent;
 import com.sergey.spacegame.common.ecs.component.ShipComponent;
 import com.sergey.spacegame.common.ecs.component.VelocityComponent;
 import com.sergey.spacegame.common.ecs.system.OrderSystem;
 import com.sergey.spacegame.common.ecs.system.PlanetSystem;
 import com.sergey.spacegame.common.game.Level;
+import com.sergey.spacegame.common.math.Angle;
 import com.sergey.spacegame.common.math.AngleRange;
 
 import java.util.Optional;
@@ -23,6 +26,9 @@ import java.util.stream.StreamSupport;
  * @author sergeys
  */
 public class BuildBuildingOrder implements IOrder {
+    
+    private static final float   EPSILON = 1e-2f;
+    private static final Vector2 TMP     = new Vector2();
     
     private boolean           isDone;
     private Entity            building;
@@ -137,18 +143,56 @@ public class BuildBuildingOrder implements IOrder {
                     .scl(1.5f)
                     .add(planetPos.x, planetPos.y)
                     .add(20f * e.hashCode() / 2147483647f, 20f * ship.hashCode() / 2147483647f);
-            
-            double dx   = desired.x - pos.x;
-            double dy   = desired.y - pos.y;
-            double dist = Math.hypot(dx, dy);
-            if (dist < speed * deltaTime) {
+    
+            double dx              = desired.x - pos.x;
+            double dy              = desired.y - pos.y;
+            double dist            = Math.hypot(dx, dy);
+            double timePerUnitDist = dist / speed;
+            if (timePerUnitDist < deltaTime) {
                 pos.x = desired.x;
                 pos.y = desired.y;
                 e.remove(VelocityComponent.class);
                 InContructionComponent.MAPPER.get(building).timeRemaining -= deltaTime;
             } else {
-                vel.vx = (float) (speed * dx / dist);
-                vel.vy = (float) (speed * dy / dist);
+                if (RotationComponent.MAPPER.has(e)) {
+                    RotationComponent rotationComponent = RotationComponent.MAPPER.get(e);
+                    float             desiredAngle      = TMP.set((float) dx, (float) dy).angle();
+                    if (Math.abs(rotationComponent.r - desiredAngle) > EPSILON) {
+                        float timeToRotate = (float) (
+                                Angle.getThroughRotateDistance(rotationComponent.r, desiredAngle) / ship.rotateSpeed);
+                        if (timeToRotate > deltaTime) {
+                            RotationVelocityComponent rotationVelocityComponent;
+                            if (RotationVelocityComponent.MAPPER.has(e)) {
+                                rotationVelocityComponent = RotationVelocityComponent.MAPPER.get(e);
+                            } else {
+                                rotationVelocityComponent = new RotationVelocityComponent();
+                                e.add(rotationVelocityComponent);
+                            }
+                    
+                            float dr = desiredAngle - rotationComponent.r;
+                            //Fix the angle
+                            while (dr < -180) {
+                                dr += 360;
+                            }
+                            //Fix the angle
+                            while (dr > 180) {
+                                dr -= 360;
+                            }
+                    
+                            rotationVelocityComponent.vr = Math.signum(dr) * ship.rotateSpeed;
+                        } else {
+                            if (RotationVelocityComponent.MAPPER.has(e)) e.remove(RotationVelocityComponent.class);
+                            rotationComponent.r = desiredAngle;
+                            vel.vx = (float) (dx / timePerUnitDist);
+                            vel.vy = (float) (dy / timePerUnitDist);
+                        }
+                    }
+                } else {
+                    vel.vx = (float) (dx / timePerUnitDist);
+                    vel.vy = (float) (dy / timePerUnitDist);
+                }
+    
+                
             }
         } else {
             InContructionComponent.MAPPER.get(building).timeRemaining -= deltaTime;

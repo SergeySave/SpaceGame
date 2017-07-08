@@ -10,6 +10,7 @@ import com.sergey.spacegame.common.game.Level;
 import com.sergey.spacegame.common.game.orders.FaceOrder;
 import com.sergey.spacegame.common.game.orders.MoveOrder;
 import com.sergey.spacegame.common.game.orders.TimeMoveOrder;
+import com.sergey.spacegame.common.math.Angle;
 
 import java.util.stream.StreamSupport;
 
@@ -67,10 +68,12 @@ public final class MoveCommandExecutable implements CommandExecutable {
                         ang = deltaPos.angle();
                         //Turn time 1
                         times[0] = (doesTurn ?
-                                            getThroughRotateDistance(ang, RotationComponent.MAPPER.get(e).r) /
+                                            Angle.getThroughRotateDistance(ang, RotationComponent.MAPPER.get(e).r) /
                                             ship.rotateSpeed :
                                             0) + deltaPos.len() / ship.moveSpeed +
-                                   (doesTurn ? getThroughRotateDistance(fleetMoveDir, ang) / ship.rotateSpeed : 0);
+                                   (doesTurn ?
+                                            Angle.getThroughRotateDistance(fleetMoveDir, ang) / ship.rotateSpeed :
+                                            0);
                         
                         startPos.add(dx, dy);
                         times[1] = ds / ship.moveSpeed;
@@ -80,9 +83,10 @@ public final class MoveCommandExecutable implements CommandExecutable {
                         deltaPos = endPos.cpy().sub(startPos);
                         ang = deltaPos.angle();
                         //Turn time 2
-                        times[2] = (doesTurn ? getThroughRotateDistance(ang, fleetMoveDir) / ship.rotateSpeed : 0) +
+                        times[2] =
+                                (doesTurn ? Angle.getThroughRotateDistance(ang, fleetMoveDir) / ship.rotateSpeed : 0) +
                                    deltaPos.len() / ship.moveSpeed +
-                                   (doesTurn ? getThroughRotateDistance(dr, ang) / ship.rotateSpeed : 0);
+                                (doesTurn ? Angle.getThroughRotateDistance(dr, ang) / ship.rotateSpeed : 0);
                         
                         return times;
                     })
@@ -114,8 +118,8 @@ public final class MoveCommandExecutable implements CommandExecutable {
                     //Fleet rotate 1
                     ord.addOrder(new FaceOrder(ang, ship.rotateSpeed));
                     double maxTime = maxTimes[0];
-                    float  d1      = getThroughRotateDistance(ang, fleetMoveDir);
-                    float  d2      = getThroughRotateDistance(ang, RotationComponent.MAPPER.get(e).r);
+                    float  d1      = (float) Angle.getThroughRotateDistance(ang, fleetMoveDir);
+                    float  d2      = (float) Angle.getThroughRotateDistance(ang, RotationComponent.MAPPER.get(e).r);
                     float  dt      = d1 + d2;
                     float  tr      = dt / ship.rotateSpeed;
                     float  mT      = (float) (maxTime - tr);
@@ -133,7 +137,8 @@ public final class MoveCommandExecutable implements CommandExecutable {
                     //Fleet rotate 2
                     ord.addOrder(new FaceOrder(ang, ship.rotateSpeed));
                     mT = (float) (maxTimes[2] -
-                                  (getThroughRotateDistance(ang, fleetMoveDir) + getThroughRotateDistance(ang, dr)) /
+                                  (Angle.getThroughRotateDistance(ang, fleetMoveDir) +
+                                   Angle.getThroughRotateDistance(ang, dr)) /
                                   ship.rotateSpeed);
                     ord.addOrder(new TimeMoveOrder(endPos.x, endPos.y, mT));
                     ord.addOrder(new FaceOrder(dr, ship.rotateSpeed));
@@ -174,12 +179,6 @@ public final class MoveCommandExecutable implements CommandExecutable {
                 e.add(ord);
             });
         }
-    }
-    
-    private static float getThroughRotateDistance(float angle1, float angle2) {
-        float dr = Math.abs(angle1 - angle2) % 360;
-        if (dr > 180) return 360 - dr;
-        return dr;
     }
     
     @Override
