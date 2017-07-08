@@ -232,7 +232,7 @@ public class HUDSystem extends EntitySystem implements EntityListener {
             objectivesTable.add().expand();
         }
     
-        moneyLabel.setText("" + level.getMoney());
+        moneyLabel.setText(String.format("%1$,.2f", level.getMoney()));
         
         stage.act(deltaTime);
         stage.draw();
