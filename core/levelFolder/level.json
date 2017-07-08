@@ -19,7 +19,7 @@
 			"pressedIconName": "missingTexture",
 			"cursor": {
 				"class": "com.sergey.spacegame.client.ui.cursor.BuildingConstructionCursorOverride",
-				"entity": "buildingTest"
+				"entity": "moneyBuildingTest"
 			}
 		}
 	},
@@ -36,13 +36,19 @@
 				"test"
 			]
 		},
-		"buildingTest": {
+		"moneyBuildingTest": {
 			"com.sergey.spacegame.client.ecs.component.VisualComponent": { "image": "building/factory" },
 			"com.sergey.spacegame.common.ecs.component.PositionComponent": {},
 			"com.sergey.spacegame.common.ecs.component.VelocityComponent": {},
-			"com.sergey.spacegame.common.ecs.component.SizeComponent": { "w": 50, "h": 50 },
+			"com.sergey.spacegame.common.ecs.component.SizeComponent": {
+				"w": 25,
+				"h": 25
+			},
 			"com.sergey.spacegame.common.ecs.component.RotationComponent": { "originX": 0.5, "originY": 0.5 },
-			"com.sergey.spacegame.common.ecs.component.ControllableComponent": []
+			"com.sergey.spacegame.common.ecs.component.ControllableComponent": [],
+			"com.sergey.spacegame.common.ecs.component.TickableComponent": {
+				"id": "moneyBuilding"
+			}
 		}
 	},
 	"state": [
@@ -86,6 +92,7 @@
 	"events": {
 		"com.sergey.spacegame.common.event.SelectionChangeEvent": "file://lua/SelectionChangeEvent.lua",
 		"com.sergey.spacegame.common.event.BeginLevelEvent": "file://lua/BeginLevelEvent.lua",
-		"com.sergey.spacegame.common.event.LuaDelayEvent": "file://lua/LuaDelayEvent.lua"
+		"com.sergey.spacegame.common.event.LuaDelayEvent": "file://lua/LuaDelayEvent.lua",
+		"com.sergey.spacegame.common.event.EntityTickEvent": "file://lua/EntityTickEvent.lua"
 	}
 }

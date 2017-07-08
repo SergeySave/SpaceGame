@@ -29,6 +29,7 @@ import com.sergey.spacegame.common.ecs.system.BuildingSystem;
 import com.sergey.spacegame.common.ecs.system.MovementSystem;
 import com.sergey.spacegame.common.ecs.system.PlanetSystem;
 import com.sergey.spacegame.common.ecs.system.RotationSystem;
+import com.sergey.spacegame.common.ecs.system.TickableSystem;
 import com.sergey.spacegame.common.event.Event;
 import com.sergey.spacegame.common.event.EventBus;
 import com.sergey.spacegame.common.event.EventHandle;
@@ -78,6 +79,7 @@ public class Level {
         ecsManager.addSystem(new RotationSystem());
         ecsManager.addSystem(new BuildingSystem());
         ecsManager.addSystem(new PlanetSystem());
+        ecsManager.addSystem(new TickableSystem());
         
         planets = ecsManager.getEntitiesFor(Family.all(PlanetComponent.class).get());
         buildingsInConstruction = ecsManager.getEntitiesFor(Family.all(BuildingComponent.class, InContructionComponent.class)
