@@ -46,8 +46,8 @@
 			},
 			"com.sergey.spacegame.common.ecs.component.RotationComponent": { "originX": 0.5, "originY": 0.5 },
 			"com.sergey.spacegame.common.ecs.component.ControllableComponent": [],
-			"com.sergey.spacegame.common.ecs.component.TickableComponent": {
-				"id": "moneyBuilding"
+			"com.sergey.spacegame.common.ecs.component.MoneyProducerComponent": {
+				"amount": 1
 			}
 		}
 	},
