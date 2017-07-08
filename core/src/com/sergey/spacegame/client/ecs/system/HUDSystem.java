@@ -215,7 +215,8 @@ public class HUDSystem extends EntitySystem implements EntityListener {
     public void update(float deltaTime) {
         batch.end();
     
-        int hash = level.getObjectives().hashCode();
+        int hash = level.getObjectives().hashCode() * 31 + level.getObjectives()
+                .size(); //So that a list of items with hashcode -30 won't be the same no matter the size
         if (lastObjectives != hash) {
             lastObjectives = hash;
             objectivesTable.clearChildren();
