@@ -9,25 +9,29 @@ import com.sergey.spacegame.common.ecs.component.InContructionComponent
 import com.sergey.spacegame.common.ecs.component.MoneyProducerComponent
 import com.sergey.spacegame.common.game.Level
 
-class MoneyProducerSystem(private val level: Level) : IntervalSystem(1f), EntityListener {
+class MoneyProducerSystem(private val level: Level) : IntervalSystem(deltaTime.toFloat()), EntityListener {
     
-    private var perSecond: Double = 0.0
+    private var perUpdate: Double = 0.0
     
     override fun updateInterval() {
-        level.money += perSecond
+        level.money += perUpdate
     }
     
     override fun addedToEngine(engine: Engine) {
         val family = Family.all(MoneyProducerComponent::class.java).exclude(InContructionComponent::class.java).get()
-        perSecond = engine.getEntitiesFor(family).sumByDouble { e -> MoneyProducerComponent.MAPPER.get(e).amount }
+        perUpdate = engine.getEntitiesFor(family).sumByDouble { e -> MoneyProducerComponent.MAPPER.get(e).amount } * deltaTime
         engine.addEntityListener(family, this)
     }
     
     override fun entityAdded(entity: Entity) {
-        perSecond += MoneyProducerComponent.MAPPER.get(entity).amount
+        perUpdate += MoneyProducerComponent.MAPPER.get(entity).amount * deltaTime
     }
     
     override fun entityRemoved(entity: Entity) {
-        perSecond -= MoneyProducerComponent.MAPPER.get(entity).amount
+        perUpdate -= MoneyProducerComponent.MAPPER.get(entity).amount * deltaTime
+    }
+    
+    private companion object {
+        private val deltaTime: Double = 1 / 16.0 //Update 16 times a second
     }
 }
