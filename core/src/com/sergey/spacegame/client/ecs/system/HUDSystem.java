@@ -228,6 +228,7 @@ public class HUDSystem extends EntitySystem implements EntityListener {
                 label.addListener(new Tooltip<Actor>(new Label(SpaceGame.getInstance()
                                                                        .localize(objective.getDescription()), skin, "small"), tooltipManager));
                 objectivesTable.add(label).expandX().fillX().align(Align.topLeft).pad(1, 5, 1, 1);
+                objectivesTable.row();
             }
             objectivesTable.add().expand();
         }

@@ -94,6 +94,7 @@
 		"com.sergey.spacegame.common.event.SelectionChangeEvent": "file://lua/SelectionChangeEvent.lua",
 		"com.sergey.spacegame.common.event.BeginLevelEvent": "file://lua/BeginLevelEvent.lua",
 		"com.sergey.spacegame.common.event.LuaDelayEvent": "file://lua/LuaDelayEvent.lua",
-		"com.sergey.spacegame.common.event.EntityTickEvent": "file://lua/EntityTickEvent.lua"
+    "com.sergey.spacegame.common.event.EntityTickEvent": "file://lua/EntityTickEvent.lua",
+    "com.sergey.spacegame.common.event.CommandIssuedEvent": "file://lua/CommandIssuedEvent.lua"
 	}
 }

@@ -69,7 +69,7 @@ public class CommandUISystem extends EntitySystem {
                     .collect(Collectors.toList());
             SpaceGame.getInstance()
                     .getCommandExecutor()
-                    .executeCommand(command.getExecutable(), entities, entities.size(), Vector2.Zero, Vector2.Zero, level);
+                    .executeCommand(command, entities, entities.size(), Vector2.Zero, Vector2.Zero, level);
             return;
         }
         
@@ -81,7 +81,7 @@ public class CommandUISystem extends EntitySystem {
                         .collect(Collectors.toList());
                 SpaceGame.getInstance()
                         .getCommandExecutor()
-                        .executeCommand(command.getExecutable(), entities, entities.size(), new Vector2(vec.x, vec.y), Vector2.Zero, level);
+                        .executeCommand(command, entities, entities.size(), new Vector2(vec.x, vec.y), Vector2.Zero, level);
                 return;
             }
             orderCenter = new Vector2(vec.x, vec.y);
@@ -97,7 +97,7 @@ public class CommandUISystem extends EntitySystem {
                         .collect(Collectors.toList());
                 SpaceGame.getInstance()
                         .getCommandExecutor()
-                        .executeCommand(command.getExecutable(), entities, entities.size(), orderCenter, new Vector2(vec.x, vec.y), level);
+                        .executeCommand(command, entities, entities.size(), orderCenter, new Vector2(vec.x, vec.y), level);
                 orderCenter = null;
                 return;
             }
