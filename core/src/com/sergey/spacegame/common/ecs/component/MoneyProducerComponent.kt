@@ -13,7 +13,7 @@ class MoneyProducerComponent @JvmOverloads constructor(val amount: Double = 0.0)
     }
     
     companion object MAP {
-        @JvmStatic
-        val MAPPER = ComponentMapper.getFor(MoneyProducerComponent::class.java)
+        @JvmField
+        val MAPPER = ComponentMapper.getFor(MoneyProducerComponent::class.java)!!
     }
 }

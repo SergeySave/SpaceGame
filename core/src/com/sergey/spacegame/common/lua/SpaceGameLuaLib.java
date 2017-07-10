@@ -3,6 +3,7 @@ package com.sergey.spacegame.common.lua;
 import com.badlogic.ashley.core.Entity;
 import com.sergey.spacegame.SpaceGame;
 import com.sergey.spacegame.common.ecs.component.OrderComponent;
+import com.sergey.spacegame.common.ecs.component.TagComponent;
 import com.sergey.spacegame.common.event.BeginLevelEvent;
 import com.sergey.spacegame.common.event.EventHandle;
 import com.sergey.spacegame.common.event.LuaDelayEvent;
@@ -71,6 +72,14 @@ public class SpaceGameLuaLib extends TwoArgFunction {
         env.set("setMoney", new Lua1Arg((money) -> {
             currLevel.setMoney(money.checkdouble());
             return NIL;
+        }));
+        env.set("getTag", new Lua1Arg((entity) -> {
+            Entity entity1 = (Entity) CoerceLuaToJava.coerce(entity, Entity.class);
+            if (TagComponent.MAPPER.has(entity1)) {
+                return LuaValue.valueOf(TagComponent.MAPPER.get(entity1).getTag());
+            } else {
+                return NIL;
+            }
         }));
         
         LuaTable ordersTable = new LuaTable();
