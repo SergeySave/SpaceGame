@@ -225,6 +225,7 @@ public class BuildBuildingOrder implements IOrder {
         if (building != null) {
             level.getECS().removeEntity(building);
         }
+        level.setMoney(level.getMoney() + price);
     }
     
     public Optional<Vector2> getPosition() {
