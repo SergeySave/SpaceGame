@@ -6,16 +6,10 @@ import com.badlogic.ashley.core.ComponentMapper
 /**
  * @author sergeys
  */
-class TagComponent : ClonableComponent {
-    
-    var tag: String = ""
+class TagComponent @JvmOverloads constructor(var tag: String = "") : ClonableComponent {
     
     override fun copy(): Component {
-        val component = TagComponent()
-        
-        component.tag = this.tag
-        
-        return component
+        return TagComponent(tag)
     }
     
     companion object MAP {

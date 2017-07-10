@@ -6,16 +6,10 @@ import com.badlogic.ashley.core.ComponentMapper
 /**
  * @author sergeys
  */
-class TickableComponent : ClonableComponent {
-    
-    var id: String? = null
+class TickableComponent @JvmOverloads constructor(var id: String = "") : ClonableComponent {
     
     override fun copy(): Component {
-        val copy = TickableComponent()
-        
-        copy.id = this.id
-        
-        return copy
+        return TickableComponent(id)
     }
     
     companion object MAP {

@@ -5,6 +5,7 @@ import com.google.gson.GsonBuilder
 import com.sergey.spacegame.common.game.Level
 import com.sergey.spacegame.common.game.orders.IOrder
 import org.luaj.vm2.LuaValue
+import kotlin.properties.Delegates
 
 //-------------------------------------------
 //Simple events
@@ -22,13 +23,8 @@ class LuaDelayEvent(val id: LuaValue, val parameter: LuaValue) : Event()
  * Selection Change Event done in a way that the event is created through a builder that uses a single instance
  */
 class SelectionChangeEvent : Event() {
-    private var _selected: List<Entity>? = null
     
-    var selected: List<Entity>
-        get() = _selected!!
-        private set(v) {
-            _selected = v
-        }
+    var selected by Delegates.notNull<List<Entity>>()
     
     class Builder {
         private val selectionChangeEvent = SelectionChangeEvent()
@@ -45,19 +41,8 @@ class SelectionChangeEvent : Event() {
  * Selection Change Event done in a way that the event is created through a builder that uses a single instance
  */
 class CommandIssuedEvent : Event() {
-    private var _targets: Iterator<Entity>? = null
-    private var _id: String? = null
-    
-    var targets: Iterator<Entity>
-        get() = _targets!!
-        private set(v) {
-            _targets = v
-        }
-    var id: String
-        get() = _id!!
-        private set(v) {
-            _id = v
-        }
+    var targets by Delegates.notNull<Iterator<Entity>>()
+    var id by Delegates.notNull<String>()
     
     class Builder {
         private val event = CommandIssuedEvent()
@@ -75,13 +60,8 @@ class CommandIssuedEvent : Event() {
  * Order Initialized Event done in a way that the event is created through a builder that uses a single instance
  */
 class OrderInitializedEvent : Event() {
-    private var _order: IOrder? = null
     
-    var order: IOrder
-        get() = _order!!
-        private set(v) {
-            _order = v
-        }
+    var order by Delegates.notNull<IOrder>()
     
     class Builder {
         private val event = OrderInitializedEvent()

@@ -2,18 +2,13 @@ package com.sergey.spacegame.common.event
 
 import com.badlogic.ashley.core.Entity
 import com.sergey.spacegame.common.ecs.component.TickableComponent
+import kotlin.properties.Delegates
 
 /**
  * @author sergeys
  */
 open class EntityEvent : Event() {
-    private var _entity: Entity? = null
-    
-    var entity: Entity
-        get() = _entity!!
-        protected set(v) {
-            _entity = v
-        }
+    var entity by Delegates.notNull<Entity>()
 }
 
 /**
@@ -35,13 +30,8 @@ class EntityAddedEvent : EntityEvent() {
  * Building Built Event done in a way that the event is created through a builder that uses a single instance
  */
 class BuildingConstructedEvent : EntityEvent() {
-    private var _id: String? = null
     
-    var id: String
-        get() = _id!!
-        protected set(v) {
-            _id = v
-        }
+    var id by Delegates.notNull<String>()
     
     class Builder {
         private val event = BuildingConstructedEvent()
@@ -74,26 +64,16 @@ class EntityRemovedEvent : EntityEvent() {
  * Entity Tick Event done in a way that the event is created through a builder that uses a single instance
  */
 class EntityTickEvent : EntityEvent() {
-    private var _id: String? = null
-    private var _tickNum: Int? = null
     
-    var id: String
-        get() = _id!!
-        protected set(v) {
-            _id = v
-        }
-    var count: Int
-        get() = _tickNum!!
-        protected set(v) {
-            _tickNum = v
-        }
+    var id by Delegates.notNull<String>()
+    var count by Delegates.notNull<Int>()
     
     class Builder {
         private val event = EntityTickEvent()
         
         operator fun get(entity: Entity, tickableComponent: TickableComponent, count: Int): EntityTickEvent {
             event.entity = entity
-            event._id = tickableComponent.id
+            event.id = tickableComponent.id
             event.count = count
             
             return event
