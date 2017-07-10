@@ -52,6 +52,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map.Entry;
+import java.util.Set;
 
 public class Level {
     
@@ -123,10 +124,6 @@ public class Level {
     
     public void init(LevelEventRegistry ler) {
         levelEventRegistry = ler;
-        
-        for (Entry<String, Command> cmd : commands.entrySet()) {
-            cmd.getValue().setId(cmd.getKey());
-        }
     }
     
     public static Level deserializing() {
@@ -255,8 +252,16 @@ public class Level {
             JsonObject obj = json.getAsJsonObject();
             
             Level level = new Level();
-            
-            level.commands = context.deserialize(obj.get("commands"), new TypeToken<HashMap<String, Command>>() {}.getType());
+    
+            //level.commands = context.deserialize(obj.get("commands"), new TypeToken<HashMap<String, Command>>() {}.getType());
+            Set<Entry<String, JsonElement>> commands = obj.get("commands").getAsJsonObject().entrySet();
+            level.commands = new HashMap<>(commands.size());
+            for (Entry<String, JsonElement> entry : commands) {
+                JsonObject commandJson = entry.getValue().getAsJsonObject();
+                commandJson.addProperty("id", entry.getKey());
+                level.commands.put(entry.getKey(), context.deserialize(commandJson, Command.class));
+            }
+    
             level.entities = context.deserialize(obj.get("entities"), new TypeToken<HashMap<String, EntityPrototype>>() {}
                     .getType());
             

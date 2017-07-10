@@ -28,7 +28,7 @@ public final class Command {
     private CursorOverride    cursor;
     
     public Command(CommandExecutable executable, boolean requiresInput, boolean requiresTwoInput, String name,
-                   String drawableName, String drawableCheckedName, CursorOverride cursor) {
+                   String drawableName, String drawableCheckedName, CursorOverride cursor, String id) {
         this.executable = executable;
         this.requiresInput = requiresInput;
         this.requiresTwoInput = requiresTwoInput;
@@ -36,6 +36,7 @@ public final class Command {
         this.drawableName = drawableName;
         this.drawableCheckedName = drawableCheckedName;
         this.cursor = cursor;
+        this.id = id;
     }
     
     /**
@@ -73,10 +74,6 @@ public final class Command {
     
     public String getId() {
         return id;
-    }
-    
-    public void setId(String id) {
-        this.id = id;
     }
     
     public CursorOverride getCursor() {
@@ -139,6 +136,7 @@ public final class Command {
             boolean requiresInput    = obj.getAsJsonPrimitive("requiresInput").getAsBoolean();
             boolean requiresTwoInput = obj.getAsJsonPrimitive("requiresTwoInput").getAsBoolean();
             String  name             = obj.getAsJsonPrimitive("name").getAsString();
+            String  id               = obj.getAsJsonPrimitive("id").getAsString();
             String  drawableName     = obj.getAsJsonPrimitive("iconName").getAsString();
             String drawableCheckedName = Optional.ofNullable(obj.getAsJsonPrimitive("pressedIconName"))
                     .map(JsonPrimitive::getAsString)
@@ -159,8 +157,8 @@ public final class Command {
                     throw new JsonParseException("Cursor " + className + " IO Error", e);
                 }
             }
-            
-            return new Command(executable, requiresInput, requiresTwoInput, name, drawableName, drawableCheckedName, cursor);
+    
+            return new Command(executable, requiresInput, requiresTwoInput, name, drawableName, drawableCheckedName, cursor, id);
         }
         
         @Override
