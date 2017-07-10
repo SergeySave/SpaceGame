@@ -19,7 +19,8 @@
 			"pressedIconName": "missingTexture",
 			"cursor": {
 				"class": "com.sergey.spacegame.client.ui.cursor.BuildingConstructionCursorOverride",
-				"entity": "moneyBuildingTest"
+        "entity": "moneyBuildingTest",
+        "disable": "return getMoney() < 250"
 			}
 		}
 	},

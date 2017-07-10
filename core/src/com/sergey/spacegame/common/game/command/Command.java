@@ -152,8 +152,11 @@ public final class Command {
                 try {
                     Class<?> clazz = ClassLoader.getSystemClassLoader().loadClass(className);
                     cursor = context.deserialize(cursorObj, clazz);
+                    cursor.load(Level.deserializingFileSystem());
                 } catch (ClassNotFoundException e) {
                     throw new JsonParseException("Class " + className + " not found. ", e);
+                } catch (IOException e) {
+                    throw new JsonParseException("Cursor " + className + " IO Error", e);
                 }
             }
             

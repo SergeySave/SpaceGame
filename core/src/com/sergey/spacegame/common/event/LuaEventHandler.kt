@@ -11,10 +11,7 @@ class LuaEventHandler {
     var original: String
         private set
     var lua: String
-        get() = field
-        private set(value) {
-            field = value
-        }
+        private set
     
     constructor(lua: String, original: String) {
         this.code = LUA_GLOBALS.load(lua)

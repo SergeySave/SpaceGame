@@ -4,6 +4,8 @@ import com.badlogic.gdx.graphics.Cursor;
 import com.sergey.spacegame.client.gl.DrawingBatch;
 import com.sergey.spacegame.common.game.Level;
 
+import java.io.IOException;
+import java.nio.file.FileSystem;
 import java.util.Optional;
 
 public interface CursorOverride {
@@ -16,9 +18,11 @@ public interface CursorOverride {
      */
     Optional<Cursor> getRequestedCursor();
     
-    default void init()                                     {}
+    default void load(FileSystem fileSystem) throws IOException {}
     
-    default void drawExtra(Level level, DrawingBatch batch) {}
+    default void init()                                         {}
+    
+    default void drawExtra(Level level, DrawingBatch batch)     {}
     
     default boolean needsInitialization() {
         return false;
