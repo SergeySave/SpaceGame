@@ -16,7 +16,6 @@ open class EntityEvent : Event() {
         }
 }
 
-
 /**
  * Entity Added Event done in a way that the event is created through a builder that uses a single instance
  */
@@ -27,6 +26,30 @@ class EntityAddedEvent : EntityEvent() {
         operator fun get(entity: Entity): EntityAddedEvent {
             event.entity = entity
         
+            return event
+        }
+    }
+}
+
+/**
+ * Building Built Event done in a way that the event is created through a builder that uses a single instance
+ */
+class BuildingConstructedEvent : EntityEvent() {
+    private var _id: String? = null
+    
+    var id: String
+        get() = _id!!
+        protected set(v) {
+            _id = v
+        }
+    
+    class Builder {
+        private val event = BuildingConstructedEvent()
+        
+        operator fun get(entity: Entity, id: String): BuildingConstructedEvent {
+            event.entity = entity
+            event.id = id
+            
             return event
         }
     }

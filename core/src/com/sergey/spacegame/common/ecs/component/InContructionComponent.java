@@ -7,5 +7,10 @@ public class InContructionComponent implements Component {
     
     public static final ComponentMapper<InContructionComponent> MAPPER = ComponentMapper.getFor(InContructionComponent.class);
     
-    public float timeRemaining;
+    public float  timeRemaining;
+    public String entityID;
+    
+    public InContructionComponent(String entityID) {
+        this.entityID = entityID;
+    }
 }

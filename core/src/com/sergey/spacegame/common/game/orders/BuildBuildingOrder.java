@@ -2,6 +2,7 @@ package com.sergey.spacegame.common.game.orders;
 
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.math.Vector2;
+import com.sergey.spacegame.SpaceGame;
 import com.sergey.spacegame.common.ecs.component.BuildingComponent;
 import com.sergey.spacegame.common.ecs.component.InContructionComponent;
 import com.sergey.spacegame.common.ecs.component.PlanetComponent;
@@ -12,6 +13,7 @@ import com.sergey.spacegame.common.ecs.component.ShipComponent;
 import com.sergey.spacegame.common.ecs.component.VelocityComponent;
 import com.sergey.spacegame.common.ecs.system.OrderSystem;
 import com.sergey.spacegame.common.ecs.system.PlanetSystem;
+import com.sergey.spacegame.common.event.BuildingConstructedEvent;
 import com.sergey.spacegame.common.game.Level;
 import com.sergey.spacegame.common.math.Angle;
 import com.sergey.spacegame.common.math.AngleRange;
@@ -27,8 +29,9 @@ import java.util.stream.StreamSupport;
  */
 public class BuildBuildingOrder implements IOrder {
     
-    private static final float   EPSILON = 1e-2f;
-    private static final Vector2 TMP     = new Vector2();
+    private static final float                            EPSILON                  = 1e-2f;
+    private static final Vector2                          TMP                      = new Vector2();
+    private static       BuildingConstructedEvent.Builder buildingConstructedEvent = new BuildingConstructedEvent.Builder();
     
     private boolean           isDone;
     private Entity            building;
@@ -66,7 +69,7 @@ public class BuildBuildingOrder implements IOrder {
             Entity planet = closestPlanet.get();
             
             Entity                 building               = level.getEntities().get(entity).createEntity(level); //Copy of building
-            InContructionComponent inContructionComponent = new InContructionComponent();
+            InContructionComponent inContructionComponent = new InContructionComponent(entity);
             inContructionComponent.timeRemaining = time;
             building.add(inContructionComponent);
     
@@ -199,6 +202,9 @@ public class BuildBuildingOrder implements IOrder {
         }
     
         if (InContructionComponent.MAPPER.get(building).timeRemaining < 0) {
+            SpaceGame.getInstance()
+                    .getEventBus()
+                    .post(buildingConstructedEvent.get(building, InContructionComponent.MAPPER.get(building).entityID));
             building.remove(InContructionComponent.class);
             isDone = true;
         }

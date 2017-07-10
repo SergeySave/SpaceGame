@@ -9,35 +9,54 @@
 			"iconName": "icons/gotoarrow",
 			"pressedIconName": "missingTexture"
 		},
-		"test": {
+    "buildMine": {
 			"type": "lua",
-			"lua": "file://lua/testCommand.lua",
+      "lua": "file://lua/BuildMineCommand.lua",
 			"requiresInput": true,
 			"requiresTwoInput": false,
-			"name": "command.test.name",
+      "name": "command.buildMine.name",
 			"iconName": "building/factory",
 			"pressedIconName": "missingTexture",
 			"cursor": {
 				"class": "com.sergey.spacegame.client.ui.cursor.BuildingConstructionCursorOverride",
-        "entity": "moneyBuildingTest",
+        "entity": "mine1",
         "disable": "return getMoney() < 250"
 			}
-		}
+    },
+    "buildFactory": {
+      "type": "lua",
+      "lua": "file://lua/BuildFactoryCommand.lua",
+      "requiresInput": true,
+      "requiresTwoInput": false,
+      "name": "command.buildFactory.name",
+      "iconName": "building/factory",
+      "pressedIconName": "missingTexture",
+      "cursor": {
+        "class": "com.sergey.spacegame.client.ui.cursor.BuildingConstructionCursorOverride",
+        "entity": "factory1",
+        "disable": "return getMoney() < 500"
+      }
+    }
 	},
 	"entities": {
-		"shipTest1": {
+    "ship1": {
 			"com.sergey.spacegame.client.ecs.component.VisualComponent": { "image": "ships/pew" },
 			"com.sergey.spacegame.common.ecs.component.PositionComponent": {},
 			"com.sergey.spacegame.common.ecs.component.VelocityComponent": {},
-			"com.sergey.spacegame.common.ecs.component.SizeComponent": { "w": 25, "h": 25 },
+      "com.sergey.spacegame.common.ecs.component.SizeComponent": {
+        "w": 50,
+        "h": 50
+      },
 			"com.sergey.spacegame.common.ecs.component.RotationComponent": { "originX": 0.5, "originY": 0.5 },
-			"com.sergey.spacegame.common.ecs.component.ShipComponent": { "moveSpeed": 200, "rotateSpeed": 45 },
+      "com.sergey.spacegame.common.ecs.component.ShipComponent": {
+        "moveSpeed": 250,
+        "rotateSpeed": 45
+      },
 			"com.sergey.spacegame.common.ecs.component.ControllableComponent": [
-				"default",
-				"test"
+        "default"
 			]
 		},
-		"moneyBuildingTest": {
+    "mine1": {
 			"com.sergey.spacegame.client.ecs.component.VisualComponent": { "image": "building/factory" },
 			"com.sergey.spacegame.common.ecs.component.PositionComponent": {},
 			"com.sergey.spacegame.common.ecs.component.VelocityComponent": {},
@@ -50,7 +69,26 @@
 			"com.sergey.spacegame.common.ecs.component.MoneyProducerComponent": {
 				"amount": 1
 			}
-		}
+    },
+    "factory1": {
+      "com.sergey.spacegame.client.ecs.component.VisualComponent": {
+        "image": "building/factory"
+      },
+      "com.sergey.spacegame.common.ecs.component.PositionComponent": {},
+      "com.sergey.spacegame.common.ecs.component.VelocityComponent": {},
+      "com.sergey.spacegame.common.ecs.component.SizeComponent": {
+        "w": 50,
+        "h": 50
+      },
+      "com.sergey.spacegame.common.ecs.component.RotationComponent": {
+        "originX": 0.5,
+        "originY": 0.5
+      },
+      "com.sergey.spacegame.common.ecs.component.ControllableComponent": [],
+      "com.sergey.spacegame.common.ecs.component.MoneyProducerComponent": {
+        "amount": 1
+      }
+    }
 	},
 	"state": [
 		{
@@ -71,22 +109,14 @@
 			"com.sergey.spacegame.common.ecs.component.VelocityComponent": {},
 			"com.sergey.spacegame.common.ecs.component.SizeComponent": { "w": 25, "h": 25 },
 			"com.sergey.spacegame.common.ecs.component.RotationComponent":{ "originX": 0.5, "originY": 0.5, "r": 90 },
-			"com.sergey.spacegame.common.ecs.component.ShipComponent": { "moveSpeed": 200, "rotateSpeed": 45 },
+      "com.sergey.spacegame.common.ecs.component.ShipComponent": {
+        "moveSpeed": 150,
+        "rotateSpeed": 90
+      },
 			"com.sergey.spacegame.common.ecs.component.ControllableComponent": [
 				"default",
-				"test"
-			]
-		},
-		{
-			"com.sergey.spacegame.client.ecs.component.VisualComponent": { "image": "ships/pew" },
-			"com.sergey.spacegame.common.ecs.component.PositionComponent":{ "x": 200, "y": 150 },
-			"com.sergey.spacegame.common.ecs.component.VelocityComponent": {},
-			"com.sergey.spacegame.common.ecs.component.SizeComponent": { "w": 25, "h": 25 },
-			"com.sergey.spacegame.common.ecs.component.RotationComponent":{ "originX": 0.5, "originY": 0.5, "r": 90 },
-			"com.sergey.spacegame.common.ecs.component.ShipComponent": { "moveSpeed": 200, "rotateSpeed": 45 },
-			"com.sergey.spacegame.common.ecs.component.ControllableComponent": [
-				"default",
-				"test"
+        "buildMine",
+        "buildFactory"
 			]
 		}
 	],
@@ -95,6 +125,7 @@
 		"com.sergey.spacegame.common.event.BeginLevelEvent": "file://lua/BeginLevelEvent.lua",
 		"com.sergey.spacegame.common.event.LuaDelayEvent": "file://lua/LuaDelayEvent.lua",
     "com.sergey.spacegame.common.event.EntityTickEvent": "file://lua/EntityTickEvent.lua",
-    "com.sergey.spacegame.common.event.CommandIssuedEvent": "file://lua/CommandIssuedEvent.lua"
+    "com.sergey.spacegame.common.event.CommandIssuedEvent": "file://lua/CommandIssuedEvent.lua",
+    "com.sergey.spacegame.common.event.BuildingConstructedEvent": "file://lua/BuildingConstructedEvent.lua"
 	}
 }
