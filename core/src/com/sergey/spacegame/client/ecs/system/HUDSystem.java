@@ -174,20 +174,28 @@ public class HUDSystem extends EntitySystem implements EntityListener {
                 buttons.add(butt);
                 butt.getImageCell().grow();
                 butt.setChecked(cmd.equals(uiCmd));
+                butt.setProgrammaticChangeEvents(false);
                 butt.addListener(new ChangeListener() {
                     @Override
                     public void changed(ChangeEvent event, Actor actor) {
+                        buttons.forEach(b -> b.setChecked(b == butt && cmd.isRequiresInput()));
+                        commandUI.setCommand(cmd);
+                        /*
                         if (butt.isChecked()) {
                             //Set this as the command
                             commandUI.setCommand(cmd);
                             //Disable other buttons
-                            buttons.forEach((b) -> { if (b != butt) b.setChecked(false); });
+                            buttons.forEach((b) -> {
+                                if (b != butt) {
+                                    b.setChecked(false);
+                                }
+                            });
                         } else {
                             //If trying to uncheck recheck
                             if (commandUI.getCommand() == cmd) {
-                                butt.setChecked(true);
+                                butt.setChecked(cmd.isRequiresInput());
                             }
-                        }
+                        }*/
                     }
                 });
                 butt.addListener(new Tooltip<Actor>(new Label(SpaceGame.getInstance()

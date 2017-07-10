@@ -70,6 +70,7 @@ public class CommandUISystem extends EntitySystem {
             SpaceGame.getInstance()
                     .getCommandExecutor()
                     .executeCommand(command, entities, entities.size(), Vector2.Zero, Vector2.Zero, level);
+            command = null;
             return;
         }
         
