@@ -44,7 +44,8 @@ public class BuildShipOrder implements IOrder {
                                         .sub(planetPosition)
                                         .scl(1.5f)
                                         .add(planetPosition)
-                                        .add(20f * e.hashCode() / 2147483647f, 20f * pos.hashCode() / 2147483647f));
+                                        .add(20f * newEntity.hashCode() / 2147483647f,
+                                             20f * pos.hashCode() / 2147483647f));
                 } else {
                     pos.x = curr.x + 20f * newEntity.hashCode() / 2147483647f;
                     pos.y = curr.y + 20f * pos.hashCode() / 2147483647f;

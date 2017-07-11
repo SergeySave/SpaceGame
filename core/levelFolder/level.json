@@ -100,7 +100,7 @@
         "buildShip"
       ],
       "com.sergey.spacegame.common.ecs.component.MoneyProducerComponent": {
-        "amount": 1
+        "amount": 10
       }
     }
 	},
