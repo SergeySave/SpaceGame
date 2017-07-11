@@ -5,7 +5,6 @@ import com.google.gson.GsonBuilder
 import com.sergey.spacegame.common.game.Level
 import com.sergey.spacegame.common.game.orders.IOrder
 import org.luaj.vm2.LuaValue
-import kotlin.properties.Delegates
 
 //-------------------------------------------
 //Simple events
@@ -24,7 +23,7 @@ class LuaDelayEvent(val id: LuaValue, val parameter: LuaValue) : Event()
  */
 class SelectionChangeEvent : Event() {
     
-    var selected by Delegates.notNull<List<Entity>>()
+    lateinit var selected: List<Entity>
     
     class Builder {
         private val selectionChangeEvent = SelectionChangeEvent()
@@ -41,8 +40,8 @@ class SelectionChangeEvent : Event() {
  * Selection Change Event done in a way that the event is created through a builder that uses a single instance
  */
 class CommandIssuedEvent : Event() {
-    var targets by Delegates.notNull<Iterator<Entity>>()
-    var id by Delegates.notNull<String>()
+    lateinit var targets: Iterator<Entity>
+    lateinit var id: String
     
     class Builder {
         private val event = CommandIssuedEvent()
@@ -61,7 +60,7 @@ class CommandIssuedEvent : Event() {
  */
 class OrderInitializedEvent : Event() {
     
-    var order by Delegates.notNull<IOrder>()
+    lateinit var order: IOrder
     
     class Builder {
         private val event = OrderInitializedEvent()

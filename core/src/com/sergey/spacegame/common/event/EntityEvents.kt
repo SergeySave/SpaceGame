@@ -8,7 +8,7 @@ import kotlin.properties.Delegates
  * @author sergeys
  */
 open class EntityEvent : Event() {
-    var entity by Delegates.notNull<Entity>()
+    lateinit var entity: Entity
 }
 
 /**
@@ -31,7 +31,7 @@ class EntityAddedEvent : EntityEvent() {
  */
 class BuildingConstructedEvent : EntityEvent() {
     
-    var id by Delegates.notNull<String>()
+    lateinit var id: String
     
     class Builder {
         private val event = BuildingConstructedEvent()
@@ -65,7 +65,7 @@ class EntityRemovedEvent : EntityEvent() {
  */
 class EntityTickEvent : EntityEvent() {
     
-    var id by Delegates.notNull<String>()
+    lateinit var id: String
     var count by Delegates.notNull<Int>()
     
     class Builder {

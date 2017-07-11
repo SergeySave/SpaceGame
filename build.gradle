@@ -12,7 +12,7 @@ allprojects {
     apply plugin: "eclipse"
     apply plugin: "idea"
 
-    version = '1.0'
+    version = '0.0.1'
     ext {
         appName = "spacegame"
         gdxVersion = '1.9.6'
