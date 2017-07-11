@@ -45,6 +45,24 @@
       "name": "command.buildShip.name",
       "iconName": "ships/pew",
       "pressedIconName": "missingTexture"
+    },
+    "square": {
+      "type": "java",
+      "class": "com.sergey.spacegame.common.game.command.SquareFormationCommandExecutable",
+      "requiresInput": false,
+      "requiresTwoInput": false,
+      "name": "command.square.name",
+      "iconName": "ships/pew",
+      "pressedIconName": "missingTexture"
+    },
+    "triangle": {
+      "type": "java",
+      "class": "com.sergey.spacegame.common.game.command.TriangleFormationCommandExecutable",
+      "requiresInput": false,
+      "requiresTwoInput": false,
+      "name": "command.triangle.name",
+      "iconName": "ships/pew",
+      "pressedIconName": "missingTexture"
     }
 	},
 	"entities": {
@@ -62,7 +80,9 @@
         "rotateSpeed": 45
       },
 			"com.sergey.spacegame.common.ecs.component.ControllableComponent": [
-        "default"
+        "default",
+        "square",
+        "triangle"
       ],
       "com.sergey.spacegame.common.ecs.component.TagComponent": {
         "tag": "ship"

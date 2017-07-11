@@ -22,6 +22,10 @@ public class PositionComponent implements ClonableComponent {
         return new Vector2(x, y);
     }
     
+    public Vector2 setVector(Vector2 v) {
+        return v.set(x, y);
+    }
+    
     public void setFrom(Vector2 v) {
         x = v.x;
         y = v.y;
