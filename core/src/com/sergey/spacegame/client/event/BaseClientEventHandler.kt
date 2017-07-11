@@ -4,7 +4,6 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Pixmap
 import com.badlogic.gdx.graphics.g2d.PixmapPacker
 import com.sergey.spacegame.common.event.EventHandle
-import java.nio.file.Files
 
 
 class BaseClientEventHandler {
@@ -16,7 +15,7 @@ class BaseClientEventHandler {
     
     @EventHandle
     fun onLocalizationRegistry(event: LocalizationRegistryEvent) {
-        Files.lines(Gdx.files.internal("localization/${event.locale}.loc").file().toPath())
+        Gdx.files.internal("localization/${event.locale}.loc").readString().split("\n")
                 .filter { s -> !s.startsWith("#") && s.matches("([^=]+)=([^=]+)".toRegex()) }
                 .forEach { s ->
                     val parts = s.split("=".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()

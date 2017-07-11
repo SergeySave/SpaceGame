@@ -4,7 +4,6 @@ import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.utils.ImmutableArray;
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.g2d.PixmapPacker;
 import com.badlogic.gdx.utils.GdxRuntimeException;
@@ -90,10 +89,19 @@ public class Level {
     }
     
     public static Level tempLevelGet() {
-        FileHandle levelZip = Gdx.files.internal("level.sgl");
-        
+        Path levelZip = SpaceGame.getInstance().getAsset("level.sgl");
+    
         try {
-            Level level = deserialize(levelZip);
+            Path tempFile = Files.createTempFile("tmp.", ".sgl");
+    
+            System.out.println(tempFile);
+    
+            Files.copy(levelZip, Files.newOutputStream(tempFile));
+    
+            Level level = deserialize(tempFile);
+    
+            Files.delete(tempFile);
+            
             return level;
         } catch (IOException e) {
             e.printStackTrace();
@@ -102,8 +110,8 @@ public class Level {
         return null;
     }
     
-    private static synchronized Level deserialize(FileHandle levelZip) throws IOException {
-        FileSystem fileSystem = FileSystems.newFileSystem(levelZip.file().toPath(), null);
+    private static synchronized Level deserialize(Path levelZip) throws IOException {
+        FileSystem fileSystem = FileSystems.newFileSystem(levelZip, null);
         levelFile = fileSystem;
         
         Path jsonPath = fileSystem.getPath("level.json");

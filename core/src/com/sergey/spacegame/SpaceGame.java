@@ -34,6 +34,13 @@ import com.sergey.spacegame.common.game.command.CommandExecutorService;
 import com.sergey.spacegame.common.lua.SpaceGameLuaLib;
 import com.sergey.spacegame.common.util.DoubleObject;
 
+import java.io.File;
+import java.io.IOException;
+import java.net.URISyntaxException;
+import java.nio.file.FileSystems;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.PriorityQueue;
 
@@ -46,6 +53,7 @@ public class SpaceGame extends Game {
     private        TextureAtlas           atlas;
     private        Skin                   skin;
     private        FreeTypeFontGenerator  fontGenerator;
+    private        Path                   assets;
     
     private BitmapFontWrapper smallFont, mediumFont, largeFont;
     
@@ -67,6 +75,19 @@ public class SpaceGame extends Game {
     
     @Override
     public void create() {
+        try {
+            Path assetsPath = Paths.get(SpaceGame.class.getProtectionDomain().getCodeSource().getLocation().toURI());
+            if (Files.isDirectory(assetsPath)) {
+                assets = new File("").getAbsoluteFile().toPath();
+            } else {
+                assets = FileSystems.newFileSystem(assetsPath, null).getPath("");
+                //assets = FileSystems.newFileSystem(assetsPath, null);
+            }
+        } catch (IOException | URISyntaxException e) {
+            e.printStackTrace();
+            Gdx.app.exit();
+        }
+    
         instance = this;
         
         setScreen(new LoadingScreen());
@@ -350,5 +371,13 @@ public class SpaceGame extends Game {
     
     public String localize(String str) {
         return localizations.getOrDefault(str, str);
+    }
+    
+    public Path getAsset(String asset) {
+        if (!assets.toString().equals("")) {
+            return assets.resolve(asset);
+        } else {
+            return assets.resolveSibling(asset);
+        }
     }
 }
