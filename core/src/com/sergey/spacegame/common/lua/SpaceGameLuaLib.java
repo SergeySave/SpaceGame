@@ -81,6 +81,16 @@ public class SpaceGameLuaLib extends TwoArgFunction {
                 return NIL;
             }
         }));
+        LuaTable dataTable = new LuaTable();
+        for (int i = 0; i < 10; i++) {
+            final int n = i;
+            dataTable.set("get" + n, new Lua0Arg(() -> currLevel.getLuaStores()[n])); //currLevel.getLuaStores()[i]
+            dataTable.set("set" + n, new Lua1Arg((v) -> {
+                currLevel.getLuaStores()[n] = v;
+                return NIL;
+            })); //currLevel.getLuaStores()[i]
+        }
+        env.set("data", dataTable);
         
         LuaTable ordersTable = new LuaTable();
         for (Class<? extends IOrder> clazz : ORDERS) {

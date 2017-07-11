@@ -36,6 +36,7 @@ import com.sergey.spacegame.common.event.EventHandle;
 import com.sergey.spacegame.common.event.LuaEventHandler;
 import com.sergey.spacegame.common.game.command.Command;
 import com.sergey.spacegame.common.lua.LuaUtils;
+import org.luaj.vm2.LuaValue;
 
 import java.io.IOException;
 import java.lang.reflect.Type;
@@ -63,6 +64,7 @@ public class Level {
     private HashMap<Class<? extends Event>, LuaEventHandler> events       = new HashMap<>();
     private HashMap<String, String>                          localization = new HashMap<>();
     
+    private transient LuaValue[]             luaStores;
     private transient double                 money;
     private transient List<Objective>        objectives;
     private transient ECSManager             ecsManager;
@@ -72,6 +74,10 @@ public class Level {
     
     private Level() {
         _deserializing = this;
+        luaStores = new LuaValue[10];
+        for (int i = 0; i < luaStores.length; i++) {
+            luaStores[i] = LuaValue.NIL;
+        }
     
         objectives = new ArrayList<>();
         
@@ -176,6 +182,10 @@ public class Level {
     
     public void setMoney(double money) {
         this.money = money;
+    }
+    
+    public LuaValue[] getLuaStores() {
+        return luaStores;
     }
     
     public static class LevelEventRegistry {
