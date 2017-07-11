@@ -42,10 +42,10 @@ abstract class FormationCommandExecutable : CommandExecutable {
         if (width == 0f) length = 1f
         
         val angle = facingVector.angle().toDouble()
-        
-        MTX.setToScaling(length, width)
+    
+        MTX.setToTranslation(center)
         MTX.rotate(angle.toFloat())
-        MTX.translate(center.scl(1 / length, 1 / width))
+        MTX.scale(length, width)
         
         val entityIterator = entitySource.iterator()
         getDeltaPositions(numEntities).forEach { v ->

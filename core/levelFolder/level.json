@@ -99,7 +99,7 @@
 			"com.sergey.spacegame.common.ecs.component.RotationComponent": { "originX": 0.5, "originY": 0.5 },
 			"com.sergey.spacegame.common.ecs.component.ControllableComponent": [],
 			"com.sergey.spacegame.common.ecs.component.MoneyProducerComponent": {
-				"amount": 1
+        "amount": 10
 			}
     },
     "factory1": {
@@ -118,10 +118,7 @@
       },
       "com.sergey.spacegame.common.ecs.component.ControllableComponent": [
         "buildShip"
-      ],
-      "com.sergey.spacegame.common.ecs.component.MoneyProducerComponent": {
-        "amount": 10
-      }
+      ]
     }
 	},
 	"state": [
