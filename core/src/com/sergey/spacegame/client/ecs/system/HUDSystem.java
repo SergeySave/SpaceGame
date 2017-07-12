@@ -178,7 +178,7 @@ public class HUDSystem extends EntitySystem implements EntityListener {
                 butt.addListener(new ChangeListener() {
                     @Override
                     public void changed(ChangeEvent event, Actor actor) {
-                        buttons.forEach(b -> b.setChecked(b == butt && cmd.isRequiresInput()));
+                        buttons.forEach(b -> b.setChecked(b == butt && cmd.getRequiresInput()));
                         commandUI.setCommand(cmd);
                         /*
                         if (butt.isChecked()) {

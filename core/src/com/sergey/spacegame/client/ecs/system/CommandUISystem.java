@@ -63,7 +63,7 @@ public class CommandUISystem extends EntitySystem {
                 return;
             }
         }
-        if (!command.isRequiresInput()) {
+        if (!command.getRequiresInput()) {
             List<Entity> entities = StreamSupport.stream(selectedEntities.spliterator(), true)
                     .filter((e) -> ControllableComponent.MAPPER.get(e).commands.contains(command))
                     .collect(Collectors.toList());
@@ -76,7 +76,7 @@ public class CommandUISystem extends EntitySystem {
         
         if (Gdx.input.justTouched() && Gdx.input.isButtonPressed(Buttons.RIGHT)) {
             Vector3 vec = camera.unproject(new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0));
-            if (!command.isRequiresTwoInput()) {
+            if (!command.getRequiresTwoInput()) {
                 List<Entity> entities = StreamSupport.stream(selectedEntities.spliterator(), true)
                         .filter((e) -> ControllableComponent.MAPPER.get(e).commands.contains(command))
                         .collect(Collectors.toList());

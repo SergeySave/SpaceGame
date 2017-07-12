@@ -78,9 +78,9 @@ abstract class FormationCommandExecutable : CommandExecutable {
      */
     protected abstract fun getDeltaPositions(count: Int): Iterable<Vector2>
     
-    override fun equals(obj: Any?): Boolean = testEquals(obj)
+    override fun equals(other: Any?): Boolean = testEquals(other)
     
-    protected abstract fun testEquals(obj: Any?): Boolean
+    protected abstract fun testEquals(other: Any?): Boolean
     
     override fun hashCode(): Int = javaClass.hashCode()
     
@@ -123,7 +123,7 @@ class SquareFormationCommandExecutable : FormationCommandExecutable() {
         return positions
     }
     
-    override fun testEquals(obj: Any?): Boolean = obj is SquareFormationCommandExecutable
+    override fun testEquals(other: Any?): Boolean = other is SquareFormationCommandExecutable
 }
 
 class TriangleFormationCommandExecutable : FormationCommandExecutable() {
@@ -147,7 +147,7 @@ class TriangleFormationCommandExecutable : FormationCommandExecutable() {
         return positions
     }
     
-    override fun testEquals(obj: Any?): Boolean = obj is TriangleFormationCommandExecutable
+    override fun testEquals(other: Any?): Boolean = other is TriangleFormationCommandExecutable
     
     private fun Double.floor(): Int = Math.floor(this).toInt()
     private fun Double.ceil(): Int = Math.ceil(this).toInt()
