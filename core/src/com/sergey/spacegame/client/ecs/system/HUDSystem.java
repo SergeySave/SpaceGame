@@ -152,7 +152,8 @@ public class HUDSystem extends EntitySystem implements EntityListener {
                 commands = new LinkedHashSet<>();
                 commands.addAll(ControllableComponent.MAPPER.get(e).commands);
             } else {
-                commands.removeIf(command -> !ControllableComponent.MAPPER.get(e).commands.contains(command));
+                commands.removeIf(command -> !command.getAllowMulti() ||
+                                             !ControllableComponent.MAPPER.get(e).commands.contains(command));
             }
         }
     

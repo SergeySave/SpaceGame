@@ -16,9 +16,9 @@ import java.lang.reflect.Type
 /**
  * @author sergeys
  */
-data class Command(val executable: CommandExecutable, val requiresInput: Boolean, val requiresTwoInput: Boolean,
-                   val name: String, val id: String, val drawableName: String, val drawableCheckedName: String?,
-                   val cursor: CursorOverride?) {
+data class Command(val executable: CommandExecutable, val allowMulti: Boolean, val requiresInput: Boolean,
+                   val requiresTwoInput: Boolean, val name: String, val id: String, val drawableName: String,
+                   val drawableCheckedName: String?, val cursor: CursorOverride?) {
     class Adapter : JsonSerializer<Command>, JsonDeserializer<Command> {
         override fun deserialize(json: JsonElement, typeOfT: Type, context: JsonDeserializationContext): Command {
             val obj = json.asJsonObject
@@ -52,6 +52,7 @@ data class Command(val executable: CommandExecutable, val requiresInput: Boolean
                     }
                 }
             }
+            val allowMulti = obj["allowsMulti"]?.asBoolean ?: true
             val requiresInput = obj["requiresInput"]?.asBoolean ?: false
             val requiresTwoInput = obj["requiresTwoInput"]?.asBoolean ?: false
             val name = obj["name"]?.asString ?: throw JsonParseException("Command name not set")
@@ -75,8 +76,8 @@ data class Command(val executable: CommandExecutable, val requiresInput: Boolean
                 }
                 false -> null
             }
-            
-            return Command(executable, requiresInput, requiresTwoInput, name, id, drawableName, drawableCheckedName, cursor)
+    
+            return Command(executable, allowMulti, requiresInput, requiresTwoInput, name, id, drawableName, drawableCheckedName, cursor)
         }
         
         override fun serialize(src: Command, typeOfSrc: Type, context: JsonSerializationContext): JsonElement {
@@ -88,7 +89,8 @@ data class Command(val executable: CommandExecutable, val requiresInput: Boolean
                     addProperty("type", "java")
                     addProperty("class", src.executable::class.java.name)
                 }
-                
+    
+                addProperty("allowsMulti", src.allowMulti)
                 addProperty("requiresInput", src.requiresInput)
                 addProperty("requiresTwoInput", src.requiresTwoInput)
                 addProperty("name", src.name)
