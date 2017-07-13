@@ -15,4 +15,8 @@ public interface IOrder {
     default void init(Entity e, Level level, OrderSystem orderSystem) {}
     
     default void onCancel(Entity e, Level level)                      {}
+    
+    default float getEstimatedPercentComplete()                       { return -1; }
+    
+    default String getTag()                                           { return null; }
 }

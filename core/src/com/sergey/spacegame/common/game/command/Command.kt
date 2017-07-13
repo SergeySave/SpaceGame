@@ -18,7 +18,7 @@ import java.lang.reflect.Type
  */
 data class Command(val executable: CommandExecutable, val allowMulti: Boolean, val requiresInput: Boolean,
                    val requiresTwoInput: Boolean, val name: String, val id: String, val drawableName: String,
-                   val drawableCheckedName: String?, val cursor: CursorOverride?) {
+                   val drawableCheckedName: String?, val cursor: CursorOverride?, val orderTag: String?) {
     class Adapter : JsonSerializer<Command>, JsonDeserializer<Command> {
         override fun deserialize(json: JsonElement, typeOfT: Type, context: JsonDeserializationContext): Command {
             val obj = json.asJsonObject
@@ -59,6 +59,7 @@ data class Command(val executable: CommandExecutable, val allowMulti: Boolean, v
             val id = obj["id"]?.asString ?: throw JsonParseException("Command id not set") // Should never occur as set programmatically
             val drawableName = obj["iconName"]?.asString ?: throw JsonParseException("Command iconName not set")
             val drawableCheckedName = obj["pressedIconName"]?.asString //Nullable type
+            val orderTag = if (!allowMulti) obj["orderTag"].asString!! else null //Nullable but cannot be null if allowMulti is false
             val cursor: CursorOverride? = when (obj.has("cursor")) {
                 true  -> {
                     val cursorObj = obj["cursor"].asJsonObject
@@ -77,7 +78,7 @@ data class Command(val executable: CommandExecutable, val allowMulti: Boolean, v
                 false -> null
             }
     
-            return Command(executable, allowMulti, requiresInput, requiresTwoInput, name, id, drawableName, drawableCheckedName, cursor)
+            return Command(executable, allowMulti, requiresInput, requiresTwoInput, name, id, drawableName, drawableCheckedName, cursor, orderTag)
         }
         
         override fun serialize(src: Command, typeOfSrc: Type, context: JsonSerializationContext): JsonElement {
@@ -96,6 +97,7 @@ data class Command(val executable: CommandExecutable, val allowMulti: Boolean, v
                 addProperty("name", src.name)
                 addProperty("iconName", src.drawableName)
                 if (src.drawableCheckedName != null) addProperty("pressedIconName", src.drawableCheckedName)
+                if (!src.allowMulti) addProperty("orderTag", src.orderTag)
                 
                 if (src.cursor != null) {
                     add("cursor", context.serialize(src.cursor).apply {

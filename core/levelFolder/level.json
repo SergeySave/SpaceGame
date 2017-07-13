@@ -41,6 +41,7 @@
       "type": "lua",
       "lua": "file://lua/BuildShipCommand.lua",
       "allowsMulti": false,
+      "orderTag": "BuildShipOrder:ship1",
       "requiresInput": false,
       "requiresTwoInput": false,
       "name": "command.buildShip.name",

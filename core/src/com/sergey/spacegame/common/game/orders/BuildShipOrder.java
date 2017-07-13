@@ -10,12 +10,16 @@ import com.sergey.spacegame.common.game.Level;
 public class BuildShipOrder implements IOrder {
     
     private String entity;
+    private String tag;
     private float  time;
+    private float  totalTime;
     private double price;
     
     public BuildShipOrder(String entityName, float time, double price) {
         this.entity = entityName;
-        this.time = time;
+        this.tag = "BuildShipOrder:" + entityName;
+        this.time = 0;
+        this.totalTime = time;
         this.price = price;
     }
     
@@ -27,10 +31,10 @@ public class BuildShipOrder implements IOrder {
     @Override
     public void update(Entity e, float deltaTime, Level level) {
         if (time < 0) return;
-        
-        time -= deltaTime;
-        
-        if (time < 0) {
+    
+        time += deltaTime;
+    
+        if (time >= totalTime) {
             Entity newEntity = level.getEntities().get(entity).createEntity(level);
             if (PositionComponent.MAPPER.has(newEntity) && PositionComponent.MAPPER.has(e)) {
                 PositionComponent pos  = PositionComponent.MAPPER.get(newEntity);
@@ -69,5 +73,15 @@ public class BuildShipOrder implements IOrder {
     @Override
     public boolean completed() {
         return time < 0;
+    }
+    
+    @Override
+    public float getEstimatedPercentComplete() {
+        return time / totalTime;
+    }
+    
+    @Override
+    public String getTag() {
+        return tag;
     }
 }
