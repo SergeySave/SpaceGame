@@ -41,14 +41,16 @@ class SelectionChangeEvent : Event() {
  */
 class CommandIssuedEvent : Event() {
     lateinit var targets: Iterator<Entity>
+    var count: Int = 0
     lateinit var id: String
     
     class Builder {
         private val event = CommandIssuedEvent()
-        
-        operator fun get(targets: Iterator<Entity>, id: String): CommandIssuedEvent {
+    
+        operator fun get(targets: Iterator<Entity>, id: String, count: Int): CommandIssuedEvent {
             event.targets = targets
             event.id = id
+            event.count = count
             
             return event
         }

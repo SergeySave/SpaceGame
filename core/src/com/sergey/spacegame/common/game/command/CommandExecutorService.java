@@ -18,7 +18,9 @@ public class CommandExecutorService {
                                Vector2 start, Vector2 end, Level level) {
         if (numEntities == 0) return;
         command.getExecutable().issue(entitySource, numEntities, start, end, level);
-        SpaceGame.getInstance().getEventBus().post(commandIssuedEvent.get(entitySource.iterator(), command.getId()));
+        SpaceGame.getInstance()
+                .getEventBus()
+                .post(commandIssuedEvent.get(entitySource.iterator(), command.getId(), numEntities));
         //If replay is wanted it can be implemented by remembering the times that this was called
     }
 }

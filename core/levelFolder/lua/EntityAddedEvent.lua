@@ -18,6 +18,7 @@ if getTag(event:getEntity()) == 'ship' then
 
         if (objective and not objective:getCompleted()) then
             objective:setCompleted(true)
+            addObjective('obj.select-10ship.id', 'obj.select-10ship.title', 'obj.select-10ship.desc')
         end
     end
 end

@@ -90,6 +90,25 @@
         "tag": "ship"
       }
 		},
+    "enemy1": {
+      "com.sergey.spacegame.client.ecs.component.VisualComponent": {
+        "image": "ships/enepew"
+      },
+      "com.sergey.spacegame.common.ecs.component.PositionComponent": {},
+      "com.sergey.spacegame.common.ecs.component.VelocityComponent": {},
+      "com.sergey.spacegame.common.ecs.component.SizeComponent": {
+        "w": 30,
+        "h": 30
+      },
+      "com.sergey.spacegame.common.ecs.component.RotationComponent": {
+        "originX": 0.5,
+        "originY": 0.5
+      },
+      "com.sergey.spacegame.common.ecs.component.ShipComponent": {
+        "moveSpeed": 250,
+        "rotateSpeed": 45
+      }
+    },
     "mine1": {
 			"com.sergey.spacegame.client.ecs.component.VisualComponent": { "image": "building/factory" },
 			"com.sergey.spacegame.common.ecs.component.PositionComponent": {},

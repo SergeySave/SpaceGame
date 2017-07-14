@@ -81,6 +81,11 @@ public class SpaceGameLuaLib extends TwoArgFunction {
                 return NIL;
             }
         }));
+        env.set("spawnEntity", new Lua1Arg((entityName) -> {
+            Entity entity = currLevel.getEntities().get(entityName.checkjstring()).createEntity(currLevel);
+            currLevel.getECS().addEntity(entity);
+            return CoerceJavaToLua.coerce(entity);
+        }));
         LuaTable dataTable = new LuaTable();
         for (int i = 0; i < 10; i++) {
             final int n = i;
