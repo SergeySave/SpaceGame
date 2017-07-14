@@ -30,7 +30,7 @@ public class BuildShipOrder implements IOrder {
     
     @Override
     public void update(Entity e, float deltaTime, Level level) {
-        if (time < 0) return;
+        if (time >= totalTime) return;
     
         time += deltaTime;
     
@@ -72,7 +72,7 @@ public class BuildShipOrder implements IOrder {
     
     @Override
     public boolean completed() {
-        return time < 0;
+        return time >= totalTime;
     }
     
     @Override

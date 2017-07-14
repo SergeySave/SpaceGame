@@ -8,12 +8,14 @@ import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.utils.ImmutableArray;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
 import com.badlogic.gdx.scenes.scene2d.ui.ImageButton.ImageButtonStyle;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Label.LabelStyle;
 import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.scenes.scene2d.ui.Stack;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.ui.Tooltip;
@@ -26,12 +28,15 @@ import com.sergey.spacegame.SpaceGame;
 import com.sergey.spacegame.client.ecs.component.SelectedComponent;
 import com.sergey.spacegame.client.gl.DrawingBatch;
 import com.sergey.spacegame.common.ecs.component.ControllableComponent;
+import com.sergey.spacegame.common.ecs.component.OrderComponent;
 import com.sergey.spacegame.common.game.Level;
 import com.sergey.spacegame.common.game.Objective;
 import com.sergey.spacegame.common.game.command.Command;
+import com.sergey.spacegame.common.game.orders.IOrder;
 
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.LinkedHashSet;
-import java.util.LinkedList;
 import java.util.List;
 
 public class HUDSystem extends EntitySystem implements EntityListener {
@@ -55,6 +60,8 @@ public class HUDSystem extends EntitySystem implements EntityListener {
     private Table      actionBar;
     private TextButton collapseMinimap;
     
+    private List<CommandButton> buttons;
+    
     public HUDSystem(DrawingBatch batch, CommandUISystem commandUI, Level level) {
         super(6);
         this.batch = batch;
@@ -64,6 +71,8 @@ public class HUDSystem extends EntitySystem implements EntityListener {
         tooltipManager.initialTime = 0.50f;
         tooltipManager.subsequentTime = 0.00f;
         tooltipManager.resetTime = 0.00f;
+    
+        buttons = new ArrayList<>();
     }
     
     @Override
@@ -157,58 +166,91 @@ public class HUDSystem extends EntitySystem implements EntityListener {
             }
         }
     
-        actionBar.clearChildren();
         if (commands != null) {
-            Command           uiCmd   = commandUI.getCommand();
-            List<ImageButton> buttons = new LinkedList<>();
-            for (Command cmd : commands) {
-                ImageButtonStyle ibs = skin.get(ImageButtonStyle.class);
-                ibs = new ImageButtonStyle(ibs);
-                ibs.imageUp = skin.getDrawable(cmd.getDrawableName());
-                if (cmd.getDrawableCheckedName() != null) {
-                    ibs.imageOver = skin.getDrawable(cmd.getDrawableCheckedName());
-                }
-                //ibs.imageChecked = skin.getDrawable(cmd.getDrawableCheckedName());
-                //ibs.checkedOffsetX = 10;
-                //ibs.checkedOffsetY = 20;
-                ImageButton butt = new ImageButton(ibs);
-                buttons.add(butt);
-                butt.getImageCell().grow();
-                butt.setChecked(cmd.equals(uiCmd));
-                butt.setProgrammaticChangeEvents(false);
-                butt.addListener(new ChangeListener() {
-                    @Override
-                    public void changed(ChangeEvent event, Actor actor) {
-                        buttons.forEach(b -> b.setChecked(b == butt && cmd.getRequiresInput()));
-                        commandUI.setCommand(cmd);
-                        /*
-                        if (butt.isChecked()) {
-                            //Set this as the command
-                            commandUI.setCommand(cmd);
-                            //Disable other buttons
-                            buttons.forEach((b) -> {
-                                if (b != butt) {
-                                    b.setChecked(false);
-                                }
-                            });
-                        } else {
-                            //If trying to uncheck recheck
-                            if (commandUI.getCommand() == cmd) {
-                                butt.setChecked(cmd.isRequiresInput());
-                            }
-                        }*/
+            if (commands.size() >= buttons.size()) {
+                Iterator<Command> iterator = commands.iterator();
+                int               i        = 0;
+                while (iterator.hasNext()) {
+                    CommandButton button;
+                    if (i >= buttons.size()) {
+                        buttons.add(button = newCommandButton());
+                
+                        actionBar.add(button.stack)
+                                .height(Value.percentHeight(1f, actionBar))
+                                .width(Value.percentHeight(1f, actionBar))
+                                .align(Align.left)
+                                .pad(0, 5, 0, 5);
+                    } else {
+                        button = buttons.get(i);
                     }
-                });
-                butt.addListener(new Tooltip<Actor>(new Label(SpaceGame.getInstance()
-                                                                      .getLocalizations()
-                                                                      .get(cmd.getName()), skin), tooltipManager));
-                actionBar.add(butt)
-                        .height(Value.percentHeight(1f, actionBar))
-                        .width(Value.percentHeight(1f, actionBar))
-                        .align(Align.left)
-                        .pad(0, 5, 0, 5);
+            
+                    setVisible(button, iterator.next());
+            
+                    ++i;
+                }
+            } else {
+                Iterator<Command> iterator = commands.iterator();
+                for (int i = 0; i < buttons.size(); i++) {
+                    CommandButton button = buttons.get(i);
+                    if (i >= commands.size()) {
+                        button.stack.setVisible(false);
+                        button.command = null;
+                    } else {
+                        setVisible(button, iterator.next());
+                    }
+                }
+            }
+        } else {
+            for (CommandButton button : buttons) {
+                button.stack.setVisible(false);
             }
         }
+    }
+    
+    private CommandButton newCommandButton() {
+        CommandButton commandButton = new CommandButton();
+        commandButton.stack = new Stack();
+        {
+            ImageButtonStyle ibs = skin.get(ImageButtonStyle.class);
+            ibs = new ImageButtonStyle(ibs);
+            
+            commandButton.button = new ImageButton(ibs);
+            commandButton.button.getImageCell().grow();
+            commandButton.button.setProgrammaticChangeEvents(false);
+            commandButton.button.addListener(new ChangeListener() {
+                @Override
+                public void changed(ChangeEvent event, Actor actor) {
+                    buttons.forEach(b -> b.button.setChecked(
+                            b.button == commandButton.button && commandButton.command.getRequiresInput()));
+                    commandUI.setCommand(commandButton.command);
+                }
+            });
+            commandButton.tooltipLabel = new Label("", skin);
+            commandButton.button.addListener(new Tooltip<Actor>(commandButton.tooltipLabel, tooltipManager));
+            
+            commandButton.stack.add(commandButton.button);
+        }
+        commandButton.label = new Label("", skin, "small");
+        commandButton.label.setAlignment(Align.bottomLeft);
+        commandButton.label.setVisible(false);
+        commandButton.label.setTouchable(Touchable.disabled);
+        commandButton.stack.add(commandButton.label);
+        
+        return commandButton;
+    }
+    
+    private void setVisible(CommandButton button, Command command) {
+        button.command = command;
+        button.button.setChecked(button.command.equals(commandUI.getCommand()));
+        button.stack.setVisible(true);
+        ImageButtonStyle style = button.button.getStyle();
+        style.imageUp = skin.getDrawable(button.command.getDrawableName());
+        if (button.command.getDrawableCheckedName() == null) {
+            style.imageOver = null;
+        } else {
+            style.imageOver = skin.getDrawable(button.command.getDrawableCheckedName());
+        }
+        button.tooltipLabel.setText(SpaceGame.getInstance().localize(button.command.getName()));
     }
     
     @Override
@@ -243,11 +285,45 @@ public class HUDSystem extends EntitySystem implements EntityListener {
         }
     
         moneyLabel.setText(String.format("%1$,.2f", level.getMoney()));
+    
+        updateCommands();
         
         stage.act(deltaTime);
         stage.draw();
     
         batch.begin();
+    }
+    
+    private void updateCommands() {
+        for (CommandButton button : buttons) {
+            if (button.command == null) return;
+            
+            if (!button.command.getAllowMulti()) {
+                String orderTag = button.command.getOrderTag();
+                if (selectedEntities.size() == 0 || orderTag == null) {
+                    continue;
+                }
+                Entity entity = selectedEntities.first(); // Only one entity available since it's a not allow multi
+                
+                OrderComponent orderComponent = OrderComponent.MAPPER.get(entity);
+                if (orderComponent == null) {
+                    button.label.setVisible(false);
+                } else {
+                    int count = 0;
+                    
+                    for (IOrder order : orderComponent) {
+                        if (orderTag.equals(order.getTag())) ++count;
+                    }
+                    
+                    if (count > 1) {
+                        button.label.setVisible(true);
+                        button.label.setText("" + count);
+                    } else {
+                        button.label.setVisible(false);
+                    }
+                }
+            }
+        }
     }
     
     @Override
@@ -258,5 +334,16 @@ public class HUDSystem extends EntitySystem implements EntityListener {
     @Override
     public void entityRemoved(Entity entity) {
         recalculateUI();
+    }
+    
+    private static class CommandButton {
+        
+        public Command command;
+        
+        public Stack stack;
+        
+        public ImageButton button;
+        public Label       tooltipLabel;
+        public Label       label;
     }
 }
