@@ -32,7 +32,7 @@ import com.sergey.spacegame.common.event.EventBus;
 import com.sergey.spacegame.common.event.GsonRegisterEvent;
 import com.sergey.spacegame.common.game.command.CommandExecutorService;
 import com.sergey.spacegame.common.lua.SpaceGameLuaLib;
-import com.sergey.spacegame.common.util.DoubleObject;
+import com.sergey.spacegame.common.util.Pair;
 
 import java.io.File;
 import java.io.IOException;
@@ -62,7 +62,7 @@ public class SpaceGame extends Game {
     
     private EventBus eventBus;
     
-    private PriorityQueue<DoubleObject<Long, Event>> delayedEvents;
+    private PriorityQueue<Pair<Long, Event>> delayedEvents;
     
     private HashMap<String, String> localizations = new HashMap<>();
     
@@ -362,7 +362,7 @@ public class SpaceGame extends Game {
     }
     
     public void dispatchDelayedEvent(long millis, Event e) {
-        delayedEvents.add(new DoubleObject<>(System.currentTimeMillis() + millis, e));
+        delayedEvents.add(new Pair<>(System.currentTimeMillis() + millis, e));
     }
     
     public HashMap<String, String> getLocalizations() {
