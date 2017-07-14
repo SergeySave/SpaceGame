@@ -8,11 +8,12 @@ import com.badlogic.gdx.math.MathUtils
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable
 
 
-class RadialSprite @JvmOverloads constructor(textureRegion: TextureRegion) : Drawable {
+class RadialSprite(textureRegion: TextureRegion) : Drawable {
     
     var texture: Texture? = null
         private set
     
+    //Verts: x,y,color,u,v
     private val verts = FloatArray(60)
     
     private var x: Float = 0f
@@ -101,63 +102,64 @@ class RadialSprite @JvmOverloads constructor(textureRegion: TextureRegion) : Dra
         val y2 = y + height
         val xc = x + centerX
         val yc = y + centerY
-        val ax = MathUtils.cosDeg(angle + angleOffset) // positive right, negative left
-        val ay = MathUtils.sinDeg(angle + angleOffset) // positive top, negative bottom
+        val ax = MathUtils.cosDeg(angle + 270) // positive right, negative left
+        val ay = MathUtils.sinDeg(angle + 270) // positive top, negative bottom
         val txa = if (ax != 0f) Math.abs(centerX / ax) else 99999999f // intersection on left or right "wall"
         val tya = if (ay != 0f) Math.abs(centerY / ay) else 99999999f // intersection on top or bottom "wall"
         val t = Math.min(txa, tya)
         // tx and ty are the intersection points relative to centerX and centerY.
         val tx = t * ax
         val ty = t * ay
-        vert(verts, BOTTOMRIGHT1, x + centerX, y)
+    
+        vert(verts, BOTTOMRIGHT1, xc, y2)
         if (ax >= 0f) {
             // rotation on the rights half
-            vert(verts, TOPLEFT1, x, y2)
-            vert(verts, TOPRIGHT1, xc, y2)
-            vert(verts, BOTTOMLEFT1, x, y)
+            vert(verts, TOPLEFT1, x, y)
+            vert(verts, TOPRIGHT1, xc, y)
+            vert(verts, BOTTOMLEFT1, x, y2)
             vert(verts, BOTTOMLEFT2, xc, yc)
-            vert(verts, TOPLEFT2, xc, y2)
+            vert(verts, TOPLEFT2, xc, y)
             if (txa < tya) {
                 // rotation on the right side
-                vert(verts, TOPRIGHT2, x2, y2)
-                vert(verts, BOTTOMRIGHT2, x2, yc + ty)
+                vert(verts, TOPRIGHT2, x2, y)
+                vert(verts, BOTTOMRIGHT2, x2, yc - ty)
                 draw = 2
             } else if (ay > 0f) {
                 // rotation on the top side
-                vert(verts, BOTTOMRIGHT2, xc + tx, y2)
-                vert(verts, TOPRIGHT2, xc + tx * 0.5f, y2)
+                vert(verts, BOTTOMRIGHT2, xc + tx, y)
+                vert(verts, TOPRIGHT2, xc + tx * 0.5f, y)
                 draw = 2
             } else {
                 // rotation on the bottom side
-                vert(verts, TOPRIGHT2, x2, y2)
-                vert(verts, BOTTOMRIGHT2, x2, y)
+                vert(verts, TOPRIGHT2, x2, y)
+                vert(verts, BOTTOMRIGHT2, x2, y2)
                 vert(verts, TOPLEFT3, xc, yc)
-                vert(verts, TOPRIGHT3, x2, y)
-                vert(verts, BOTTOMLEFT3, xc + tx, y)
-                vert(verts, BOTTOMRIGHT3, xc + tx * 0.5f, y)
+                vert(verts, TOPRIGHT3, x2, y2)
+                vert(verts, BOTTOMLEFT3, xc + tx, y2)
+                vert(verts, BOTTOMRIGHT3, xc + tx * 0.5f, y2)
                 draw = 3
             }
         } else {
             // rotation on the left half
-            vert(verts, TOPRIGHT1, x + centerX, y + centerY)
+            vert(verts, TOPRIGHT1, x + centerX, y2 - centerY)
             if (txa < tya) {
                 // rotation on the left side
-                vert(verts, BOTTOMLEFT1, x, y)
-                vert(verts, TOPLEFT1, x, yc + ty)
+                vert(verts, BOTTOMLEFT1, x, y2)
+                vert(verts, TOPLEFT1, x, yc - ty)
                 draw = 1
             } else if (ay < 0f) {
                 // rotation on the bottom side
-                vert(verts, TOPLEFT1, xc + tx, y)
-                vert(verts, BOTTOMLEFT1, xc + tx * 0.5f, y)
+                vert(verts, TOPLEFT1, xc + tx, y2)
+                vert(verts, BOTTOMLEFT1, xc + tx * 0.5f, y2)
                 draw = 1
             } else {
                 // rotation on the top side
-                vert(verts, TOPLEFT1, x, y2)
-                vert(verts, BOTTOMLEFT1, x, y)
+                vert(verts, TOPLEFT1, x, y)
+                vert(verts, BOTTOMLEFT1, x, y2)
                 vert(verts, BOTTOMRIGHT2, xc, yc)
-                vert(verts, BOTTOMLEFT2, x, y2)
-                vert(verts, TOPLEFT2, xc + tx * 0.5f, y2)
-                vert(verts, TOPRIGHT2, xc + tx, y2)
+                vert(verts, BOTTOMLEFT2, x, y)
+                vert(verts, TOPLEFT2, xc + tx * 0.5f, y)
+                vert(verts, TOPRIGHT2, xc + tx, y)
                 draw = 2
             }
         }
@@ -243,16 +245,16 @@ class RadialSprite @JvmOverloads constructor(textureRegion: TextureRegion) : Dra
     }
     
     private companion object {
-        val angleOffset = 270f
-        
         val TOPRIGHT1 = 0
         val BOTTOMRIGHT1 = 5
         val BOTTOMLEFT1 = 10
         val TOPLEFT1 = 15
+    
         val TOPRIGHT2 = 20
         val BOTTOMRIGHT2 = 25
         val BOTTOMLEFT2 = 30
         val TOPLEFT2 = 35
+    
         val TOPRIGHT3 = 40
         val BOTTOMRIGHT3 = 45
         val BOTTOMLEFT3 = 50
