@@ -9,6 +9,8 @@ import com.badlogic.ashley.utils.ImmutableArray;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.Touchable;
+import com.badlogic.gdx.scenes.scene2d.ui.Container;
+import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
 import com.badlogic.gdx.scenes.scene2d.ui.ImageButton.ImageButtonStyle;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
@@ -27,6 +29,7 @@ import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.sergey.spacegame.SpaceGame;
 import com.sergey.spacegame.client.ecs.component.SelectedComponent;
 import com.sergey.spacegame.client.gl.DrawingBatch;
+import com.sergey.spacegame.client.ui.scene2d.RadialSprite;
 import com.sergey.spacegame.common.ecs.component.ControllableComponent;
 import com.sergey.spacegame.common.ecs.component.OrderComponent;
 import com.sergey.spacegame.common.game.Level;
@@ -220,8 +223,9 @@ public class HUDSystem extends EntitySystem implements EntityListener {
             commandButton.button.addListener(new ChangeListener() {
                 @Override
                 public void changed(ChangeEvent event, Actor actor) {
-                    buttons.forEach(b -> b.button.setChecked(
-                            b.button == commandButton.button && commandButton.command.getRequiresInput()));
+                    //buttons.forEach(b -> b.button.setChecked(
+                    //       b.button == commandButton.button && commandButton.command.getRequiresInput()));
+                    commandButton.button.setChecked(true);
                     commandUI.setCommand(commandButton.command);
                 }
             });
@@ -230,11 +234,24 @@ public class HUDSystem extends EntitySystem implements EntityListener {
             
             commandButton.stack.add(commandButton.button);
         }
-        commandButton.label = new Label("", skin, "small");
-        commandButton.label.setAlignment(Align.bottomLeft);
-        commandButton.label.setVisible(false);
-        commandButton.label.setTouchable(Touchable.disabled);
-        commandButton.stack.add(commandButton.label);
+        {
+            commandButton.radialSprite = new RadialSprite(SpaceGame.getInstance().getRegion("radialBar"));
+        
+            Image radialImage = new Image(commandButton.radialSprite);
+            commandButton.radialSpriteContainer = new Container<>(radialImage);
+            commandButton.radialSpriteContainer.fill();
+            commandButton.radialSpriteContainer.setVisible(false);
+            commandButton.radialSpriteContainer.setTouchable(Touchable.disabled);
+        
+            commandButton.stack.add(commandButton.radialSpriteContainer);
+        }
+        {
+            commandButton.label = new Label("", skin, "small");
+            commandButton.label.setAlignment(Align.bottomLeft);
+            commandButton.label.setVisible(false);
+            commandButton.label.setTouchable(Touchable.disabled);
+            commandButton.stack.add(commandButton.label);
+        }
         
         return commandButton;
     }
@@ -251,6 +268,8 @@ public class HUDSystem extends EntitySystem implements EntityListener {
             style.imageOver = skin.getDrawable(button.command.getDrawableCheckedName());
         }
         button.tooltipLabel.setText(SpaceGame.getInstance().localize(button.command.getName()));
+        button.label.setVisible(false);
+        button.radialSpriteContainer.setVisible(false);
     }
     
     @Override
@@ -297,6 +316,8 @@ public class HUDSystem extends EntitySystem implements EntityListener {
     private void updateCommands() {
         for (CommandButton button : buttons) {
             if (button.command == null) return;
+    
+            button.button.setChecked(button.command.equals(commandUI.getCommand()));
             
             if (!button.command.getAllowMulti()) {
                 String orderTag = button.command.getOrderTag();
@@ -308,11 +329,24 @@ public class HUDSystem extends EntitySystem implements EntityListener {
                 OrderComponent orderComponent = OrderComponent.MAPPER.get(entity);
                 if (orderComponent == null) {
                     button.label.setVisible(false);
+                    button.radialSpriteContainer.setVisible(false);
                 } else {
-                    int count = 0;
+                    int   count     = 0;
+                    float firstTime = -1;
                     
                     for (IOrder order : orderComponent) {
-                        if (orderTag.equals(order.getTag())) ++count;
+                        if (orderTag.equals(order.getTag())) {
+                            if (++count == 1) {
+                                firstTime = order.getEstimatedPercentComplete();
+                            }
+                        }
+                    }
+    
+                    if (count > 0) {
+                        button.radialSpriteContainer.setVisible(true);
+                        button.radialSprite.setAngle(360 * firstTime);
+                    } else {
+                        button.radialSpriteContainer.setVisible(false);
                     }
                     
                     if (count > 1) {
@@ -341,9 +375,11 @@ public class HUDSystem extends EntitySystem implements EntityListener {
         public Command command;
         
         public Stack stack;
-        
-        public ImageButton button;
-        public Label       tooltipLabel;
-        public Label       label;
+    
+        public ImageButton      button;
+        public Label            tooltipLabel;
+        public Label            label;
+        public Container<Image> radialSpriteContainer;
+        public RadialSprite     radialSprite;
     }
 }

@@ -11,6 +11,7 @@ class BaseClientEventHandler {
     @EventHandle
     fun onAtlasRegistry(event: AtlasRegistryEvent) {
         event.packer.load("missingTexture")
+        event.packer.load("radialBar")
     }
     
     @EventHandle
