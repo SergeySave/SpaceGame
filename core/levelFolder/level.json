@@ -105,6 +105,10 @@
       "com.sergey.spacegame.common.ecs.component.ShipComponent": {
         "moveSpeed": 250,
         "rotateSpeed": 45
+      },
+      "com.sergey.spacegame.common.ecs.component.HealthComponent": {
+        "health": 50,
+        "maxHealth": 50
       }
     },
     "mine1": {

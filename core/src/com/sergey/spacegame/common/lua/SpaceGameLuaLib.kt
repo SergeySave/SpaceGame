@@ -4,6 +4,7 @@ import com.badlogic.ashley.core.Component
 import com.badlogic.ashley.core.ComponentMapper
 import com.badlogic.ashley.core.Entity
 import com.sergey.spacegame.SpaceGame
+import com.sergey.spacegame.common.ecs.component.HealthComponent
 import com.sergey.spacegame.common.ecs.component.OrderComponent
 import com.sergey.spacegame.common.ecs.component.PositionComponent
 import com.sergey.spacegame.common.ecs.component.RotationComponent
@@ -190,6 +191,7 @@ class SpaceGameLuaLib private constructor() : TwoArgFunction() {
             COMPONENTS.add(Quadruple("size", SizeComponent.MAPPER, { SizeComponent() }, listOf("s")))
             COMPONENTS.add(Quadruple("velocity", VelocityComponent.MAPPER, { VelocityComponent() }, listOf("vel", "v")))
             COMPONENTS.add(Quadruple("ship", ShipComponent.MAPPER, { ShipComponent() }, listOf()))
+            COMPONENTS.add(Quadruple("health", HealthComponent.MAPPER, { HealthComponent() }, listOf("h")))
         }
     }
 }

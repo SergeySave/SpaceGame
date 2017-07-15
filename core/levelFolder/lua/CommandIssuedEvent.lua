@@ -14,7 +14,8 @@ if event:getId() == 'default' then
 
         if (objective and not objective:getCompleted()) then
             objective:setCompleted(true)
-            local enemy = spawnEntity("enemy1")
+
+
             addObjective('obj.defeat-enemies-1.id', 'obj.defeat-enemies-1.title', 'obj.defeat-enemies-1.desc')
         end
     end
