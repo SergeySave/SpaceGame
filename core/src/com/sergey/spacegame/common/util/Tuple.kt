@@ -3,4 +3,4 @@ package com.sergey.spacegame.common.util
 /**
  * @author sergeys
  */
-data class Pair<T, U>(var obj1: T, var obj2: U)
+data class Quadruple<T, U, V, W>(val obj1: T, val obj2: U, val obj3: V, val obj4: W)

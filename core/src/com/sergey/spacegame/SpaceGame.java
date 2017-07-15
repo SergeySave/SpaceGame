@@ -32,7 +32,7 @@ import com.sergey.spacegame.common.event.EventBus;
 import com.sergey.spacegame.common.event.GsonRegisterEvent;
 import com.sergey.spacegame.common.game.command.CommandExecutorService;
 import com.sergey.spacegame.common.lua.SpaceGameLuaLib;
-import com.sergey.spacegame.common.util.Pair;
+import kotlin.Pair;
 
 import java.io.File;
 import java.io.IOException;

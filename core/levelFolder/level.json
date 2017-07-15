@@ -71,7 +71,6 @@
     "ship1": {
 			"com.sergey.spacegame.client.ecs.component.VisualComponent": { "image": "ships/pew" },
 			"com.sergey.spacegame.common.ecs.component.PositionComponent": {},
-			"com.sergey.spacegame.common.ecs.component.VelocityComponent": {},
       "com.sergey.spacegame.common.ecs.component.SizeComponent": {
         "w": 50,
         "h": 50
@@ -95,7 +94,6 @@
         "image": "ships/enepew"
       },
       "com.sergey.spacegame.common.ecs.component.PositionComponent": {},
-      "com.sergey.spacegame.common.ecs.component.VelocityComponent": {},
       "com.sergey.spacegame.common.ecs.component.SizeComponent": {
         "w": 30,
         "h": 30
@@ -111,8 +109,6 @@
     },
     "mine1": {
 			"com.sergey.spacegame.client.ecs.component.VisualComponent": { "image": "building/factory" },
-			"com.sergey.spacegame.common.ecs.component.PositionComponent": {},
-			"com.sergey.spacegame.common.ecs.component.VelocityComponent": {},
 			"com.sergey.spacegame.common.ecs.component.SizeComponent": {
 				"w": 25,
 				"h": 25
@@ -127,8 +123,6 @@
       "com.sergey.spacegame.client.ecs.component.VisualComponent": {
         "image": "building/factory"
       },
-      "com.sergey.spacegame.common.ecs.component.PositionComponent": {},
-      "com.sergey.spacegame.common.ecs.component.VelocityComponent": {},
       "com.sergey.spacegame.common.ecs.component.SizeComponent": {
         "w": 50,
         "h": 50

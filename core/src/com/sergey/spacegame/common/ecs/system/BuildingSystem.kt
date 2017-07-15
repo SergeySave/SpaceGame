@@ -19,7 +19,7 @@ class BuildingSystem : IteratingSystem((Family.all(BuildingComponent::class.java
     companion object Helper {
         @JvmStatic
         fun doSetBuildingPosition(entity: Entity, planet: Entity, position: Float) {
-            val pos = PositionComponent.MAPPER.get(entity)
+            val pos = PositionComponent.MAPPER.get(entity) ?: PositionComponent().apply { entity.add(this) }
             val size = SizeComponent.MAPPER.get(entity)
             val rot = if (RotationComponent.MAPPER.has(entity)) RotationComponent.MAPPER.get(entity) else null
             
