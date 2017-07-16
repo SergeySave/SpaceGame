@@ -29,6 +29,7 @@ import com.sergey.spacegame.common.ecs.system.MoneyProducerSystem;
 import com.sergey.spacegame.common.ecs.system.MovementSystem;
 import com.sergey.spacegame.common.ecs.system.PlanetSystem;
 import com.sergey.spacegame.common.ecs.system.RotationSystem;
+import com.sergey.spacegame.common.ecs.system.SpacialQuadtreeSystem;
 import com.sergey.spacegame.common.ecs.system.TickableSystem;
 import com.sergey.spacegame.common.event.Event;
 import com.sergey.spacegame.common.event.EventBus;
@@ -66,15 +67,15 @@ public class Level {
     private HashMap<Class<? extends Event>, LuaEventHandler> events       = new HashMap<>();
     private HashMap<String, String>                          localization = new HashMap<>();
     
-    private transient LuaValue[]             luaStores;
-    private transient double                 money;
-    private transient List<Objective>        objectives;
-    private transient ECSManager             ecsManager;
-    private transient ImmutableArray<Entity> planets;
-    private transient ImmutableArray<Entity> buildingsInConstruction;
-    private transient LevelEventRegistry     levelEventRegistry;
-    private transient SpatialQuadtree        friendlyTeam;
-    private transient SpatialQuadtree        enemyTeam;
+    private transient LuaValue[]              luaStores;
+    private transient double                  money;
+    private transient List<Objective>         objectives;
+    private transient ECSManager              ecsManager;
+    private transient ImmutableArray<Entity>  planets;
+    private transient ImmutableArray<Entity>  buildingsInConstruction;
+    private transient LevelEventRegistry      levelEventRegistry;
+    private transient SpatialQuadtree<Entity> friendlyTeam;
+    private transient SpatialQuadtree<Entity> enemyTeam;
     
     private Level() {
         _deserializing = this;
@@ -92,6 +93,7 @@ public class Level {
         ecsManager.addSystem(new PlanetSystem());
         ecsManager.addSystem(new TickableSystem());
         ecsManager.addSystem(new MoneyProducerSystem(this));
+        ecsManager.addSystem(new SpacialQuadtreeSystem(this));
         
         planets = ecsManager.getEntitiesFor(Family.all(PlanetComponent.class).get());
         buildingsInConstruction = ecsManager.getEntitiesFor(Family.all(BuildingComponent.class, InContructionComponent.class)
@@ -196,6 +198,14 @@ public class Level {
         return limits;
     }
     
+    public SpatialQuadtree<Entity> getTeam1() {
+        return friendlyTeam;
+    }
+    
+    public SpatialQuadtree<Entity> getTeam2() {
+        return enemyTeam;
+    }
+    
     public static class LevelEventRegistry {
         
         private FileSystem fileSystem;
@@ -281,9 +291,10 @@ public class Level {
     
             level.limits = context.deserialize(obj.get("levelLimits"), LevelLimits.class);
     
-            level.friendlyTeam = new SpatialQuadtree(level.limits.getMinX(), level.limits.getMinY(), level.limits.getMaxX(), level.limits
+            level.friendlyTeam = new SpatialQuadtree<>(level.limits.getMinX(), level.limits.getMinY(), level.limits
+                    .getMaxX(), level.limits
                     .getMaxY(), 9);
-            level.enemyTeam = new SpatialQuadtree(level.limits.getMinX(), level.limits.getMinY(), level.limits.getMaxX(), level.limits
+            level.enemyTeam = new SpatialQuadtree<>(level.limits.getMinX(), level.limits.getMinY(), level.limits.getMaxX(), level.limits
                     .getMaxY(), 9);
     
             //level.commands = context.deserialize(obj.get("commands"), new TypeToken<HashMap<String, Command>>() {}.getType());

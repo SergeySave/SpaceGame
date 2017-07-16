@@ -93,7 +93,8 @@
       ],
       "com.sergey.spacegame.common.ecs.component.TagComponent": {
         "tag": "ship"
-      }
+      },
+      "com.sergey.spacegame.common.ecs.component.Team1Component": {}
 		},
     "enemy1": {
       "com.sergey.spacegame.client.ecs.component.VisualComponent": {
@@ -115,7 +116,8 @@
       "com.sergey.spacegame.common.ecs.component.HealthComponent": {
         "health": 50,
         "maxHealth": 50
-      }
+      },
+      "com.sergey.spacegame.common.ecs.component.Team2Component": {}
     },
     "mine1": {
 			"com.sergey.spacegame.client.ecs.component.VisualComponent": { "image": "building/factory" },
@@ -127,7 +129,8 @@
 			"com.sergey.spacegame.common.ecs.component.ControllableComponent": [],
 			"com.sergey.spacegame.common.ecs.component.MoneyProducerComponent": {
         "amount": 10
-			}
+      },
+      "com.sergey.spacegame.common.ecs.component.Team1Component": {}
     },
     "factory1": {
       "com.sergey.spacegame.client.ecs.component.VisualComponent": {
@@ -143,7 +146,8 @@
       },
       "com.sergey.spacegame.common.ecs.component.ControllableComponent": [
         "buildShip"
-      ]
+      ],
+      "com.sergey.spacegame.common.ecs.component.Team1Component": {}
     }
 	},
 	"state": [
@@ -173,7 +177,8 @@
 				"default",
         "buildMine",
         "buildFactory"
-			]
+      ],
+      "com.sergey.spacegame.common.ecs.component.Team1Component": {}
 		}
 	],
 	"events": {

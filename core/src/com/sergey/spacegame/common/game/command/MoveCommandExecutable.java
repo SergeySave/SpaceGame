@@ -16,12 +16,13 @@ import java.util.stream.StreamSupport;
 
 public final class MoveCommandExecutable implements CommandExecutable {
     
+    private Vector2 TMP = new Vector2();
+    
     @Override
     public void issue(Iterable<Entity> entitySource, int numEntities, Vector2 start, Vector2 end, Level level) {
         //Gets the center of all of the ships by averaging their coordinates
         Vector2 center = StreamSupport.stream(entitySource.spliterator(), true)
-                .collect(Vector2::new, (v, s) -> v.add(new Vector2(PositionComponent.MAPPER.get(s).x, PositionComponent.MAPPER
-                        .get(s).y)), Vector2::add);
+                .collect(Vector2::new, (v, s) -> v.add(PositionComponent.MAPPER.get(s).setVector(TMP)), Vector2::add);
         center.scl(1f / numEntities);
         
         //The direction we want the fleet to move
@@ -169,7 +170,8 @@ public final class MoveCommandExecutable implements CommandExecutable {
                 OrderComponent ord = new OrderComponent(
                         new FaceOrder(fleetMoveDir, 45),
                         new MoveOrder(
-                                PositionComponent.MAPPER.get(e).x + dx, PositionComponent.MAPPER.get(e).y + dy, speed),
+                                PositionComponent.MAPPER.get(e).getX() + dx,
+                                PositionComponent.MAPPER.get(e).getY() + dy, speed),
                         new FaceOrder(dr, 45));
                 
                 if (OrderComponent.MAPPER.has(e)) {

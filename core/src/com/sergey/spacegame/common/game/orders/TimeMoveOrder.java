@@ -32,13 +32,13 @@ public class TimeMoveOrder implements IOrder {
             e.add(vel);
         }
         //ShipComponent ship = ShipComponent.MAPPER.get(e);
-        
-        double dx = x - pos.x;
-        double dy = y - pos.y;
+    
+        double dx = x - pos.getX();
+        double dy = y - pos.getY();
         if (time < 0) {
             done = true;
-            pos.x = (float) x;
-            pos.y = (float) y;
+            pos.setX((float) x);
+            pos.setY((float) y);
             e.remove(VelocityComponent.class);
         } else {
             vel.vx = (float) (dx / time);

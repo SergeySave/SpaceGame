@@ -8,8 +8,11 @@ public class PositionComponent implements ClonableComponent {
     
     public static final ComponentMapper<PositionComponent> MAPPER = ComponentMapper.getFor(PositionComponent.class);
     
-    public float x;
-    public float y;
+    private float   x;
+    private float   y;
+    private float   oldX;
+    private float   oldY;
+    private boolean dirty;
     
     public PositionComponent() {}
     
@@ -27,8 +30,52 @@ public class PositionComponent implements ClonableComponent {
     }
     
     public void setFrom(Vector2 v) {
+        if (v.x == this.x && v.y == this.y) return;
         x = v.x;
         y = v.y;
+        setDirty();
+    }
+    
+    public void setDirty() {
+        dirty = true;
+    }
+    
+    public float getX() {
+        return x;
+    }
+    
+    public void setX(float x) {
+        if (x == this.x) return;
+        this.x = x;
+        setDirty();
+    }
+    
+    public float getY() {
+        return y;
+    }
+    
+    public void setY(float y) {
+        if (y == this.y) return;
+        this.y = y;
+        setDirty();
+    }
+    
+    public boolean isDirty() {
+        return dirty;
+    }
+    
+    public float getOldX() {
+        return oldX;
+    }
+    
+    public float getOldY() {
+        return oldY;
+    }
+    
+    public void setNotDirty() {
+        dirty = false;
+        oldX = x;
+        oldY = y;
     }
     
     @Override

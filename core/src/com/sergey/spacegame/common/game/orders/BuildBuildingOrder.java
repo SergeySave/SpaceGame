@@ -59,12 +59,12 @@ public class BuildBuildingOrder implements IOrder {
                 .filter(PositionComponent.MAPPER::has)
                 .map((p) -> new Object[]{p, PositionComponent.MAPPER.get(p)})
                 .map((p) -> new Object[]{
-                        p[0], (((PositionComponent) p[1]).x - x) * (((PositionComponent) p[1]).x - x) +
-                              (((PositionComponent) p[1]).y - y) * (((PositionComponent) p[1]).y - y)
+                        p[0], (((PositionComponent) p[1]).getX() - x) * (((PositionComponent) p[1]).getX() - x) +
+                              (((PositionComponent) p[1]).getY() - y) * (((PositionComponent) p[1]).getY() - y)
                 })
                 .min((l, r) -> Float.compare((Float) l[1], (Float) r[1]))
                 .map((c) -> (Entity) c[0]);
-        
+    
         if (closestPlanet.isPresent()) {
             Entity planet = closestPlanet.get();
             
@@ -110,6 +110,7 @@ public class BuildBuildingOrder implements IOrder {
             buildingC.init(planet, buildingPos, building);
             
             building.add(buildingC);
+            if (!PositionComponent.MAPPER.has(building)) building.add(new PositionComponent());
             
             level.getECS().addEntity(building);
             orderSystem.registerNewInConstruction(building);
@@ -142,18 +143,18 @@ public class BuildBuildingOrder implements IOrder {
             float         speed = ship.moveSpeed;
             desired = PositionComponent.MAPPER.get(building)
                     .createVector()
-                    .sub(planetPos.x, planetPos.y)
+                    .sub(planetPos.getX(), planetPos.getY())
                     .scl(1.5f)
-                    .add(planetPos.x, planetPos.y)
+                    .add(planetPos.getX(), planetPos.getY())
                     .add(20f * e.hashCode() / 2147483647f, 20f * ship.hashCode() / 2147483647f);
     
-            double dx              = desired.x - pos.x;
-            double dy              = desired.y - pos.y;
+            double dx              = desired.x - pos.getX();
+            double dy              = desired.y - pos.getY();
             double dist            = Math.hypot(dx, dy);
             double timePerUnitDist = dist / speed;
             if (timePerUnitDist < deltaTime) {
-                pos.x = desired.x;
-                pos.y = desired.y;
+                pos.setX(desired.x);
+                pos.setY(desired.y);
                 e.remove(VelocityComponent.class);
                 InContructionComponent.MAPPER.get(building).timeRemaining -= deltaTime;
             } else {

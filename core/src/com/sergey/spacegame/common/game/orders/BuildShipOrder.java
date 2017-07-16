@@ -51,8 +51,8 @@ public class BuildShipOrder implements IOrder {
                                         .add(20f * newEntity.hashCode() / 2147483647f,
                                              20f * pos.hashCode() / 2147483647f));
                 } else {
-                    pos.x = curr.x + 20f * newEntity.hashCode() / 2147483647f;
-                    pos.y = curr.y + 20f * pos.hashCode() / 2147483647f;
+                    pos.setX(curr.getX() + 20f * newEntity.hashCode() / 2147483647f);
+                    pos.setY(curr.getY() + 20f * pos.hashCode() / 2147483647f);
                 }
             }
             

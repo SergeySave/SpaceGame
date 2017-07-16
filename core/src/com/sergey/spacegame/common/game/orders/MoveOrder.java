@@ -37,14 +37,14 @@ public class MoveOrder implements IOrder {
         }
         ShipComponent ship = ShipComponent.MAPPER.get(e);
         if (speed < 0) speed = ship.moveSpeed;
-        
-        double dx   = x - pos.x;
-        double dy   = y - pos.y;
+    
+        double dx   = x - pos.getX();
+        double dy   = y - pos.getY();
         double dist = Math.hypot(dx, dy);
         if (dist < speed * deltaTime) {
             done = true;
-            pos.x = (float) x;
-            pos.y = (float) y;
+            pos.setX((float) x);
+            pos.setY((float) y);
             e.remove(VelocityComponent.class);
         } else {
             vel.vx = (float) (speed * dx / dist);

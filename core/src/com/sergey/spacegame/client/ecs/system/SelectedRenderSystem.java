@@ -60,10 +60,10 @@ public class SelectedRenderSystem extends EntitySystem {
                 float oX = rotVar.originX * sizeVar.w;
                 float oY = rotVar.originY * sizeVar.h;
                 batch.draw(visVar.getRegion(),
-                           posVar.x - oX, posVar.y - oY, oX, oY, sizeVar.w, sizeVar.h, 1, 1, rotVar.r);
+                           posVar.getX() - oX, posVar.getY() - oY, oX, oY, sizeVar.w, sizeVar.h, 1, 1, rotVar.r);
             } else {
                 batch.draw(visVar.getRegion(),
-                           posVar.x - sizeVar.w / 2, posVar.y - sizeVar.h / 2, sizeVar.w, sizeVar.h);
+                           posVar.getX() - sizeVar.w / 2, posVar.getY() - sizeVar.h / 2, sizeVar.w, sizeVar.h);
             }
             
         }

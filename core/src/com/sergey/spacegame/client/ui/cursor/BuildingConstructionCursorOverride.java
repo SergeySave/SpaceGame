@@ -64,8 +64,8 @@ public final class BuildingConstructionCursorOverride implements CursorOverride 
                 .filter(PositionComponent.MAPPER::has)
                 .map((p) -> new Object[]{p, PositionComponent.MAPPER.get(p)})
                 .map((p) -> new Object[]{
-                        p[0], (((PositionComponent) p[1]).x - x) * (((PositionComponent) p[1]).x - x) +
-                              (((PositionComponent) p[1]).y - y) * (((PositionComponent) p[1]).y - y)
+                        p[0], (((PositionComponent) p[1]).getX() - x) * (((PositionComponent) p[1]).getX() - x) +
+                              (((PositionComponent) p[1]).getY() - y) * (((PositionComponent) p[1]).getY() - y)
                 })
                 .min((l, r) -> Float.compare((Float) l[1], (Float) r[1]))
                 .map((c) -> (Entity) c[0])
@@ -75,8 +75,8 @@ public final class BuildingConstructionCursorOverride implements CursorOverride 
                         entityDirty = false;
                         if (building == null) return;
                     }
-                    
-                    if (!PositionComponent.MAPPER.has(building)) return;
+    
+                    if (!PositionComponent.MAPPER.has(building)) building.add(new PositionComponent());
                     if (!SizeComponent.MAPPER.has(building)) return;
                     
                     PositionComponent planetPos = PositionComponent.MAPPER.get(planet);
@@ -108,10 +108,11 @@ public final class BuildingConstructionCursorOverride implements CursorOverride 
                         float oX = rotVar.originX * sizeVar.w;
                         float oY = rotVar.originY * sizeVar.h;
                         batch.draw(visVar.getRegion(),
-                                   posVar.x - oX, posVar.y - oY, oX, oY, sizeVar.w, sizeVar.h, 1, 1, rotVar.r);
+                                   posVar.getX() - oX,
+                                   posVar.getY() - oY, oX, oY, sizeVar.w, sizeVar.h, 1, 1, rotVar.r);
                     } else {
                         batch.draw(visVar.getRegion(),
-                                   posVar.x - sizeVar.w / 2, posVar.y - sizeVar.h / 2, sizeVar.w, sizeVar.h);
+                                   posVar.getX() - sizeVar.w / 2, posVar.getY() - sizeVar.h / 2, sizeVar.w, sizeVar.h);
                     }
                 });
     }

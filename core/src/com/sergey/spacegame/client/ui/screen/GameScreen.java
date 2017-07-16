@@ -55,7 +55,7 @@ public class GameScreen extends BaseScreen {
         ecsManager.addSystem(selectedRenderSystem = new SelectedRenderSystem(batch));
         ecsManager.addSystem(inConstructionRenderSystem = new InConstructionRenderSystem(batch));
         ecsManager.addSystem(commandUISystem = new CommandUISystem(camera, batch, level));
-        ecsManager.addSystem(selectionControlSystem = new SelectionSystem(camera, batch, commandUISystem));
+        ecsManager.addSystem(selectionControlSystem = new SelectionSystem(camera, batch, commandUISystem, level.getTeam1()));
         ecsManager.addSystem(hudSystem = new HUDSystem(batch, commandUISystem, level));
     
         SpaceGame.getInstance().getEventBus().post(new BeginLevelEvent(level));
