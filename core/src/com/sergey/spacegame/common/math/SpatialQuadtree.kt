@@ -140,15 +140,17 @@ class SpatialQuadtree<T> @JvmOverloads constructor(private val minX: Float, priv
         val bl = Vector2(minX, minY)
         val br = Vector2(maxX, minY)
         val center = Vector2((minX + maxX) / 2, (minY + maxY) / 2)
-        
+    
         abstract fun remove(obj: T, pos: Vector2): Vector2?
-        
+    
         abstract fun queryArea(start: Vector2, end: Vector2): Iterator<Map.Entry<T, Vector2>>
-        
+    
+        abstract fun rawContents(): Iterator<Map.Entry<T, Vector2>>
+                
         abstract fun getSubNode(pos: Vector2): Leaf
-        
+    
         abstract fun replaceChild(old: Node, new: Node)
-        
+    
         abstract fun count(): Int
     }
     
@@ -173,21 +175,32 @@ class SpatialQuadtree<T> @JvmOverloads constructor(private val minX: Float, priv
         }
         
         override fun queryArea(start: Vector2, end: Vector2): Iterator<Map.Entry<T, Vector2>> {
-            val list = mutableListOf<Node>()
-            if (overlaps(start, end, tl, center)) {
-                list.add(topLeft)
+            val list = mutableListOf<Iterator<Map.Entry<T, Vector2>>>()
+            if (contains(start, end, tl, center)) {
+                list.add(topLeft.rawContents())
+            } else if (overlaps(start, end, tl, center)) {
+                list.add(topLeft.queryArea(start, end))
             }
-            if (overlaps(start, end, tr, center)) {
-                list.add(topRight)
+            if (contains(start, end, tr, center)) {
+                list.add(topRight.rawContents())
+            } else if (overlaps(start, end, tr, center)) {
+                list.add(topRight.queryArea(start, end))
             }
-            if (overlaps(start, end, br, center)) {
-                list.add(bottomRight)
+            if (contains(start, end, br, center)) {
+                list.add(bottomRight.rawContents())
+            } else if (overlaps(start, end, br, center)) {
+                list.add(bottomRight.queryArea(start, end))
             }
-            if (overlaps(start, end, bl, center)) {
-                list.add(bottomLeft)
+            if (contains(start, end, bl, center)) {
+                list.add(bottomLeft.rawContents())
+            } else if (overlaps(start, end, bl, center)) {
+                list.add(bottomLeft.queryArea(start, end))
             }
-            return CombinedIterator(*list.map { node -> node.queryArea(start, end) }.toTypedArray())
+            return CombinedIterator(*list.toTypedArray())
         }
+    
+        override fun rawContents(): Iterator<Map.Entry<T, Vector2>> =
+                CombinedIterator(*listOf<Node>(topLeft, topRight, bottomLeft, bottomRight).map { node -> node.rawContents() }.toTypedArray())
         
         override fun getSubNode(pos: Vector2): Leaf {
             if (pos.x > center.x) {
@@ -225,6 +238,8 @@ class SpatialQuadtree<T> @JvmOverloads constructor(private val minX: Float, priv
         
         override fun queryArea(start: Vector2,
                                end: Vector2): Iterator<Map.Entry<T, Vector2>> = map.filter { (_, value) -> value bothAxisPositiveOf start && value bothAxisNegativeOf end }.iterator()
+    
+        override fun rawContents(): Iterator<Map.Entry<T, Vector2>> = map.entries.iterator()
         
         override fun getSubNode(pos: Vector2): Leaf = this
         
@@ -239,4 +254,7 @@ private infix fun Vector2.bothAxisPositiveOf(other: Vector2): Boolean = this.x >
 private infix fun Vector2.bothAxisNegativeOf(other: Vector2): Boolean = this.x <= other.x && this.y <= other.y
 private fun overlaps(start1: Vector2, end1: Vector2, start2: Vector2,
                      end2: Vector2) = start1.x <= end2.x && end1.x >= start2.x && start1.y <= end2.y && end1.y >= start2.y
+
+private fun contains(start1: Vector2, end1: Vector2, start2: Vector2,
+                     end2: Vector2) = start1.x <= start2.x && end1.x >= end2.x && start1.y <= start2.y && end1.y >= end2.y
 
