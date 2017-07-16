@@ -1,4 +1,10 @@
 {
+  "levelLimits": {
+    "minX": 0,
+    "minY": 0,
+    "maxX": 1000,
+    "maxY": 1000
+  },
 	"commands": {
 		"default": {
 			"type": "java",

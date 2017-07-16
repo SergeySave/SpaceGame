@@ -36,6 +36,7 @@ import com.sergey.spacegame.common.event.EventHandle;
 import com.sergey.spacegame.common.event.LuaEventHandler;
 import com.sergey.spacegame.common.game.command.Command;
 import com.sergey.spacegame.common.lua.LuaUtils;
+import com.sergey.spacegame.common.math.SpatialQuadtree;
 import org.luaj.vm2.LuaValue;
 
 import java.io.IOException;
@@ -59,6 +60,7 @@ public class Level {
     private static Level      _deserializing;
     private static FileSystem levelFile;
     
+    private LevelLimits limits;
     private HashMap<String, Command>                         commands     = new HashMap<>();
     private HashMap<String, EntityPrototype>                 entities     = new HashMap<>();
     private HashMap<Class<? extends Event>, LuaEventHandler> events       = new HashMap<>();
@@ -71,6 +73,8 @@ public class Level {
     private transient ImmutableArray<Entity> planets;
     private transient ImmutableArray<Entity> buildingsInConstruction;
     private transient LevelEventRegistry     levelEventRegistry;
+    private transient SpatialQuadtree        friendlyTeam;
+    private transient SpatialQuadtree        enemyTeam;
     
     private Level() {
         _deserializing = this;
@@ -188,6 +192,10 @@ public class Level {
         return luaStores;
     }
     
+    public LevelLimits getLimits() {
+        return limits;
+    }
+    
     public static class LevelEventRegistry {
         
         private FileSystem fileSystem;
@@ -270,6 +278,13 @@ public class Level {
             JsonObject obj = json.getAsJsonObject();
             
             Level level = new Level();
+    
+            level.limits = context.deserialize(obj.get("levelLimits"), LevelLimits.class);
+    
+            level.friendlyTeam = new SpatialQuadtree(level.limits.getMinX(), level.limits.getMinY(), level.limits.getMaxX(), level.limits
+                    .getMaxY(), 9);
+            level.enemyTeam = new SpatialQuadtree(level.limits.getMinX(), level.limits.getMinY(), level.limits.getMaxX(), level.limits
+                    .getMaxY(), 9);
     
             //level.commands = context.deserialize(obj.get("commands"), new TypeToken<HashMap<String, Command>>() {}.getType());
             Set<Entry<String, JsonElement>> commands = obj.get("commands").getAsJsonObject().entrySet();
