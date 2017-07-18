@@ -2,6 +2,7 @@ package com.sergey.spacegame.common.math
 
 import com.badlogic.gdx.math.Vector2
 import com.sergey.spacegame.common.util.CombinedIterator
+import java.util.PriorityQueue
 
 /**
  * @author sergeys
@@ -106,26 +107,24 @@ class SpatialQuadtree<T> @JvmOverloads constructor(private val minX: Float, priv
         return root.queryArea(VEC1, VEC2)
     }
     
-    fun queryNearest(pos: Vector2): T? {
+    fun queryNearest(pos: Vector2): Iterator<T> {
         val root = this.root
-        if (root == null) return null
+        if (root == null) return emptyList<T>().iterator()
         
         val smallestNode = root.getSubNode(pos) //Leaf
-        val (obj, aPoint) = smallestNode.map.entries.first() //T, Vector2
+        val contents = if (smallestNode.count() == 0) smallestNode.parent?.rawContents() ?: emptyMap<T, Vector2>().iterator() else smallestNode.rawContents()
+        if (!contents.hasNext()) return emptyList<T>().iterator()
+        
+        val (_, aPoint) = contents.next() //T, Vector2
         val distToFirstPoint = aPoint.dst(pos)
         
-        var minDist2 = Float.MAX_VALUE
-        var closest = obj
-        root.queryArea(VEC1.set(pos).sub(distToFirstPoint, distToFirstPoint),
-                       VEC2.set(pos).add(distToFirstPoint, distToFirstPoint)).forEach { (obj, loc) ->
-            val dst2 = loc.dst2(pos)
-            if (dst2 < minDist2) {
-                minDist2 = dst2
-                closest = obj
-            }
-        }
-        
-        return closest
+        return NearestIterator(pos, distToFirstPoint, root)
+    }
+    
+    fun getSingleNearest(pos: Vector2): T? {
+        val iterator = queryNearest(pos)
+        if (iterator.hasNext()) return null
+        return iterator.next()
     }
     
     fun count(): Int {
@@ -247,6 +246,36 @@ class SpatialQuadtree<T> @JvmOverloads constructor(private val minX: Float, priv
                                   new: Node) = throw UnsupportedOperationException("Leaf cannot replace child")
         
         override fun count(): Int = map.size
+    }
+    
+    private inner class NearestIterator(private val center: Vector2, private var radius: Float,
+                                        private val root: Node) : Iterator<T> {
+        private val queue = PriorityQueue<Pair<T, Float>>({ o1, o2 -> o1.second.compareTo(o2.second) })
+        private var VEC1 = Vector2()
+        private var VEC2 = Vector2()
+        
+        override fun hasNext(): Boolean {
+            if (queue.isEmpty()) {
+                val oldRadius = radius
+                radius *= 1.5f
+                
+                val oldRadius2 = oldRadius * oldRadius
+                val radius2 = radius * radius
+                root.queryArea(VEC1.set(center).sub(radius, radius),
+                               VEC2.set(center).add(radius, radius)).forEach { (obj, loc) ->
+                    
+                    val dst = loc.dst2(center)
+                    if (dst <= radius2 && dst > oldRadius2) {
+                        queue.add(Pair(obj, dst))
+                    }
+                }
+            }
+            
+            return !queue.isEmpty()
+        }
+        
+        override fun next() = queue.poll().first
+        
     }
 }
 

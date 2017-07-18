@@ -91,7 +91,7 @@ public class SelectionSystem extends EntitySystem implements InputProcessor {
                 });
     
                 if (changedSelected.size() == 0) {
-                    Entity nearest = quadtree.queryNearest(selectionEnd);
+                    Entity nearest = quadtree.getSingleNearest(selectionEnd);
         
                     if (nearest != null) {
                         Rectangle rect = new Rectangle(Math.min(selectionEnd.x, selectionBegin.x), Math.min(selectionEnd.y, selectionBegin.y), Math
