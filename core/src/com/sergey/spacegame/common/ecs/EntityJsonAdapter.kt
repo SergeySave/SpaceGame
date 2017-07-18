@@ -9,6 +9,9 @@ import com.google.gson.JsonObject
 import com.google.gson.JsonParseException
 import com.google.gson.JsonSerializationContext
 import com.google.gson.JsonSerializer
+import com.sergey.spacegame.common.ecs.component.HealthComponent
+import com.sergey.spacegame.common.ecs.component.Team1Component
+import com.sergey.spacegame.common.ecs.component.Team2Component
 import com.sergey.spacegame.common.game.Level
 import java.lang.reflect.Type
 import java.util.ArrayList
@@ -21,15 +24,30 @@ class EntityJsonAdapter : JsonSerializer<Entity>, JsonDeserializer<Entity> {
         val components = ArrayList<Component>()
         
         val entries = obj.entrySet()
+    
+        var hasTeam = false
+        var hasHealth = false
         
         for ((className, value) in entries) {
             try {
                 val clazz = ClassLoader.getSystemClassLoader().loadClass(className)
-                components.add(context.deserialize<Component>(value, clazz))
+                val component = context.deserialize<Component>(value, clazz)
+    
+                when (component) {
+                    is HealthComponent -> hasHealth = true
+                    is Team1Component  -> hasTeam = true
+                    is Team2Component  -> hasTeam = true
+                }
+    
+                components.add(component)
             } catch (e: ClassNotFoundException) {
                 throw JsonParseException("Class $className not found. ", e)
             }
             
+        }
+    
+        if (hasHealth xor hasTeam) {
+            System.err.println("Entity has only one of HealthComponent and TeamComponent")
         }
         
         val entity = Level.deserializing().ecs.newEntity()

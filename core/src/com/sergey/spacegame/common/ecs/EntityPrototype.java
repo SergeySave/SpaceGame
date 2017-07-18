@@ -9,6 +9,9 @@ import com.google.gson.JsonParseException;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
 import com.sergey.spacegame.common.ecs.component.ClonableComponent;
+import com.sergey.spacegame.common.ecs.component.HealthComponent;
+import com.sergey.spacegame.common.ecs.component.Team1Component;
+import com.sergey.spacegame.common.ecs.component.Team2Component;
 import com.sergey.spacegame.common.game.Level;
 
 import java.lang.reflect.Type;
@@ -39,15 +42,26 @@ public final class EntityPrototype {
             ArrayList<ClonableComponent> components = new ArrayList<>();
             
             Set<Entry<String, JsonElement>> entries = obj.entrySet();
+    
+            boolean hasTeam   = false;
+            boolean hasHealth = false;
             
             for (Entry<String, JsonElement> entry : entries) {
                 String className = entry.getKey();
                 try {
-                    Class<?> clazz = ClassLoader.getSystemClassLoader().loadClass(className);
-                    components.add(context.deserialize(entry.getValue(), clazz));
+                    Class<?>          clazz     = ClassLoader.getSystemClassLoader().loadClass(className);
+                    ClonableComponent component = context.deserialize(entry.getValue(), clazz);
+                    components.add(component);
+    
+                    if (component instanceof HealthComponent) hasHealth = true;
+                    if (component instanceof Team1Component || component instanceof Team2Component) hasTeam = true;
                 } catch (ClassNotFoundException e) {
                     throw new JsonParseException("Class " + className + " not found. ", e);
                 }
+            }
+    
+            if (hasTeam != hasHealth) { //xor
+                System.err.println("Entity has only one of HealthComponent and TeamComponent");
             }
             
             EntityPrototype proto = new EntityPrototype();

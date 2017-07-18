@@ -94,6 +94,10 @@
       "com.sergey.spacegame.common.ecs.component.TagComponent": {
         "tag": "ship"
       },
+      "com.sergey.spacegame.common.ecs.component.HealthComponent": {
+        "health": 100,
+        "maxHealth": 100
+      },
       "com.sergey.spacegame.common.ecs.component.Team1Component": {}
 		},
     "enemy1": {
@@ -130,6 +134,10 @@
 			"com.sergey.spacegame.common.ecs.component.MoneyProducerComponent": {
         "amount": 10
       },
+      "com.sergey.spacegame.common.ecs.component.HealthComponent": {
+        "health": 25,
+        "maxHealth": 25
+      },
       "com.sergey.spacegame.common.ecs.component.Team1Component": {}
     },
     "factory1": {
@@ -147,6 +155,10 @@
       "com.sergey.spacegame.common.ecs.component.ControllableComponent": [
         "buildShip"
       ],
+      "com.sergey.spacegame.common.ecs.component.HealthComponent": {
+        "health": 25,
+        "maxHealth": 25
+      },
       "com.sergey.spacegame.common.ecs.component.Team1Component": {}
     }
 	},
@@ -178,6 +190,10 @@
         "buildMine",
         "buildFactory"
       ],
+      "com.sergey.spacegame.common.ecs.component.HealthComponent": {
+        "health": 25,
+        "maxHealth": 25
+      },
       "com.sergey.spacegame.common.ecs.component.Team1Component": {}
 		}
 	],
