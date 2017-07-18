@@ -18,8 +18,8 @@ import java.lang.reflect.Type
 /**
  * @author sergeys
  */
-class Weapon(val color: Float, val thickness: Float, val speed: Float, val reloadTime: Float, val range: Float,
-             val damage: Float, val turnSpeed: Float) {
+class Weapon(val color: Float, val thickness: Float, val reloadTime: Float, val range: Float,
+             val damage: Float) {
     @Transient
     val range2 = range * range
     
@@ -39,11 +39,9 @@ class Weapon(val color: Float, val thickness: Float, val speed: Float, val reloa
             return json.asJsonObject.run {
                 Weapon(Color.valueOf(get("color").asString).toFloatBits(),
                        get("thickness").asFloat,
-                       get("speed").asFloat,
                        get("reloadTime").asFloat,
                        get("range").asFloat,
-                       get("damage").asFloat,
-                       get("turnSpeed").asFloat)
+                       get("damage").asFloat)
             }
         }
         
@@ -51,11 +49,9 @@ class Weapon(val color: Float, val thickness: Float, val speed: Float, val reloa
             val jsonObject = JsonObject().apply {
                 addProperty("color", Color(NumberUtils.floatToIntColor(src.color)).toString())
                 addProperty("thickness", src.thickness)
-                addProperty("speed", src.speed)
                 addProperty("reloadTime", src.reloadTime)
                 addProperty("range", src.range)
                 addProperty("damage", src.damage)
-                addProperty("turnSpeed", src.turnSpeed)
             }
             
             return jsonObject

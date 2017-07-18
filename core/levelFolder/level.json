@@ -103,17 +103,13 @@
         {
           "color": "FF0000FF",
           "thickness": 1.5,
-          "speed": 25000,
           "reloadTime": 2,
-          "turnSpeed": 0,
           "range": 250,
           "damage": 5
         },
         {
           "color": "FFFFFFFF",
           "thickness": 2.5,
-          "speed": 1,
-          "turnSpeed": 45,
           "reloadTime": 5,
           "range": 350,
           "damage": 10
