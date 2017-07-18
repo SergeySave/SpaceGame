@@ -7,6 +7,7 @@ import com.sergey.spacegame.SpaceGame;
 import com.sergey.spacegame.client.ecs.system.CommandUISystem;
 import com.sergey.spacegame.client.ecs.system.HUDSystem;
 import com.sergey.spacegame.client.ecs.system.InConstructionRenderSystem;
+import com.sergey.spacegame.client.ecs.system.LineRenderSystem;
 import com.sergey.spacegame.client.ecs.system.MainRenderSystem;
 import com.sergey.spacegame.client.ecs.system.OrderRenderSystem;
 import com.sergey.spacegame.client.ecs.system.SelectedRenderSystem;
@@ -24,6 +25,7 @@ public class GameScreen extends BaseScreen {
     
     private OrderSystem                orderSystem;
     private MainRenderSystem           mainRenderSystem;
+    private LineRenderSystem           lineSystem;
     private OrderRenderSystem          orderRenderSystem;
     private SelectedRenderSystem       selectedRenderSystem;
     private InConstructionRenderSystem inConstructionRenderSystem;
@@ -44,13 +46,13 @@ public class GameScreen extends BaseScreen {
     public void show() {
         camera = new OrthographicCamera(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         batch = new DrawingBatch(1000, UIUtil.compileShader(Gdx.files.internal("shaders/basic.vertex.glsl"), Gdx.files.internal("shaders/basic.fragment.glsl")), true);
-        batch.setLineWidth(1f);
         batch.setBlendFunction(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
         
         ecsManager = level.getECS();
         ecsManager.addSystem(orderSystem = new OrderSystem(level));
         
         ecsManager.addSystem(mainRenderSystem = new MainRenderSystem(batch));
+        ecsManager.addSystem(lineSystem = new LineRenderSystem(batch));
         ecsManager.addSystem(orderRenderSystem = new OrderRenderSystem(batch));
         ecsManager.addSystem(selectedRenderSystem = new SelectedRenderSystem(batch));
         ecsManager.addSystem(inConstructionRenderSystem = new InConstructionRenderSystem(batch));
@@ -87,6 +89,7 @@ public class GameScreen extends BaseScreen {
     public void hide() {
         ecsManager.removeSystem(orderSystem);
         ecsManager.removeSystem(mainRenderSystem);
+        ecsManager.removeSystem(lineSystem);
         ecsManager.removeSystem(orderRenderSystem);
         ecsManager.removeSystem(selectedRenderSystem);
         ecsManager.removeSystem(selectionControlSystem);

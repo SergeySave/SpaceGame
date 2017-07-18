@@ -107,7 +107,8 @@ class SpatialQuadtree<T> @JvmOverloads constructor(private val minX: Float, priv
         return root.queryArea(VEC1, VEC2)
     }
     
-    fun queryNearest(pos: Vector2): Iterator<T> {
+    @JvmOverloads
+    fun queryNearest(pos: Vector2, maxRange: Float = Float.MAX_VALUE): Iterator<T> {
         val root = this.root
         if (root == null) return emptyList<T>().iterator()
         
@@ -118,12 +119,12 @@ class SpatialQuadtree<T> @JvmOverloads constructor(private val minX: Float, priv
         val (_, aPoint) = contents.next() //T, Vector2
         val distToFirstPoint = aPoint.dst(pos)
         
-        return NearestIterator(pos, distToFirstPoint, root)
+        return NearestIterator(pos, distToFirstPoint, root, maxRange)
     }
     
     fun getSingleNearest(pos: Vector2): T? {
         val iterator = queryNearest(pos)
-        if (iterator.hasNext()) return null
+        if (!iterator.hasNext()) return null
         return iterator.next()
     }
     
@@ -249,15 +250,31 @@ class SpatialQuadtree<T> @JvmOverloads constructor(private val minX: Float, priv
     }
     
     private inner class NearestIterator(private val center: Vector2, private var radius: Float,
-                                        private val root: Node) : Iterator<T> {
+                                        private val root: Node, private val maxRange: Float) : Iterator<T> {
         private val queue = PriorityQueue<Pair<T, Float>>({ o1, o2 -> o1.second.compareTo(o2.second) })
         private var VEC1 = Vector2()
         private var VEC2 = Vector2()
+    
+        init {
+            val radius2 = radius * radius
+            root.queryArea(VEC1.set(center).sub(radius, radius),
+                           VEC2.set(center).add(radius, radius)).forEach { (obj, loc) ->
+            
+                val dst = loc.dst2(center)
+                if (dst <= radius2) {
+                    queue.add(Pair(obj, dst))
+                }
+            }
+        }
         
         override fun hasNext(): Boolean {
-            if (queue.isEmpty()) {
+            while (queue.isEmpty()) {
+                if (radius >= maxRange) return false
+                
                 val oldRadius = radius
                 radius *= 1.5f
+        
+                if (radius > maxRange) radius = maxRange
                 
                 val oldRadius2 = oldRadius * oldRadius
                 val radius2 = radius * radius
@@ -270,8 +287,8 @@ class SpatialQuadtree<T> @JvmOverloads constructor(private val minX: Float, priv
                     }
                 }
             }
-            
-            return !queue.isEmpty()
+    
+            return true
         }
         
         override fun next() = queue.poll().first

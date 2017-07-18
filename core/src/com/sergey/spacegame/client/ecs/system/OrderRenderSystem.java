@@ -41,6 +41,7 @@ public class OrderRenderSystem extends EntitySystem {
     @Override
     public void update(float deltaTime) {
         batch.setForceColor(LINE_COLOR);
+        batch.setLineWidth(1f);
         Vector2 posVar;
         
         for (Entity entity : entities) {
