@@ -29,7 +29,7 @@ class LineRenderSystem(private val batch: DrawingBatch) : EntitySystem(2) {
             line = LineVisualComponent.MAPPER.get(entity)
             
             batch.setLineWidth(line.thickness)
-            batch.setForceColor(line.color)
+            batch.setForceColor(line.getColorWithOpacity())
             batch.line(line.x, line.y, line.x2, line.y2)
             
             line.life -= deltaTime

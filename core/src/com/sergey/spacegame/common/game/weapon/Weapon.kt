@@ -2,7 +2,6 @@ package com.sergey.spacegame.common.game.weapon
 
 import com.badlogic.ashley.core.Entity
 import com.badlogic.gdx.graphics.Color
-import com.badlogic.gdx.utils.NumberUtils
 import com.google.gson.JsonDeserializationContext
 import com.google.gson.JsonDeserializer
 import com.google.gson.JsonElement
@@ -19,7 +18,7 @@ import java.lang.reflect.Type
 /**
  * @author sergeys
  */
-class Weapon(val color: Float, val thickness: Float, val reloadTime: Float, val range: Float,
+class Weapon(val color: Int, val thickness: Float, val reloadTime: Float, val range: Float,
              val damage: Float, val accuracy: Float) {
     @Transient
     val range2 = range * range
@@ -29,7 +28,6 @@ class Weapon(val color: Float, val thickness: Float, val reloadTime: Float, val 
         
         val entity = level.ecs.newEntity()
         
-        entity.add(LineVisualComponent(x, y, positionComponent.x, positionComponent.y, thickness, color, 0.25f))
         level.random.test(accuracy) { success ->
             if (success) {
                 HealthComponent.MAPPER.get(target).health -= damage
@@ -45,7 +43,7 @@ class Weapon(val color: Float, val thickness: Float, val reloadTime: Float, val 
     class Adapter : JsonSerializer<Weapon>, JsonDeserializer<Weapon> {
         override fun deserialize(json: JsonElement, typeOfT: Type, context: JsonDeserializationContext): Weapon {
             return json.asJsonObject.run {
-                Weapon(Color.valueOf(get("color").asString).toFloatBits(),
+                Weapon(Color.rgba8888(Color.valueOf(get("color").asString)),
                        get("thickness").asFloat,
                        get("reloadTime").asFloat,
                        get("range").asFloat,
@@ -57,7 +55,7 @@ class Weapon(val color: Float, val thickness: Float, val reloadTime: Float, val 
         
         override fun serialize(src: Weapon, typeOfSrc: Type, context: JsonSerializationContext): JsonElement {
             val jsonObject = JsonObject().apply {
-                addProperty("color", Color(NumberUtils.floatToIntColor(src.color)).toString())
+                addProperty("color", Color(src.color).toString())
                 addProperty("thickness", src.thickness)
                 addProperty("reloadTime", src.reloadTime)
                 addProperty("range", src.range)
