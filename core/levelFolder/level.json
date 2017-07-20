@@ -141,6 +141,9 @@
         "health": 50,
         "maxHealth": 50
       },
+      "com.sergey.spacegame.common.ecs.component.TagComponent": {
+        "tag": "enemy"
+      },
       "com.sergey.spacegame.common.ecs.component.Team2Component": {}
     },
     "mine1": {
@@ -224,6 +227,7 @@
     "com.sergey.spacegame.common.event.EntityTickEvent": "file://lua/EntityTickEvent.lua",
     "com.sergey.spacegame.common.event.CommandIssuedEvent": "file://lua/CommandIssuedEvent.lua",
     "com.sergey.spacegame.common.event.BuildingConstructedEvent": "file://lua/BuildingConstructedEvent.lua",
-    "com.sergey.spacegame.common.event.EntityAddedEvent": "file://lua/EntityAddedEvent.lua"
+    "com.sergey.spacegame.common.event.EntityAddedEvent": "file://lua/EntityAddedEvent.lua",
+    "com.sergey.spacegame.common.event.EntityRemovedEvent": "file://lua/EntityRemovedEvent.lua"
 	}
 }
