@@ -105,14 +105,16 @@
           "thickness": 1.5,
           "reloadTime": 2,
           "range": 250,
-          "damage": 5
+          "damage": 5,
+          "accuracy": 0.8
         },
         {
           "color": "FFFFFFFF",
           "thickness": 2.5,
           "reloadTime": 5,
           "range": 350,
-          "damage": 10
+          "damage": 10,
+          "accuracy": 0.95
         }
       ]
 		},

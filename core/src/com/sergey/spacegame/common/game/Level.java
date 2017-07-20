@@ -55,6 +55,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map.Entry;
+import java.util.Random;
 import java.util.Set;
 
 public class Level {
@@ -68,6 +69,7 @@ public class Level {
     private HashMap<Class<? extends Event>, LuaEventHandler> events       = new HashMap<>();
     private HashMap<String, String>                          localization = new HashMap<>();
     
+    private transient Random                  random;
     private transient LuaValue[]              luaStores;
     private transient double                  money;
     private transient List<Objective>         objectives;
@@ -80,6 +82,9 @@ public class Level {
     
     private Level() {
         _deserializing = this;
+    
+        random = new Random();
+        
         luaStores = new LuaValue[10];
         for (int i = 0; i < luaStores.length; i++) {
             luaStores[i] = LuaValue.NIL;
@@ -206,6 +211,10 @@ public class Level {
     
     public SpatialQuadtree<Entity> getTeam2() {
         return enemyTeam;
+    }
+    
+    public Random getRandom() {
+        return random;
     }
     
     public static class LevelEventRegistry {
