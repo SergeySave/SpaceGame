@@ -28,10 +28,10 @@ class SpatialQuadtree<T> @JvmOverloads constructor(private val minX: Float, priv
         val smallestNode = root.getSubNode(pos)
         if (smallestNode.map.size == leafSize) {
             val branch = Branch(smallestNode, smallestNode, smallestNode, smallestNode, smallestNode.bl.x, smallestNode.bl.y, smallestNode.tr.x, smallestNode.tr.y, smallestNode.parent)
-            branch.topLeft = Leaf(smallestNode.tl.x, smallestNode.center.y, smallestNode.center.x, smallestNode.tr.y, branch)
+            branch.topLeft = Leaf(smallestNode.bl.x, smallestNode.center.y, smallestNode.center.x, smallestNode.tr.y, branch)
             branch.topRight = Leaf(smallestNode.center.x, smallestNode.center.y, smallestNode.tr.x, smallestNode.tr.y, branch)
             branch.bottomLeft = Leaf(smallestNode.bl.x, smallestNode.bl.y, smallestNode.center.x, smallestNode.center.y, branch)
-            branch.bottomRight = Leaf(smallestNode.center.x, smallestNode.br.y, smallestNode.tr.x, smallestNode.center.y, branch)
+            branch.bottomRight = Leaf(smallestNode.center.x, smallestNode.bl.y, smallestNode.tr.x, smallestNode.center.y, branch)
             if (smallestNode.parent == null) {
                 this.root = branch
             } else {
@@ -135,11 +135,13 @@ class SpatialQuadtree<T> @JvmOverloads constructor(private val minX: Float, priv
     }
     
     protected inner abstract class Node(minX: Float, minY: Float, maxX: Float, maxY: Float, val parent: Node?) {
-        val tl = Vector2(minX, maxY)
         val tr = Vector2(maxX, maxY)
         val bl = Vector2(minX, minY)
-        val br = Vector2(maxX, minY)
         val center = Vector2((minX + maxX) / 2, (minY + maxY) / 2)
+        val bc = Vector2(center.x, minY)
+        val tc = Vector2(center.x, maxY)
+        val lc = Vector2(minX, center.y)
+        val rc = Vector2(maxX, center.y)
     
         abstract fun remove(obj: T, pos: Vector2): Vector2?
     
@@ -176,19 +178,19 @@ class SpatialQuadtree<T> @JvmOverloads constructor(private val minX: Float, priv
         
         override fun queryArea(start: Vector2, end: Vector2): Iterator<Map.Entry<T, Vector2>> {
             val list = mutableListOf<Iterator<Map.Entry<T, Vector2>>>()
-            if (contains(start, end, tl, center)) {
+            if (contains(start, end, lc, tc)) {
                 list.add(topLeft.rawContents())
-            } else if (overlaps(start, end, tl, center)) {
+            } else if (overlaps(start, end, lc, tc)) {
                 list.add(topLeft.queryArea(start, end))
             }
-            if (contains(start, end, tr, center)) {
+            if (contains(start, end, center, tr)) {
                 list.add(topRight.rawContents())
-            } else if (overlaps(start, end, tr, center)) {
+            } else if (overlaps(start, end, center, tr)) {
                 list.add(topRight.queryArea(start, end))
             }
-            if (contains(start, end, br, center)) {
+            if (contains(start, end, bc, rc)) {
                 list.add(bottomRight.rawContents())
-            } else if (overlaps(start, end, br, center)) {
+            } else if (overlaps(start, end, bc, rc)) {
                 list.add(bottomRight.queryArea(start, end))
             }
             if (contains(start, end, bl, center)) {
@@ -237,7 +239,7 @@ class SpatialQuadtree<T> @JvmOverloads constructor(private val minX: Float, priv
         override fun remove(obj: T, pos: Vector2): Vector2? = map.remove(obj)
         
         override fun queryArea(start: Vector2,
-                               end: Vector2): Iterator<Map.Entry<T, Vector2>> = map.filter { (_, value) -> value bothAxisPositiveOf start && value bothAxisNegativeOf end }.iterator()
+                               end: Vector2): Iterator<Map.Entry<T, Vector2>> = map.filter { (_, value) -> contains(start, end, value) }.iterator()
     
         override fun rawContents(): Iterator<Map.Entry<T, Vector2>> = map.entries.iterator()
         
@@ -296,11 +298,14 @@ class SpatialQuadtree<T> @JvmOverloads constructor(private val minX: Float, priv
     }
 }
 
-private infix fun Vector2.bothAxisPositiveOf(other: Vector2): Boolean = this.x >= other.x && this.y >= other.y
-private infix fun Vector2.bothAxisNegativeOf(other: Vector2): Boolean = this.x <= other.x && this.y <= other.y
 private fun overlaps(start1: Vector2, end1: Vector2, start2: Vector2,
                      end2: Vector2) = start1.x <= end2.x && end1.x >= start2.x && start1.y <= end2.y && end1.y >= start2.y
 
 private fun contains(start1: Vector2, end1: Vector2, start2: Vector2,
                      end2: Vector2) = start1.x <= start2.x && end1.x >= end2.x && start1.y <= start2.y && end1.y >= end2.y
+
+private fun contains(start: Vector2, end: Vector2,
+                     pos: Vector2) = start.x <= pos.x && end.x >= pos.x && start.y <= pos.y && end.y >= pos.y
+
+
 
