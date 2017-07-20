@@ -11,6 +11,8 @@ import com.sergey.spacegame.common.ecs.component.SizeComponent
 import com.sergey.spacegame.common.game.Level
 import com.sergey.spacegame.common.game.orders.FaceOrder
 import com.sergey.spacegame.common.game.orders.MoveOrder
+import com.sergey.spacegame.common.util.ceil //KotlinUtils
+import com.sergey.spacegame.common.util.floor //KotlinUtils
 
 abstract class FormationCommandExecutable : CommandExecutable {
     
@@ -148,7 +150,4 @@ class TriangleFormationCommandExecutable : FormationCommandExecutable() {
     }
     
     override fun testEquals(other: Any?): Boolean = other is TriangleFormationCommandExecutable
-    
-    private fun Double.floor(): Int = Math.floor(this).toInt()
-    private fun Double.ceil(): Int = Math.ceil(this).toInt()
 }

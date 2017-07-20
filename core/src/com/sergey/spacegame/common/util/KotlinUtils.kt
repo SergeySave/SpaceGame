@@ -19,3 +19,17 @@ inline fun <reified T> Random.test(trueChance: Float, func: (Boolean) -> T): T =
 fun Random.test(trueChance: Double): Boolean = nextDouble() <= trueChance
 inline fun Random.test(trueChance: Double, trueFunc: () -> Unit) = if (nextDouble() <= trueChance) trueFunc() else Unit
 inline fun <reified T> Random.test(trueChance: Double, func: (Boolean) -> T): T = func(nextDouble() <= trueChance)
+
+inline fun <T> Iterator<T>.first(predicate: (T) -> Boolean): T? {
+    while (hasNext()) {
+        val obj = next()
+        if (predicate(obj))
+            return obj
+    }
+    return null
+}
+
+
+fun Double.floor(): Int = Math.floor(this).toInt()
+fun Double.ceil(): Int = Math.ceil(this).toInt()
+

@@ -10,6 +10,7 @@ import com.sergey.spacegame.common.ecs.component.Team1Component
 import com.sergey.spacegame.common.ecs.component.Team2Component
 import com.sergey.spacegame.common.ecs.component.WeaponComponent
 import com.sergey.spacegame.common.game.Level
+import com.sergey.spacegame.common.util.first //KotlinUtils
 
 class WeaponSystem(
         val level: Level) : IteratingSystem((Family.all(WeaponComponent::class.java, PositionComponent::class.java).one(Team1Component::class.java, Team2Component::class.java).get())) {
@@ -45,14 +46,5 @@ class WeaponSystem(
                 }
             }
         }
-    }
-    
-    private fun <T> Iterator<T>.first(predicate: (T) -> Boolean): T? {
-        while (hasNext()) {
-            val obj = next()
-            if (predicate(obj))
-                return obj
-        }
-        return null
     }
 }
