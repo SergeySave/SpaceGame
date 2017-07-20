@@ -19,7 +19,7 @@ import java.lang.reflect.Type
  * @author sergeys
  */
 class Weapon(val color: Int, val thickness: Float, val reloadTime: Float, val range: Float,
-             val damage: Float, val accuracy: Float) {
+             val damage: Float, val accuracy: Float, val life: Float) {
     @Transient
     val range2 = range * range
     
@@ -31,9 +31,9 @@ class Weapon(val color: Int, val thickness: Float, val reloadTime: Float, val ra
         level.random.test(accuracy) { success ->
             if (success) {
                 HealthComponent.MAPPER.get(target).health -= damage
-                entity.add(LineVisualComponent(x, y, positionComponent.x, positionComponent.y, thickness, color, 0.25f))
+                entity.add(LineVisualComponent(x, y, positionComponent.x, positionComponent.y, thickness, color, life))
             } else {
-                entity.add(LineVisualComponent(x, y, positionComponent.x + (level.random.nextFloat() - 0.5f) * 60, positionComponent.y + (level.random.nextFloat() - 0.5f) * 60, thickness, color, 0.25f))
+                entity.add(LineVisualComponent(x, y, positionComponent.x + (level.random.nextFloat() - 0.5f) * 60, positionComponent.y + (level.random.nextFloat() - 0.5f) * 60, thickness, color, life))
             }
         }
         
@@ -48,7 +48,8 @@ class Weapon(val color: Int, val thickness: Float, val reloadTime: Float, val ra
                        get("reloadTime").asFloat,
                        get("range").asFloat,
                        get("damage").asFloat,
-                       get("accuracy").asFloat
+                       get("accuracy").asFloat,
+                       get("life").asFloat
                 )
             }
         }
@@ -61,6 +62,7 @@ class Weapon(val color: Int, val thickness: Float, val reloadTime: Float, val ra
                 addProperty("range", src.range)
                 addProperty("damage", src.damage)
                 addProperty("accuracy", src.accuracy)
+                addProperty("life", src.life)
             }
             
             return jsonObject
