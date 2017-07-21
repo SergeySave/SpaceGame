@@ -9,6 +9,7 @@ import com.sergey.spacegame.common.ecs.component.ShipComponent;
 import com.sergey.spacegame.common.game.Level;
 import com.sergey.spacegame.common.game.orders.FaceOrder;
 import com.sergey.spacegame.common.game.orders.MoveOrder;
+import com.sergey.spacegame.common.game.orders.StopOrder;
 import com.sergey.spacegame.common.game.orders.TimeMoveOrder;
 import com.sergey.spacegame.common.math.Angle;
 
@@ -115,6 +116,8 @@ public final class MoveCommandExecutable implements CommandExecutable {
                     endPos = startPos.cpy().sub(center).rotate(dr1).add(center);
                     deltaPos = endPos.cpy().sub(startPos);
                     ang = deltaPos.angle();
+    
+                    ord.addOrder(new StopOrder());
                     
                     //Fleet rotate 1
                     ord.addOrder(new FaceOrder(ang, ship.rotateSpeed));
@@ -168,6 +171,7 @@ public final class MoveCommandExecutable implements CommandExecutable {
                     .getAsDouble();
             entitySource.forEach((e) -> {
                 OrderComponent ord = new OrderComponent(
+                        new StopOrder(),
                         new FaceOrder(fleetMoveDir, 45),
                         new MoveOrder(
                                 PositionComponent.MAPPER.get(e).getX() + dx,

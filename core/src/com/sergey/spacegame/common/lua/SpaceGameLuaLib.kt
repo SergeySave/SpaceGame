@@ -23,6 +23,7 @@ import com.sergey.spacegame.common.game.orders.BuildShipOrder
 import com.sergey.spacegame.common.game.orders.FaceOrder
 import com.sergey.spacegame.common.game.orders.IOrder
 import com.sergey.spacegame.common.game.orders.MoveOrder
+import com.sergey.spacegame.common.game.orders.StopOrder
 import com.sergey.spacegame.common.game.orders.TimeMoveOrder
 import com.sergey.spacegame.common.util.Quadruple
 import org.luaj.vm2.LuaTable
@@ -184,6 +185,7 @@ class SpaceGameLuaLib private constructor() : TwoArgFunction() {
             ORDERS.add(FaceOrder::class.java)
             ORDERS.add(MoveOrder::class.java)
             ORDERS.add(TimeMoveOrder::class.java)
+            ORDERS.add(StopOrder::class.java)
             
             COMPONENTS.add(Quadruple("position", PositionComponent.MAPPER, { PositionComponent() }, listOf("pos", "p")))
             COMPONENTS.add(Quadruple("rotation", RotationComponent.MAPPER, { RotationComponent() }, listOf("rot", "r")))
