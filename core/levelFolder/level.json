@@ -144,7 +144,18 @@
       "com.sergey.spacegame.common.ecs.component.TagComponent": {
         "tag": "enemy"
       },
-      "com.sergey.spacegame.common.ecs.component.Team2Component": {}
+      "com.sergey.spacegame.common.ecs.component.Team2Component": {},
+      "com.sergey.spacegame.common.ecs.component.WeaponComponent": [
+        {
+          "color": "FF0000FF",
+          "thickness": 1.6,
+          "reloadTime": 3.5,
+          "range": 400,
+          "damage": 8,
+          "accuracy": 0.9,
+          "life": 0.4
+        }
+      ]
     },
     "mine1": {
 			"com.sergey.spacegame.client.ecs.component.VisualComponent": { "image": "building/factory" },
@@ -189,12 +200,6 @@
 		{
 			"com.sergey.spacegame.client.ecs.component.VisualComponent": { "image": "planets/1" },
 			"com.sergey.spacegame.common.ecs.component.PositionComponent": { "x": 250, "y": 250 },
-			"com.sergey.spacegame.common.ecs.component.SizeComponent": { "w": 200, "h": 200 },
-			"com.sergey.spacegame.common.ecs.component.PlanetComponent": {}
-		},
-		{
-			"com.sergey.spacegame.client.ecs.component.VisualComponent": { "image": "planets/1" },
-			"com.sergey.spacegame.common.ecs.component.PositionComponent": { "x": 750, "y": 750 },
 			"com.sergey.spacegame.common.ecs.component.SizeComponent": { "w": 200, "h": 200 },
 			"com.sergey.spacegame.common.ecs.component.PlanetComponent": {}
 		},

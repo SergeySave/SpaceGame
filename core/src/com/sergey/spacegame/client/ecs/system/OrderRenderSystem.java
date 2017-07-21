@@ -10,6 +10,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.sergey.spacegame.client.gl.DrawingBatch;
 import com.sergey.spacegame.common.ecs.component.OrderComponent;
 import com.sergey.spacegame.common.ecs.component.PositionComponent;
+import com.sergey.spacegame.common.ecs.component.Team1Component;
 import com.sergey.spacegame.common.game.orders.BuildBuildingOrder;
 import com.sergey.spacegame.common.game.orders.IOrder;
 import com.sergey.spacegame.common.game.orders.MoveOrder;
@@ -30,7 +31,7 @@ public class OrderRenderSystem extends EntitySystem {
     
     @Override
     public void addedToEngine(Engine engine) {
-        entities = engine.getEntitiesFor(Family.all(OrderComponent.class).get());
+        entities = engine.getEntitiesFor(Family.all(OrderComponent.class, Team1Component.class).get());
     }
     
     @Override

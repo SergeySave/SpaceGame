@@ -24,6 +24,8 @@ if event:getId() == 'default' then
             local rotation = component.r.get(enemy)
             rotation.r = 225
 
+            addOrder(enemy, orders.MoveOrder.new(750, 750, 25), orders.MoveOrder)
+
             addObjective('obj.defeat-enemies-1.id', 'obj.defeat-enemies-1.title', 'obj.defeat-enemies-1.desc')
         end
     end
