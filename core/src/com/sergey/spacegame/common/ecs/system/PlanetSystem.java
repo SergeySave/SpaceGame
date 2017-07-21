@@ -35,15 +35,12 @@ public class PlanetSystem extends EntitySystem implements EntityListener {
     }
     @Override
     public void entityAdded(Entity building) {
-    /*
-    functionality moved to building component
         BuildingComponent buildingC = BuildingComponent.MAPPER.get(building);
         Entity            planet    = buildingC.getPlanet();
         PlanetComponent   planetC   = PlanetComponent.MAPPER.get(planet);
         float[]           minMax    = getMinMax(building, planet, buildingC.getPosition());
         
         planetC.addBuildingInRange(minMax[0], minMax[1]);
-    */
     }
     
     @Override
@@ -53,8 +50,8 @@ public class PlanetSystem extends EntitySystem implements EntityListener {
         PlanetComponent   planetC   = PlanetComponent.MAPPER.get(planet);
         float[]           minMax    = getMinMax(building, planet, buildingC.getPosition());
         
-        buildingC.reset();
         planetC.removeBuilding(minMax[0], minMax[1]);
+        buildingC.reset();
     }
     
     public static float[] getMinMax(Entity building, Entity planet, float positionB) {

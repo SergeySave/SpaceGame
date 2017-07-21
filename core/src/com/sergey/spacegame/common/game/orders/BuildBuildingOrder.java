@@ -69,7 +69,7 @@ public class BuildBuildingOrder implements IOrder {
             Entity planet = closestPlanet.get();
             
             Entity                 building               = level.getEntities().get(entity).createEntity(level); //Copy of building
-            InContructionComponent inContructionComponent = new InContructionComponent(entity);
+            InContructionComponent inContructionComponent = new InContructionComponent(entity, price);
             inContructionComponent.timeRemaining = time;
             building.add(inContructionComponent);
     
@@ -95,6 +95,9 @@ public class BuildBuildingOrder implements IOrder {
     
                 if (sameSpotBuilding.isPresent()) {
                     this.building = sameSpotBuilding.get();
+    
+                    ++InContructionComponent.MAPPER.get(this.building).building;
+                    
                     return;
                     //time = InContructionComponent.MAPPER.get(building).timeRemaining;
                 } else {
@@ -118,6 +121,7 @@ public class BuildBuildingOrder implements IOrder {
             level.setMoney(level.getMoney() - price);
             
             this.building = building;
+            ++inContructionComponent.building;
         } else {
             //No planet fail to build
             isDone = true;
@@ -224,9 +228,15 @@ public class BuildBuildingOrder implements IOrder {
     @Override
     public void onCancel(Entity e, Level level) {
         if (building != null) {
-            level.getECS().removeEntity(building);
+            InContructionComponent icc = InContructionComponent.MAPPER.get(building);
+            if (icc != null) {
+                --icc.building;
+                if (icc.building == 0) {
+                    level.getECS().removeEntity(building);
+                    level.setMoney(level.getMoney() + icc.price);
+                }
+            }
         }
-        level.setMoney(level.getMoney() + price);
     }
     
     public Optional<Vector2> getPosition() {

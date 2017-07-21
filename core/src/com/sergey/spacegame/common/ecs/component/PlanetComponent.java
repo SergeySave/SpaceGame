@@ -67,11 +67,14 @@ public class PlanetComponent implements ClonableComponent {
         Iterator<AngleRange> iterator = freeSpaces.iterator();
         while (iterator.hasNext()) {
             AngleRange range = iterator.next();
-            if (range.getMaxD() == min) {
-                AngleRange nextRange = iterator.next();
+            double     rMax  = range.getMaxD();
+            if (rMax > 360) rMax -= 360;
+            if (rMax == min) {
+                if (iterator.hasNext()) {
+                    AngleRange nextRange = iterator.next();
+                    range.setMax(nextRange.getMaxD());
+                }
                 iterator.remove();
-                
-                range.setMax(nextRange.getMaxD());
                 
                 return true;
             }

@@ -3,7 +3,6 @@ package com.sergey.spacegame.common.ecs.component;
 import com.badlogic.ashley.core.Component;
 import com.badlogic.ashley.core.ComponentMapper;
 import com.badlogic.ashley.core.Entity;
-import com.sergey.spacegame.common.ecs.system.PlanetSystem;
 
 public class BuildingComponent implements Component {
     
@@ -19,11 +18,11 @@ public class BuildingComponent implements Component {
         if (planet == null) throw new NullPointerException("Planet must not be null");
         this.planet = planet;
         this.position = position;
-        
-        PlanetComponent planetC = PlanetComponent.MAPPER.get(planet);
-        float[]         minMax  = PlanetSystem.getMinMax(building, planet, getPosition());
-        
-        planetC.addBuildingInRange(minMax[0], minMax[1]);
+    
+        //PlanetComponent planetC = PlanetComponent.MAPPER.get(planet);
+        //float[]         minMax  = PlanetSystem.getMinMax(building, planet, getPosition());
+    
+        //planetC.addBuildingInRange(minMax[0], minMax[1]);
     
         //Registration of the building should have occurred right
         //after this when this component was added in the PlanetSystem

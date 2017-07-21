@@ -9,8 +9,11 @@ public class InContructionComponent implements Component {
     
     public float  timeRemaining;
     public String entityID;
+    public double price;
+    public int    building;
     
-    public InContructionComponent(String entityID) {
+    public InContructionComponent(String entityID, double price) {
         this.entityID = entityID;
+        this.price = price;
     }
 }
