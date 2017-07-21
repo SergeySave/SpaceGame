@@ -14,6 +14,9 @@ import com.sergey.spacegame.common.game.Level
 
 /**
  * @author sergeys
+ *
+ * AKA. PositionStstem
+ *
  */
 class SpacialQuadtreeSystem(private val level: Level) : EntitySystem(), EntityListener {
     override fun entityAdded(entity: Entity) {
@@ -46,10 +49,14 @@ class SpacialQuadtreeSystem(private val level: Level) : EntitySystem(), EntityLi
         val team1 = this.team1
         val team2 = this.team2
         if (team1 == null || team2 == null) return
+    
+        val levelLimits = level.limits
         
         team1.forEach { entity ->
             val position = PositionComponent.MAPPER.get(entity)
             if (position.isDirty) {
+    
+                position.clamp(levelLimits.minX, levelLimits.maxX, levelLimits.minY, levelLimits.maxY)
                 
                 TMP.set(position.oldX, position.oldY)
                 level.team1.remove(entity, TMP)
@@ -64,7 +71,9 @@ class SpacialQuadtreeSystem(private val level: Level) : EntitySystem(), EntityLi
         team2.forEach { entity ->
             val position = PositionComponent.MAPPER.get(entity)
             if (position.isDirty) {
-                
+    
+                position.clamp(levelLimits.minX, levelLimits.maxX, levelLimits.minY, levelLimits.maxY)
+
                 TMP.set(position.oldX, position.oldY)
                 level.team2.remove(entity, TMP)
                 

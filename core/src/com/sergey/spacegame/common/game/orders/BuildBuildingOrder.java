@@ -11,10 +11,12 @@ import com.sergey.spacegame.common.ecs.component.RotationComponent;
 import com.sergey.spacegame.common.ecs.component.RotationVelocityComponent;
 import com.sergey.spacegame.common.ecs.component.ShipComponent;
 import com.sergey.spacegame.common.ecs.component.VelocityComponent;
+import com.sergey.spacegame.common.ecs.system.BuildingSystem;
 import com.sergey.spacegame.common.ecs.system.OrderSystem;
 import com.sergey.spacegame.common.ecs.system.PlanetSystem;
 import com.sergey.spacegame.common.event.BuildingConstructedEvent;
 import com.sergey.spacegame.common.game.Level;
+import com.sergey.spacegame.common.game.LevelLimits;
 import com.sergey.spacegame.common.math.Angle;
 import com.sergey.spacegame.common.math.AngleRange;
 
@@ -114,7 +116,18 @@ public class BuildBuildingOrder implements IOrder {
             
             building.add(buildingC);
             if (!PositionComponent.MAPPER.has(building)) building.add(new PositionComponent());
-            
+            BuildingSystem.doSetBuildingPosition(building, planet, buildingPos);
+    
+            PositionComponent posVar = PositionComponent.MAPPER.get(building);
+            LevelLimits       limits = level.getLimits();
+    
+            if (posVar.getX() < limits.getMinX() || posVar.getX() > limits.getMaxX() ||
+                posVar.getY() < limits.getMinY() || posVar.getY() > limits.getMaxY()) {
+                //Invalid placement
+                isDone = true;
+                return;
+            }
+    
             level.getECS().addEntity(building);
             orderSystem.registerNewInConstruction(building);
     

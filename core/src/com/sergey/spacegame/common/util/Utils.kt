@@ -1,5 +1,5 @@
 @file:kotlin.jvm.JvmMultifileClass
-@file:kotlin.jvm.JvmName("KotlinUtils")
+@file:kotlin.jvm.JvmName("Utils")
 
 package com.sergey.spacegame.common.util
 
@@ -33,3 +33,5 @@ inline fun <T> Iterator<T>.first(predicate: (T) -> Boolean): T? {
 fun Double.floor(): Int = Math.floor(this).toInt()
 fun Double.ceil(): Int = Math.ceil(this).toInt()
 
+fun Float.clamp(min: Float, max: Float): Float = if (this >= max) max else if (this <= min) min else this
+fun Double.clamp(min: Double, max: Double): Double = if (this >= max) max else if (this <= min) min else this

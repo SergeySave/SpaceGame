@@ -16,7 +16,9 @@ import com.sergey.spacegame.client.ecs.component.SelectedComponent;
 import com.sergey.spacegame.client.gl.DrawingBatch;
 import com.sergey.spacegame.common.ecs.component.ControllableComponent;
 import com.sergey.spacegame.common.game.Level;
+import com.sergey.spacegame.common.game.LevelLimits;
 import com.sergey.spacegame.common.game.command.Command;
+import com.sergey.spacegame.common.util.Utils;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -73,9 +75,17 @@ public class CommandUISystem extends EntitySystem {
             command = null;
             return;
         }
-        
+    
+        LevelLimits limits = level.getLimits();
+    
         if (Gdx.input.justTouched() && Gdx.input.isButtonPressed(Buttons.RIGHT)) {
             Vector3 vec = camera.unproject(new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0));
+    
+            if (vec.x < limits.getMinX() || vec.x > limits.getMaxX() || vec.y < limits.getMinY() ||
+                vec.y > limits.getMaxY()) {
+                return;
+            }
+            
             if (!command.getRequiresTwoInput()) {
                 List<Entity> entities = StreamSupport.stream(selectedEntities.spliterator(), true)
                         .filter((e) -> ControllableComponent.MAPPER.get(e).commands.contains(command))
@@ -90,6 +100,10 @@ public class CommandUISystem extends EntitySystem {
         
         if (orderCenter != null) {
             Vector3 vec = camera.unproject(new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0));
+    
+            vec.x = Utils.clamp(vec.x, limits.getMinX(), limits.getMaxX());
+            vec.y = Utils.clamp(vec.y, limits.getMinY(), limits.getMaxY());
+            
             batch.setForceColor(LINE_COLOR);
             batch.line(orderCenter.x, orderCenter.y, vec.x, vec.y);
             if (!Gdx.input.isButtonPressed(Buttons.RIGHT)) {

@@ -13,6 +13,7 @@ import com.sergey.spacegame.common.ecs.component.SizeComponent;
 import com.sergey.spacegame.common.ecs.system.BuildingSystem;
 import com.sergey.spacegame.common.ecs.system.PlanetSystem;
 import com.sergey.spacegame.common.game.Level;
+import com.sergey.spacegame.common.game.LevelLimits;
 import com.sergey.spacegame.common.lua.LuaUtils;
 import com.sergey.spacegame.common.lua.SpaceGameLuaLib;
 import org.luaj.vm2.Globals;
@@ -58,8 +59,9 @@ public final class BuildingConstructionCursorOverride implements CursorOverride 
     
     @Override
     public void drawExtra(Level level, DrawingBatch batch) {
-        float x = Gdx.input.getX();
-        float y = Gdx.graphics.getHeight() - Gdx.input.getY();
+        float       x      = Gdx.input.getX();
+        float       y      = Gdx.graphics.getHeight() - Gdx.input.getY();
+        LevelLimits limits = level.getLimits();
         StreamSupport.stream(level.getPlanets().spliterator(), false)
                 .filter(PositionComponent.MAPPER::has)
                 .map((p) -> new Object[]{p, PositionComponent.MAPPER.get(p)})
@@ -95,13 +97,18 @@ public final class BuildingConstructionCursorOverride implements CursorOverride 
     
                     boolean validPlacement = PlanetComponent.MAPPER.get(planet).isFree(minMax[0], minMax[1]) &&
                                              !code.call().checkboolean();
-                    
-                    batch.setMultTint(MULT);
-                    batch.setAddTint(validPlacement ? GREEN : RED);
-                    
+    
                     posVar = PositionComponent.MAPPER.get(building);
                     sizeVar = SizeComponent.MAPPER.get(building);
                     visVar = VisualComponent.MAPPER.get(building);
+    
+                    if (validPlacement && posVar.getX() < limits.getMinX() || posVar.getX() > limits.getMaxX() ||
+                        posVar.getY() < limits.getMinY() || posVar.getY() > limits.getMaxY()) {
+                        validPlacement = false;
+                    }
+                    
+                    batch.setMultTint(MULT);
+                    batch.setAddTint(validPlacement ? GREEN : RED);
                     
                     if (RotationComponent.MAPPER.has(building)) {
                         rotVar = RotationComponent.MAPPER.get(building);

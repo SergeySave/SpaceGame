@@ -3,6 +3,7 @@ package com.sergey.spacegame.common.ecs.component;
 import com.badlogic.ashley.core.Component;
 import com.badlogic.ashley.core.ComponentMapper;
 import com.badlogic.gdx.math.Vector2;
+import com.sergey.spacegame.common.util.Utils;
 
 public class PositionComponent implements ClonableComponent {
     
@@ -76,6 +77,20 @@ public class PositionComponent implements ClonableComponent {
         dirty = false;
         oldX = x;
         oldY = y;
+    }
+    
+    /**
+     * This is an advanced method that will not update the dirty flag.
+     * This should only be used if you ensure that it is set to dirty after
+     *
+     * @param minX the minimum x position
+     * @param maxX the maximum x position
+     * @param minY the mininmum y position
+     * @param maxY the maximum y position
+     */
+    public void clamp(float minX, float maxX, float minY, float maxY) {
+        x = Utils.clamp(x, minX, maxX);
+        y = Utils.clamp(y, minY, maxY);
     }
     
     @Override
