@@ -4,6 +4,8 @@ import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Cursor;
+import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.math.Vector3;
 import com.sergey.spacegame.client.ecs.component.VisualComponent;
 import com.sergey.spacegame.client.gl.DrawingBatch;
 import com.sergey.spacegame.common.ecs.component.PlanetComponent;
@@ -58,16 +60,16 @@ public final class BuildingConstructionCursorOverride implements CursorOverride 
     }
     
     @Override
-    public void drawExtra(Level level, DrawingBatch batch) {
-        float       x      = Gdx.input.getX();
-        float       y      = Gdx.graphics.getHeight() - Gdx.input.getY();
+    public void drawExtra(Level level, DrawingBatch batch, OrthographicCamera camera) {
+        Vector3     vec    = camera.unproject(new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0));
         LevelLimits limits = level.getLimits();
         StreamSupport.stream(level.getPlanets().spliterator(), false)
                 .filter(PositionComponent.MAPPER::has)
                 .map((p) -> new Object[]{p, PositionComponent.MAPPER.get(p)})
                 .map((p) -> new Object[]{
-                        p[0], (((PositionComponent) p[1]).getX() - x) * (((PositionComponent) p[1]).getX() - x) +
-                              (((PositionComponent) p[1]).getY() - y) * (((PositionComponent) p[1]).getY() - y)
+                        p[0],
+                        (((PositionComponent) p[1]).getX() - vec.x) * (((PositionComponent) p[1]).getX() - vec.x) +
+                        (((PositionComponent) p[1]).getY() - vec.y) * (((PositionComponent) p[1]).getY() - vec.y)
                 })
                 .min((l, r) -> Float.compare((Float) l[1], (Float) r[1]))
                 .map((c) -> (Entity) c[0])
@@ -82,8 +84,8 @@ public final class BuildingConstructionCursorOverride implements CursorOverride 
                     if (!SizeComponent.MAPPER.has(building)) return;
                     
                     PositionComponent planetPos = PositionComponent.MAPPER.get(planet);
-                    
-                    float pos = planetPos.createVector().sub(x, y).scl(-1).angle();
+    
+                    float pos = planetPos.createVector().sub(vec.x, vec.y).scl(-1).angle();
                     
                     BuildingSystem.doSetBuildingPosition(building, planet, pos);
                     

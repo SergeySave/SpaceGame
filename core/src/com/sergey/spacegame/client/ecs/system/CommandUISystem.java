@@ -120,7 +120,7 @@ public class CommandUISystem extends EntitySystem {
         
         if (command != null && command.getCursor() != null) {
             if (command.getCursor().needsInitialization()) command.getCursor().init();
-            command.getCursor().drawExtra(level, batch);
+            command.getCursor().drawExtra(level, batch, camera);
         }
     }
     

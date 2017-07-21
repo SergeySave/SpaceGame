@@ -1,6 +1,7 @@
 package com.sergey.spacegame.client.ui.cursor;
 
 import com.badlogic.gdx.graphics.Cursor;
+import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.sergey.spacegame.client.gl.DrawingBatch;
 import com.sergey.spacegame.common.game.Level;
 
@@ -18,11 +19,11 @@ public interface CursorOverride {
      */
     Optional<Cursor> getRequestedCursor();
     
-    default void load(FileSystem fileSystem) throws IOException {}
+    default void load(FileSystem fileSystem) throws IOException                        {}
     
-    default void init()                                         {}
+    default void init()                                                                {}
     
-    default void drawExtra(Level level, DrawingBatch batch)     {}
+    default void drawExtra(Level level, DrawingBatch batch, OrthographicCamera camera) {}
     
     default boolean needsInitialization() {
         return false;
