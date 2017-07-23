@@ -117,9 +117,9 @@ class SpatialQuadtree<T> @JvmOverloads constructor(private val minX: Float, priv
         if (!contents.hasNext()) return emptyList<T>().iterator()
         
         val (_, aPoint) = contents.next() //T, Vector2
-        val distToFirstPoint = aPoint.dst(pos)
-        
-        return NearestIterator(pos, distToFirstPoint, root, maxRange)
+        val dist2ToFirstPoint = aPoint.dst2(pos)
+    
+        return NearestIterator(pos, Math.sqrt(dist2ToFirstPoint.toDouble()).toFloat(), dist2ToFirstPoint, root, maxRange)
     }
     
     fun getSingleNearest(pos: Vector2): T? {
@@ -251,14 +251,18 @@ class SpatialQuadtree<T> @JvmOverloads constructor(private val minX: Float, priv
         override fun count(): Int = map.size
     }
     
-    private inner class NearestIterator(private val center: Vector2, private var radius: Float,
+    private inner class NearestIterator(private val center: Vector2, private var radius: Float, rad2: Float,
                                         private val root: Node, private val maxRange: Float) : Iterator<T> {
         private val queue = PriorityQueue<Pair<T, Float>>({ o1, o2 -> o1.second.compareTo(o2.second) })
         private var VEC1 = Vector2()
         private var VEC2 = Vector2()
     
         init {
-            val radius2 = radius * radius
+            var radius2 = rad2
+            if (radius > maxRange) {
+                radius = maxRange
+                radius2 = radius * radius
+            }
             root.queryArea(VEC1.set(center).sub(radius, radius),
                            VEC2.set(center).add(radius, radius)).forEach { (obj, loc) ->
             
