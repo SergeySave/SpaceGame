@@ -13,7 +13,7 @@ elseif event:getSelected():size() == 10 then
 
     if objective and not objective:getCompleted() then
         objective:setCompleted(true)
-        addObjective('obj.triangle-command.id', 'obj.triangle-command.title', 'obj.triangle-command.desc')
+        addObjective('obj.fleet-formation-command.id', 'obj.fleet-formation-command.title', 'obj.fleet-formation-command.desc')
     end
 end
 

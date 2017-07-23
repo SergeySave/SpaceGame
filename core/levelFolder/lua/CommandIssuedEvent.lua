@@ -15,29 +15,27 @@ if event:getId() == 'default' then
         if (objective and not objective:getCompleted()) then
             objective:setCompleted(true)
 
-            local enemy = spawnEntity("enemy1")
+            for i = 0, 8, 1 do
+                local x = 1000 - 50 * math.floor(i / 3)
+                local y = 1000 - 50 * (i % 3)
 
-            local position = component.p.get(enemy)
-            position:setX(1000)
-            position:setY(1000)
+                local enemy = spawnEntity("enemy1")
 
-            local rotation = component.r.get(enemy)
-            rotation.r = 225
+                local position = component.p.get(enemy)
+                position:setX(x)
+                position:setY(y)
 
-            addOrder(enemy, orders.MoveOrder.new(750, 750, 25), orders.MoveOrder)
+                local rotation = component.r.get(enemy)
+                rotation.r = 225
 
-            addObjective('obj.defeat-enemies-1.id', 'obj.defeat-enemies-1.title', 'obj.defeat-enemies-1.desc')
+                addOrder(enemy, orders.MoveOrder.new(x - 250, y - 250, 25), orders.MoveOrder)
+            end
+
+            addObjective('obj.defeat-enemies-9.id', 'obj.defeat-enemies-9.title', 'obj.defeat-enemies-9.desc')
         end
     end
-elseif event:getId() == 'triangle' then
-    local objective = getObjective('obj.triangle-command.id')
-
-    if (objective and not objective:getCompleted()) then
-        objective:setCompleted(true)
-        addObjective('obj.square-command.id', 'obj.square-command.title', 'obj.square-command.desc')
-    end
-elseif event:getId() == 'square' then
-    local objective = getObjective('obj.square-command.id')
+elseif event:getId() == 'triangle' or event:getId() == 'square' then
+    local objective = getObjective('obj.fleet-formation-command.id')
 
     if (objective and not objective:getCompleted()) then
         objective:setCompleted(true)

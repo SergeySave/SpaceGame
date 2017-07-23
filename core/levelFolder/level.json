@@ -43,6 +43,20 @@
         "disable": "return getMoney() < 500"
       }
     },
+    "buildFort": {
+      "type": "lua",
+      "lua": "file://lua/BuildFortCommand.lua",
+      "requiresInput": true,
+      "requiresTwoInput": false,
+      "name": "command.buildFort.name",
+      "iconName": "building/factory",
+      "pressedIconName": "missingTexture",
+      "cursor": {
+        "class": "com.sergey.spacegame.client.ui.cursor.BuildingConstructionCursorOverride",
+        "entity": "fort1",
+        "disable": "return getMoney() < 300"
+      }
+    },
     "buildShip": {
       "type": "lua",
       "lua": "file://lua/BuildShipCommand.lua",
@@ -164,7 +178,6 @@
 				"h": 25
 			},
 			"com.sergey.spacegame.common.ecs.component.RotationComponent": { "originX": 0.5, "originY": 0.5 },
-			"com.sergey.spacegame.common.ecs.component.ControllableComponent": [],
 			"com.sergey.spacegame.common.ecs.component.MoneyProducerComponent": {
         "amount": 10
       },
@@ -194,6 +207,44 @@
         "maxHealth": 25
       },
       "com.sergey.spacegame.common.ecs.component.Team1Component": {}
+    },
+    "fort1": {
+      "com.sergey.spacegame.client.ecs.component.VisualComponent": {
+        "image": "building/factory"
+      },
+      "com.sergey.spacegame.common.ecs.component.SizeComponent": {
+        "w": 37.5,
+        "h": 37.5
+      },
+      "com.sergey.spacegame.common.ecs.component.RotationComponent": {
+        "originX": 0.5,
+        "originY": 0.5
+      },
+      "com.sergey.spacegame.common.ecs.component.HealthComponent": {
+        "health": 100,
+        "maxHealth": 100
+      },
+      "com.sergey.spacegame.common.ecs.component.Team1Component": {},
+      "com.sergey.spacegame.common.ecs.component.WeaponComponent": [
+        {
+          "color": "00FF00FF",
+          "thickness": 2.5,
+          "reloadTime": 3.8,
+          "range": 150,
+          "damage": 10,
+          "accuracy": 0.95,
+          "life": 0.75
+        },
+        {
+          "color": "FFFF00FF",
+          "thickness": 1,
+          "reloadTime": 0.1,
+          "range": 500,
+          "damage": 1,
+          "accuracy": 0.6,
+          "life": 0.1
+        }
+      ]
     }
 	},
 	"state": [
@@ -216,6 +267,7 @@
 			"com.sergey.spacegame.common.ecs.component.ControllableComponent": [
 				"default",
         "buildMine",
+        "buildFort",
         "buildFactory"
       ],
       "com.sergey.spacegame.common.ecs.component.HealthComponent": {
