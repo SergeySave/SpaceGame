@@ -34,6 +34,6 @@ elseif event:getId() == 'factory1' then
 
     if (objective and not objective:getCompleted()) then
         objective:setCompleted(true)
-        addObjective('obj.build-ship.id', 'obj.build-ship.title', 'obj.build-ship.desc')
+        addObjective('obj.build-10ship.id', 'obj.build-10ship.title', 'obj.build-10ship.desc')
     end
 end
