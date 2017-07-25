@@ -4,6 +4,7 @@ import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.utils.ImmutableArray;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.g2d.PixmapPacker;
 import com.badlogic.gdx.utils.GdxRuntimeException;
@@ -19,6 +20,7 @@ import com.google.gson.reflect.TypeToken;
 import com.sergey.spacegame.SpaceGame;
 import com.sergey.spacegame.client.event.AtlasRegistryEvent;
 import com.sergey.spacegame.client.event.LocalizationRegistryEvent;
+import com.sergey.spacegame.common.data.AudioPlayData;
 import com.sergey.spacegame.common.ecs.ECSManager;
 import com.sergey.spacegame.common.ecs.EntityPrototype;
 import com.sergey.spacegame.common.ecs.component.BuildingComponent;
@@ -37,6 +39,7 @@ import com.sergey.spacegame.common.event.EventBus;
 import com.sergey.spacegame.common.event.EventHandle;
 import com.sergey.spacegame.common.event.LuaEventHandler;
 import com.sergey.spacegame.common.game.command.Command;
+import com.sergey.spacegame.common.io.PathFileHandle;
 import com.sergey.spacegame.common.lua.LuaUtils;
 import com.sergey.spacegame.common.math.SpatialQuadtree;
 import org.luaj.vm2.LuaValue;
@@ -57,6 +60,7 @@ import java.util.List;
 import java.util.Map.Entry;
 import java.util.Random;
 import java.util.Set;
+import java.util.function.BiConsumer;
 
 public class Level {
     
@@ -68,6 +72,7 @@ public class Level {
     private HashMap<String, EntityPrototype>                 entities     = new HashMap<>();
     private HashMap<Class<? extends Event>, LuaEventHandler> events       = new HashMap<>();
     private HashMap<String, String>                          localization = new HashMap<>();
+    private HashMap<String, Sound> soundEffects;
     
     private transient Random                  random;
     private transient LuaValue[]              luaStores;
@@ -163,6 +168,9 @@ public class Level {
     
     public void deinit() {
         SpaceGame.getInstance().getEventBus().unregisterAll(levelEventRegistry);
+        for (Sound sound : soundEffects.values()) {
+            sound.dispose();
+        }
     }
     
     public HashMap<String, Command> getCommands() {
@@ -217,6 +225,11 @@ public class Level {
         return random;
     }
     
+    public long playSound(AudioPlayData audio) {
+        return soundEffects.get(audio.getFileName())
+                .play(audio.getVolume(), audio.getPitch(), audio.getPan()); //If NPE allow it to propogate
+    }
+    
     public static class LevelEventRegistry {
         
         private FileSystem fileSystem;
@@ -228,7 +241,7 @@ public class Level {
         @EventHandle
         public void onAtlasRegistry(AtlasRegistryEvent event) {
             try {
-                Files.walkFileTree(fileSystem.getPath("images"), new FileWalker(event.getPacker()));
+                Files.walkFileTree(fileSystem.getPath("images"), new ImageFileWalker(event.getPacker()));
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -247,12 +260,12 @@ public class Level {
                 System.out.println("Localization file not found: " + event.getLocale());
             }
         }
-        
-        private static class FileWalker implements FileVisitor<Path> {
+    
+        private static class ImageFileWalker implements FileVisitor<Path> {
             
             private PixmapPacker packer;
-            
-            public FileWalker(PixmapPacker packer) {
+        
+            public ImageFileWalker(PixmapPacker packer) {
                 this.packer = packer;
             }
             
@@ -299,15 +312,22 @@ public class Level {
             JsonObject obj = json.getAsJsonObject();
             
             Level level = new Level();
-    
+            
+            level.soundEffects = new HashMap<>();
+            try {
+                Files.walkFileTree(levelFile.getPath("sounds"), new SoundFileWalker(level.soundEffects::put));
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            
             level.limits = context.deserialize(obj.get("levelLimits"), LevelLimits.class);
-    
+            
             level.friendlyTeam = new SpatialQuadtree<>(level.limits.getMinX(), level.limits.getMinY(), level.limits
                     .getMaxX(), level.limits
-                    .getMaxY(), 9);
+                                                               .getMaxY(), 9);
             level.enemyTeam = new SpatialQuadtree<>(level.limits.getMinX(), level.limits.getMinY(), level.limits.getMaxX(), level.limits
                     .getMaxY(), 9);
-    
+            
             //level.commands = context.deserialize(obj.get("commands"), new TypeToken<HashMap<String, Command>>() {}.getType());
             Set<Entry<String, JsonElement>> commands = obj.get("commands").getAsJsonObject().entrySet();
             level.commands = new HashMap<>(commands.size());
@@ -316,7 +336,7 @@ public class Level {
                 commandJson.addProperty("id", entry.getKey());
                 level.commands.put(entry.getKey(), context.deserialize(commandJson, Command.class));
             }
-    
+            
             level.entities = context.deserialize(obj.get("entities"), new TypeToken<HashMap<String, EntityPrototype>>() {}
                     .getType());
             
@@ -384,5 +404,47 @@ public class Level {
             return obj;
         }
         
+    }
+    
+    
+    private static class SoundFileWalker implements FileVisitor<Path> {
+        
+        private BiConsumer<String, Sound> consumer;
+        
+        public SoundFileWalker(BiConsumer<String, Sound> consumer) {
+            this.consumer = consumer;
+        }
+        
+        @Override
+        public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) throws IOException {
+            return FileVisitResult.CONTINUE;
+        }
+        
+        @Override
+        public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+            if (!Files.isHidden(file) && Files.exists(file, LinkOption.NOFOLLOW_LINKS)) {
+                try {
+                    String name = file.toString()
+                            .replaceFirst("/sounds/", "");
+                    int lastIndex = name.lastIndexOf('/');
+                    consumer.accept(name, Gdx.audio.newSound(new PathFileHandle(
+                            lastIndex >= 0 ? name.substring(lastIndex) : name, file)));
+                } catch (GdxRuntimeException e) {
+                    System.err.println("Failed to load file: " + file + " as a sound.");
+                }
+            }
+            return FileVisitResult.CONTINUE;
+        }
+        
+        @Override
+        public FileVisitResult visitFileFailed(Path file, IOException exc) throws IOException {
+            System.err.println("ERROR: Cannot visit path: " + file);
+            return FileVisitResult.CONTINUE;
+        }
+        
+        @Override
+        public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
+            return FileVisitResult.CONTINUE;
+        }
     }
 }

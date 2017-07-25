@@ -121,7 +121,12 @@
           "range": 250,
           "damage": 5,
           "accuracy": 0.8,
-          "life": 0.25
+          "life": 0.25,
+          "sound": {
+            "fileName": "pew.wav",
+            "volume": 0.5,
+            "pitch": 1.75
+          }
         },
         {
           "color": "FFFFFFFF",
@@ -130,7 +135,12 @@
           "range": 350,
           "damage": 10,
           "accuracy": 0.95,
-          "life": 0.5
+          "life": 0.5,
+          "sound": {
+            "fileName": "pew.wav",
+            "volume": 0.75,
+            "pitch": 1
+          }
         }
       ]
 		},
@@ -167,7 +177,12 @@
           "range": 400,
           "damage": 8,
           "accuracy": 0.9,
-          "life": 0.4
+          "life": 0.4,
+          "sound": {
+            "fileName": "pew.wav",
+            "volume": 0.75,
+            "pitch": 1
+          }
         }
       ]
     },
@@ -233,7 +248,12 @@
           "range": 150,
           "damage": 10,
           "accuracy": 0.95,
-          "life": 0.75
+          "life": 0.75,
+          "sound": {
+            "fileName": "pew.wav",
+            "volume": 1,
+            "pitch": 0.5
+          }
         },
         {
           "color": "FFFF00FF",
@@ -242,7 +262,12 @@
           "range": 500,
           "damage": 1,
           "accuracy": 0.6,
-          "life": 0.1
+          "life": 0.1,
+          "sound": {
+            "fileName": "pew.wav",
+            "volume": 0.4,
+            "pitch": 2
+          }
         }
       ]
     }

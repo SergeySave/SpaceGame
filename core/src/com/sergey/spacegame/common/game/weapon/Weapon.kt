@@ -9,6 +9,7 @@ import com.google.gson.JsonObject
 import com.google.gson.JsonSerializationContext
 import com.google.gson.JsonSerializer
 import com.sergey.spacegame.client.ecs.component.LineVisualComponent
+import com.sergey.spacegame.common.data.AudioPlayData
 import com.sergey.spacegame.common.ecs.component.HealthComponent
 import com.sergey.spacegame.common.ecs.component.PositionComponent
 import com.sergey.spacegame.common.game.Level
@@ -19,7 +20,7 @@ import java.lang.reflect.Type
  * @author sergeys
  */
 class Weapon(val color: Int, val thickness: Float, val reloadTime: Float, val range: Float,
-             val damage: Float, val accuracy: Float, val life: Float) {
+             val damage: Float, val accuracy: Float, val life: Float, val firingSound: AudioPlayData) {
     @Transient
     val range2 = range * range
     
@@ -35,6 +36,7 @@ class Weapon(val color: Int, val thickness: Float, val reloadTime: Float, val ra
             } else {
                 entity.add(LineVisualComponent(x, y, positionComponent.x + (level.random.nextFloat() - 0.5f) * 60, positionComponent.y + (level.random.nextFloat() - 0.5f) * 60, thickness, color, life))
             }
+            level.playSound(firingSound)
         }
         
         level.ecs.addEntity(entity)
@@ -49,7 +51,8 @@ class Weapon(val color: Int, val thickness: Float, val reloadTime: Float, val ra
                        get("range").asFloat,
                        get("damage").asFloat,
                        get("accuracy").asFloat,
-                       get("life").asFloat
+                       get("life").asFloat,
+                       context.deserialize(get("sound"), AudioPlayData::class.java)
                 )
             }
         }
@@ -63,6 +66,7 @@ class Weapon(val color: Int, val thickness: Float, val reloadTime: Float, val ra
                 addProperty("damage", src.damage)
                 addProperty("accuracy", src.accuracy)
                 addProperty("life", src.life)
+                add("sound", context.serialize(src.firingSound))
             }
             
             return jsonObject
