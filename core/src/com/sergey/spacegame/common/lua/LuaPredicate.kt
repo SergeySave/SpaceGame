@@ -6,7 +6,7 @@ import org.luaj.vm2.LuaValue
 /**
  * @author sergeys
  */
-class LuaPredicate(val original: String, val lua: String, val name: String) {
+class LuaPredicate(val original: String, val lua: String) {
     private val code: LuaValue = LUA_GLOBALS.load(lua)
     
     fun test(): Boolean = code.call().checkboolean()

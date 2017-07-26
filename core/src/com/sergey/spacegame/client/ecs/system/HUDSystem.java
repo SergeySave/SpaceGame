@@ -23,6 +23,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.ui.Tooltip;
 import com.badlogic.gdx.scenes.scene2d.ui.TooltipManager;
 import com.badlogic.gdx.scenes.scene2d.ui.Value;
+import com.badlogic.gdx.scenes.scene2d.ui.VerticalGroup;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
@@ -42,6 +43,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map.Entry;
 
 public class HUDSystem extends EntitySystem implements EntityListener {
     
@@ -152,7 +154,7 @@ public class HUDSystem extends EntitySystem implements EntityListener {
                     .width(Value.percentHeight(1f, bottomTable))
                     .align(Align.left);
         }
-        table.setDebug(true); // This is optional, but enables debug lines for tables.
+        //table.setDebug(true); // This is optional, but enables debug lines for tables.
         
         recalculateUI();
     }
@@ -228,8 +230,16 @@ public class HUDSystem extends EntitySystem implements EntityListener {
                     commandUI.setCommand(commandButton.command);
                 }
             });
-            commandButton.tooltipLabel = new Label("", skin);
-            commandButton.button.addListener(new Tooltip<Actor>(commandButton.tooltipLabel, tooltipManager));
+    
+            commandButton.tooltipTable = new Table();
+            commandButton.tooltipTable.pad(15f).background(skin.getDrawable("default-rect"));
+    
+            commandButton.tooltipTitle = new Label("", skin);
+            commandButton.tooltipDesc = new Label("", skin, "small");
+            commandButton.tooltipReqLabel = new Label("Requirements:", skin, "small");
+            commandButton.tooltipReqs = new VerticalGroup();
+    
+            commandButton.button.addListener(new Tooltip<>(commandButton.tooltipTable, tooltipManager));
             
             commandButton.stack.add(commandButton.button);
         }
@@ -266,7 +276,55 @@ public class HUDSystem extends EntitySystem implements EntityListener {
         } else {
             style.imageOver = skin.getDrawable(button.command.getDrawableCheckedName());
         }
-        button.tooltipLabel.setText(SpaceGame.getInstance().localize(button.command.getName()));
+    
+        button.tooltipTable.clearChildren();
+    
+        button.tooltipTitle.setText(SpaceGame.getInstance().localize(button.command.getName()));
+        button.tooltipTable.add(button.tooltipTitle).align(Align.left);
+        button.tooltipTable.row();
+    
+        String desc = SpaceGame.getInstance().localize(button.command.getDesc());
+        button.tooltipDesc.setText(desc);
+        if (!desc.isEmpty()) {
+            button.tooltipTable.add(button.tooltipDesc).align(Align.left);
+            button.tooltipTable.row();
+        }
+        if (command.getReq() != null) {
+            button.tooltipTable.add(button.tooltipReqLabel).align(Align.left).padTop(20f);
+            button.tooltipTable.row();
+        
+            button.tooltipTable.add(button.tooltipReqs).align(Align.left).padLeft(15f);
+            button.tooltipTable.row();
+        
+            if (button.tooltipReqs.getChildren().size > command.getReq().size()) {
+                Iterator<Entry<String, LuaPredicate>> iterator = command.getReq().entrySet().iterator();
+                for (Actor actor : button.tooltipReqs.getChildren()) {
+                    if (!iterator.hasNext()) {
+                        button.tooltipReqs.removeActor(actor);
+                    } else {
+                        Entry<String, LuaPredicate> entry = iterator.next();
+                        Label                       label = (Label) actor;
+                        label.setText(SpaceGame.getInstance()
+                                              .localize("command." + command.getId() + ".req." + entry.getKey() +
+                                                        ".name"));
+                    }
+                }
+            } else {
+                Iterator<Actor> iterator = button.tooltipReqs.getChildren().iterator();
+                for (Entry<String, LuaPredicate> entry : command.getReq().entrySet()) {
+                    Label label;
+                    if (iterator.hasNext()) {
+                        label = ((Label) iterator.next());
+                    } else {
+                        label = new Label("", skin, "small");
+                        button.tooltipReqs.addActor(label);
+                    }
+                    label.setText(SpaceGame.getInstance()
+                                          .localize("command." + command.getId() + ".req." + entry.getKey() + ".name"));
+                }
+            }
+        }
+        
         button.label.setVisible(false);
         button.radialSpriteContainer.setVisible(false);
     }
@@ -393,7 +451,13 @@ public class HUDSystem extends EntitySystem implements EntityListener {
         public Stack stack;
     
         public ImageButton      button;
-        public Label            tooltipLabel;
+    
+        public Table         tooltipTable;
+        public Label         tooltipTitle;
+        public Label         tooltipDesc;
+        public Label         tooltipReqLabel;
+        public VerticalGroup tooltipReqs;
+        
         public Label            label;
         public Container<Image> radialSpriteContainer;
         public RadialSprite     radialSprite;

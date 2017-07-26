@@ -267,10 +267,10 @@ public class Level {
         public void onLocalizationRegistry(LocalizationRegistryEvent event) {
             try {
                 Files.lines(fileSystem.getPath("localization", event.getLocale() + ".loc"))
-                        .filter(s -> !s.startsWith("#") && s.matches("([^=]+)\\s*=([^=]+)"))
+                        .filter(s -> !s.startsWith("#") && s.matches("([^=]+)\\s*=([^=]+)?"))
                         .forEach(s -> {
                             String[] parts = s.split("\\s*=");
-                            event.getLocalizationMap().put(parts[0], parts[1]);
+                            event.getLocalizationMap().put(parts[0], parts.length > 1 ? parts[1] : "");
                         });
             } catch (IOException e) {
                 System.out.println("Localization file not found: " + event.getLocale());

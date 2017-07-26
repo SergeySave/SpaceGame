@@ -75,7 +75,7 @@ data class Command(val executable: CommandExecutable, val allowMulti: Boolean, v
                     } catch (e: IOException) {
                         throw JsonParseException(e.message, e)
                     }
-                    map.put(entry.key, LuaPredicate(original, code, entry.key))
+                    map.put(entry.key, LuaPredicate(original, code))
                 }
         
                 map
