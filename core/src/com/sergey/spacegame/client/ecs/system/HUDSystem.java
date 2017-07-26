@@ -36,6 +36,7 @@ import com.sergey.spacegame.common.game.Level;
 import com.sergey.spacegame.common.game.Objective;
 import com.sergey.spacegame.common.game.command.Command;
 import com.sergey.spacegame.common.game.orders.IOrder;
+import com.sergey.spacegame.common.lua.LuaPredicate;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -223,8 +224,6 @@ public class HUDSystem extends EntitySystem implements EntityListener {
             commandButton.button.addListener(new ChangeListener() {
                 @Override
                 public void changed(ChangeEvent event, Actor actor) {
-                    //buttons.forEach(b -> b.button.setChecked(
-                    //       b.button == commandButton.button && commandButton.command.getRequiresInput()));
                     commandButton.button.setChecked(true);
                     commandUI.setCommand(commandButton.command);
                 }
@@ -318,6 +317,23 @@ public class HUDSystem extends EntitySystem implements EntityListener {
             if (button.command == null) return;
     
             button.button.setChecked(button.command.equals(commandUI.getCommand()));
+    
+            boolean allEnabled = true;
+            if (button.command.getReq() != null) {
+                for (LuaPredicate predicate : button.command.getReq().values()) {
+                    if (!predicate.test()) {
+                        allEnabled = false;
+                        break;
+                    }
+                }
+            }
+    
+            if (allEnabled) {
+                button.radialSpriteContainer.setVisible(false);
+            } else {
+                button.radialSpriteContainer.setVisible(true);
+                button.radialSprite.setAngle(0);
+            }
             
             if (!button.command.getAllowMulti()) {
                 String orderTag = button.command.getOrderTag();

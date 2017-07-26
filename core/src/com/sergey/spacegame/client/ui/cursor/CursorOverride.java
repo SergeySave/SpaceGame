@@ -19,11 +19,11 @@ public interface CursorOverride {
      */
     Optional<Cursor> getRequestedCursor();
     
-    default void load(FileSystem fileSystem) throws IOException                        {}
+    default void load(FileSystem fileSystem) throws IOException                                         {}
     
-    default void init()                                                                {}
+    default void init()                                                                                 {}
     
-    default void drawExtra(Level level, DrawingBatch batch, OrthographicCamera camera) {}
+    default void drawExtra(Level level, DrawingBatch batch, OrthographicCamera camera, boolean enabled) {}
     
     default boolean needsInitialization() {
         return false;

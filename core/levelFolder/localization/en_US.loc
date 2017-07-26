@@ -1,30 +1,46 @@
 
 #Objective Titles
-obj.one-ship.title=Select a single ship
-obj.move-command.title=Give your ship a move command
-obj.build-mine.title=Build a mine
-obj.build-fort.title=Build a fortification building
-obj.defeat-enemies-1.title=Kill an enemy
-obj.build-factory.title=Build a shipyard
-obj.build-10ship.title=Build ten ships
-obj.select-10ship.title=Select ten ships
-obj.fleet-formation-command.title=Put your ships into a formation
-obj.move-fleet-command.title=Move your fleet of ten ships
-obj.defeat-enemies-9.title=Kill nine enemy ships
+obj.one-ship.title					=Select a single ship
+obj.move-command.title				=Give your ship a move command
+obj.build-mine.title				=Build a mine
+obj.build-fort.title				=Build a fortification building
+obj.defeat-enemies-1.title			=Kill an enemy
+obj.build-factory.title				=Build a shipyard
+obj.build-10ship.title				=Build ten ships
+obj.select-10ship.title				=Select ten ships
+obj.fleet-formation-command.title	=Put your ships into a formation
+obj.move-fleet-command.title		=Move your fleet of ten ships
+obj.defeat-enemies-9.title			=Kill nine enemy ships
 
 #Objective Description
-#obj.one-ship.desc=Select a single ship description
-#obj.move-command.desc=Give your ship a move command description
-#obj.build-mine.desc=Build a mine description
-#obj.build-fort.desc=Build a fortification building description
-#obj.defeat-enemies-1.desc=Kill an enemy description
-#obj.build-factory.desc=Build a shipyard description
-#obj.build-10ship.desc=Build ten ships description
-#obj.select-10ship.desc=Select ten ships description
-#obj.fleet-formation-command.desc=Put your ships into a formation description
-#obj.move-fleet-command.desc=Move your fleet of ten ships description
-#obj.defeat-enemies-9.desc=Kill nine enemy ships description
+#obj.one-ship.desc					=Select a single ship description
+#obj.move-command.desc				=Give your ship a move command description
+#obj.build-mine.desc				=Build a mine description
+#obj.build-fort.desc				=Build a fortification building description
+#obj.defeat-enemies-1.desc			=Kill an enemy description
+#obj.build-factory.desc				=Build a shipyard description
+#obj.build-10ship.desc				=Build ten ships description
+#obj.select-10ship.desc				=Select ten ships description
+#obj.fleet-formation-command.desc	=Put your ships into a formation description
+#obj.move-fleet-command.desc		=Move your fleet of ten ships description
+#obj.defeat-enemies-9.desc			=Kill nine enemy ships description
 
 #Commands
-command.move.name=Move
-command.test.name=Test
+command.default.name				=Move
+command.default.desc				=
+command.buildMine.name				=Build a mine
+command.buildMine.desc				=
+command.buildMine.req.money.name	=Price: 250
+command.buildFactory.name			=Build a Factory
+command.buildFactory.desc			=
+command.buildFactory.req.money.name	=Price: 500
+command.buildFort.name				=Build a Fortification
+command.buildFort.desc				=
+command.buildFort.req.money.name	=Price: 300
+command.buildShip.name				=Build a Ship
+command.buildShip.desc				=
+command.buildShip.req.money.name	=Price: 50
+command.square.name					=Square Formation
+command.square.desc					=Put the ships in a square formation
+command.triangle.name				=Triangle formation
+command.triangle.desc				=Put the ships in a triangle formation

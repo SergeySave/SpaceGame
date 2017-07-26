@@ -9,6 +9,7 @@ import com.google.gson.JsonSerializationContext
 import com.google.gson.JsonSerializer
 import com.sergey.spacegame.client.ui.cursor.CursorOverride
 import com.sergey.spacegame.common.game.Level
+import com.sergey.spacegame.common.lua.LuaPredicate
 import com.sergey.spacegame.common.lua.LuaUtils
 import java.io.IOException
 import java.lang.reflect.Type
@@ -17,8 +18,13 @@ import java.lang.reflect.Type
  * @author sergeys
  */
 data class Command(val executable: CommandExecutable, val allowMulti: Boolean, val requiresInput: Boolean,
-                   val requiresTwoInput: Boolean, val name: String, val id: String, val drawableName: String,
+                   val requiresTwoInput: Boolean, val id: String, val drawableName: String,
+                   val req: Map<String, LuaPredicate>?,
                    val drawableCheckedName: String?, val cursor: CursorOverride?, val orderTag: String?) {
+    
+    val name = "command.$id.name"
+    val desc = "command.$id.desc"
+    
     class Adapter : JsonSerializer<Command>, JsonDeserializer<Command> {
         override fun deserialize(json: JsonElement, typeOfT: Type, context: JsonDeserializationContext): Command {
             val obj = json.asJsonObject
@@ -55,11 +61,25 @@ data class Command(val executable: CommandExecutable, val allowMulti: Boolean, v
             val allowMulti = obj["allowsMulti"]?.asBoolean ?: true
             val requiresInput = obj["requiresInput"]?.asBoolean ?: false
             val requiresTwoInput = obj["requiresTwoInput"]?.asBoolean ?: false
-            val name = obj["name"]?.asString ?: throw JsonParseException("Command name not set")
             val id = obj["id"]?.asString ?: throw JsonParseException("Command id not set") // Should never occur as set programmatically
             val drawableName = obj["iconName"]?.asString ?: throw JsonParseException("Command iconName not set")
             val drawableCheckedName = obj["pressedIconName"]?.asString //Nullable type
             val orderTag = if (!allowMulti) obj["orderTag"].asString!! else null //Nullable but cannot be null if allowMulti is false
+            val req = obj["req"]?.asJsonObject?.run {
+                val map = HashMap<String, LuaPredicate>()
+        
+                for (entry in entrySet()) {
+                    val original = entry.value.asString
+                    val code = try {
+                        LuaUtils.getLUACode(original, Level.deserializingFileSystem())
+                    } catch (e: IOException) {
+                        throw JsonParseException(e.message, e)
+                    }
+                    map.put(entry.key, LuaPredicate(original, code, entry.key))
+                }
+        
+                map
+            }
             val cursor: CursorOverride? = when (obj.has("cursor")) {
                 true  -> {
                     val cursorObj = obj["cursor"].asJsonObject
@@ -78,7 +98,7 @@ data class Command(val executable: CommandExecutable, val allowMulti: Boolean, v
                 false -> null
             }
     
-            return Command(executable, allowMulti, requiresInput, requiresTwoInput, name, id, drawableName, drawableCheckedName, cursor, orderTag)
+            return Command(executable, allowMulti, requiresInput, requiresTwoInput, id, drawableName, req, drawableCheckedName, cursor, orderTag)
         }
         
         override fun serialize(src: Command, typeOfSrc: Type, context: JsonSerializationContext): JsonElement {
@@ -94,10 +114,18 @@ data class Command(val executable: CommandExecutable, val allowMulti: Boolean, v
                 addProperty("allowsMulti", src.allowMulti)
                 addProperty("requiresInput", src.requiresInput)
                 addProperty("requiresTwoInput", src.requiresTwoInput)
-                addProperty("name", src.name)
                 addProperty("iconName", src.drawableName)
                 if (src.drawableCheckedName != null) addProperty("pressedIconName", src.drawableCheckedName)
                 if (!src.allowMulti) addProperty("orderTag", src.orderTag)
+                src.req?.let { req ->
+                    val reqObj = JsonObject()
+        
+                    for (entry in req) {
+                        reqObj.addProperty(entry.key, entry.value.original)
+                    }
+        
+                    add("req", reqObj)
+                }
                 
                 if (src.cursor != null) {
                     add("cursor", context.serialize(src.cursor).apply {

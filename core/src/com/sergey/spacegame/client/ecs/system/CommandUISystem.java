@@ -18,6 +18,7 @@ import com.sergey.spacegame.common.ecs.component.ControllableComponent;
 import com.sergey.spacegame.common.game.Level;
 import com.sergey.spacegame.common.game.LevelLimits;
 import com.sergey.spacegame.common.game.command.Command;
+import com.sergey.spacegame.common.lua.LuaPredicate;
 import com.sergey.spacegame.common.util.Utils;
 
 import java.util.List;
@@ -69,9 +70,20 @@ public class CommandUISystem extends EntitySystem {
             List<Entity> entities = StreamSupport.stream(selectedEntities.spliterator(), true)
                     .filter((e) -> ControllableComponent.MAPPER.get(e).commands.contains(command))
                     .collect(Collectors.toList());
-            SpaceGame.getInstance()
-                    .getCommandExecutor()
-                    .executeCommand(command, entities, entities.size(), Vector2.Zero, Vector2.Zero, level);
+            boolean allEnabled = true;
+            if (command.getReq() != null) {
+                for (LuaPredicate predicate : command.getReq().values()) {
+                    if (!predicate.test()) {
+                        allEnabled = false;
+                        break;
+                    }
+                }
+            }
+            if (allEnabled) {
+                SpaceGame.getInstance()
+                        .getCommandExecutor()
+                        .executeCommand(command, entities, entities.size(), Vector2.Zero, Vector2.Zero, level);
+            }
             command = null;
             return;
         }
@@ -90,9 +102,20 @@ public class CommandUISystem extends EntitySystem {
                 List<Entity> entities = StreamSupport.stream(selectedEntities.spliterator(), true)
                         .filter((e) -> ControllableComponent.MAPPER.get(e).commands.contains(command))
                         .collect(Collectors.toList());
-                SpaceGame.getInstance()
-                        .getCommandExecutor()
-                        .executeCommand(command, entities, entities.size(), new Vector2(vec.x, vec.y), Vector2.Zero, level);
+                boolean allEnabled = true;
+                if (command.getReq() != null) {
+                    for (LuaPredicate predicate : command.getReq().values()) {
+                        if (!predicate.test()) {
+                            allEnabled = false;
+                            break;
+                        }
+                    }
+                }
+                if (allEnabled) {
+                    SpaceGame.getInstance()
+                            .getCommandExecutor()
+                            .executeCommand(command, entities, entities.size(), new Vector2(vec.x, vec.y), Vector2.Zero, level);
+                }
                 return;
             }
             orderCenter = new Vector2(vec.x, vec.y);
@@ -110,9 +133,20 @@ public class CommandUISystem extends EntitySystem {
                 List<Entity> entities = StreamSupport.stream(selectedEntities.spliterator(), true)
                         .filter((e) -> ControllableComponent.MAPPER.get(e).commands.contains(command))
                         .collect(Collectors.toList());
-                SpaceGame.getInstance()
-                        .getCommandExecutor()
-                        .executeCommand(command, entities, entities.size(), orderCenter, new Vector2(vec.x, vec.y), level);
+                boolean allEnabled = true;
+                if (command.getReq() != null) {
+                    for (LuaPredicate predicate : command.getReq().values()) {
+                        if (!predicate.test()) {
+                            allEnabled = false;
+                            break;
+                        }
+                    }
+                }
+                if (allEnabled) {
+                    SpaceGame.getInstance()
+                            .getCommandExecutor()
+                            .executeCommand(command, entities, entities.size(), orderCenter, new Vector2(vec.x, vec.y), level);
+                }
                 orderCenter = null;
                 return;
             }
@@ -120,7 +154,16 @@ public class CommandUISystem extends EntitySystem {
         
         if (command != null && command.getCursor() != null) {
             if (command.getCursor().needsInitialization()) command.getCursor().init();
-            command.getCursor().drawExtra(level, batch, camera);
+            boolean allEnabled = true;
+            if (command.getReq() != null) {
+                for (LuaPredicate predicate : command.getReq().values()) {
+                    if (!predicate.test()) {
+                        allEnabled = false;
+                        break;
+                    }
+                }
+            }
+            command.getCursor().drawExtra(level, batch, camera, allEnabled);
         }
     }
     

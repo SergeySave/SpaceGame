@@ -11,7 +11,6 @@
 			"class": "com.sergey.spacegame.common.game.command.MoveCommandExecutable",
 			"requiresInput": true,
 			"requiresTwoInput": true,
-			"name": "command.move.name",
 			"iconName": "icons/gotoarrow",
 			"pressedIconName": "missingTexture"
 		},
@@ -20,13 +19,14 @@
       "lua": "file://lua/BuildMineCommand.lua",
 			"requiresInput": true,
 			"requiresTwoInput": false,
-      "name": "command.buildMine.name",
 			"iconName": "building/factory",
 			"pressedIconName": "missingTexture",
+      "req": {
+        "money": "return getMoney() >= 250"
+      },
 			"cursor": {
 				"class": "com.sergey.spacegame.client.ui.cursor.BuildingConstructionCursorOverride",
-        "entity": "mine1",
-        "disable": "return getMoney() < 250"
+        "entity": "mine1"
 			}
     },
     "buildFactory": {
@@ -34,13 +34,14 @@
       "lua": "file://lua/BuildFactoryCommand.lua",
       "requiresInput": true,
       "requiresTwoInput": false,
-      "name": "command.buildFactory.name",
       "iconName": "building/factory",
       "pressedIconName": "missingTexture",
+      "req": {
+        "money": "return getMoney() >= 500"
+      },
       "cursor": {
         "class": "com.sergey.spacegame.client.ui.cursor.BuildingConstructionCursorOverride",
-        "entity": "factory1",
-        "disable": "return getMoney() < 500"
+        "entity": "factory1"
       }
     },
     "buildFort": {
@@ -48,13 +49,14 @@
       "lua": "file://lua/BuildFortCommand.lua",
       "requiresInput": true,
       "requiresTwoInput": false,
-      "name": "command.buildFort.name",
       "iconName": "building/factory",
       "pressedIconName": "missingTexture",
+      "req": {
+        "money": "return getMoney() >= 300"
+      },
       "cursor": {
         "class": "com.sergey.spacegame.client.ui.cursor.BuildingConstructionCursorOverride",
-        "entity": "fort1",
-        "disable": "return getMoney() < 300"
+        "entity": "fort1"
       }
     },
     "buildShip": {
@@ -64,16 +66,17 @@
       "orderTag": "BuildShipOrder:ship1",
       "requiresInput": false,
       "requiresTwoInput": false,
-      "name": "command.buildShip.name",
       "iconName": "ships/pew",
-      "pressedIconName": "missingTexture"
+      "pressedIconName": "missingTexture",
+      "req": {
+        "money": "return getMoney() >= 50"
+      }
     },
     "square": {
       "type": "java",
       "class": "com.sergey.spacegame.common.game.command.SquareFormationCommandExecutable",
       "requiresInput": false,
       "requiresTwoInput": false,
-      "name": "command.square.name",
       "iconName": "ships/pew",
       "pressedIconName": "missingTexture"
     },
@@ -82,7 +85,6 @@
       "class": "com.sergey.spacegame.common.game.command.TriangleFormationCommandExecutable",
       "requiresInput": false,
       "requiresTwoInput": false,
-      "name": "command.triangle.name",
       "iconName": "ships/pew",
       "pressedIconName": "missingTexture"
     }
