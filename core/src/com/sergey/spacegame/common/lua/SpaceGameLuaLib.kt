@@ -28,9 +28,11 @@ import com.sergey.spacegame.common.game.orders.TimeMoveOrder
 import com.sergey.spacegame.common.util.Quadruple
 import org.luaj.vm2.LuaTable
 import org.luaj.vm2.LuaValue
+import org.luaj.vm2.Varargs
 import org.luaj.vm2.lib.OneArgFunction
 import org.luaj.vm2.lib.ThreeArgFunction
 import org.luaj.vm2.lib.TwoArgFunction
+import org.luaj.vm2.lib.VarArgFunction
 import org.luaj.vm2.lib.ZeroArgFunction
 import org.luaj.vm2.lib.jse.CoerceJavaToLua
 import org.luaj.vm2.lib.jse.CoerceLuaToJava
@@ -120,6 +122,22 @@ class SpaceGameLuaLib private constructor() : TwoArgFunction() {
                 }
             }
             set("component", components)
+    
+            //Audio
+            set("playSound", object : VarArgFunction() {
+                override fun invoke(args: Varargs): Varargs {
+                    if (args == LuaValue.NONE || args.narg() == 0) {
+                        return argerror("Play sound needs at least one argument")
+                    }
+                    when (args.narg()) {
+                        1 -> currLevel.playSound(args.arg1().checkjstring())
+                        2 -> currLevel.playSound(args.arg1().checkjstring(), args.arg(2).checkdouble().toFloat())
+                        3 -> currLevel.playSound(args.arg1().checkjstring(), args.arg(2).checkdouble().toFloat(), args.arg(3).checkdouble().toFloat())
+                        4 -> currLevel.playSound(args.arg1().checkjstring(), args.arg(2).checkdouble().toFloat(), args.arg(3).checkdouble().toFloat(), args.arg(4).checkdouble().toFloat())
+                    }
+                    return NIL
+                }
+            })
         }
         
         return NIL

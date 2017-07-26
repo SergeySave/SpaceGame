@@ -230,6 +230,22 @@ public class Level {
                 .play(audio.getVolume(), audio.getPitch(), audio.getPan()); //If NPE allow it to propogate
     }
     
+    public long playSound(String fileName) {
+        return soundEffects.get(fileName).play(1, 1, 0); //If NPE allow it to propogate
+    }
+    
+    public long playSound(String fileName, float volume) {
+        return soundEffects.get(fileName).play(volume, 1, 0); //If NPE allow it to propogate
+    }
+    
+    public long playSound(String fileName, float volume, float pitch) {
+        return soundEffects.get(fileName).play(volume, pitch, 0); //If NPE allow it to propogate
+    }
+    
+    public long playSound(String fileName, float volume, float pitch, float pan) {
+        return soundEffects.get(fileName).play(volume, pitch, pan); //If NPE allow it to propogate
+    }
+    
     public static class LevelEventRegistry {
         
         private FileSystem fileSystem;
