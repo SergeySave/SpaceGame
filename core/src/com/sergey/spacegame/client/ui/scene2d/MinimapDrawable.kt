@@ -6,8 +6,10 @@ import com.badlogic.ashley.utils.ImmutableArray
 import com.badlogic.gdx.graphics.g2d.Batch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.math.Matrix3
+import com.badlogic.gdx.math.Rectangle
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable
+import com.badlogic.gdx.scenes.scene2d.utils.ScissorStack
 import com.sergey.spacegame.client.ecs.component.VisualComponent
 import com.sergey.spacegame.common.ecs.component.PositionComponent
 import com.sergey.spacegame.common.ecs.component.SizeComponent
@@ -19,7 +21,8 @@ import com.sergey.spacegame.common.game.Level
  * @author sergeys
  */
 class MinimapDrawable(val team1: TextureRegion, val team2: TextureRegion, val neutral: TextureRegion,
-                      val level: Level) : Drawable {
+                      val white: TextureRegion,
+                      val level: Level, val screen: Rectangle) : Drawable {
     
     private var _minHeight: Float = 1f
     private var _minWidth: Float = 1f
@@ -33,17 +36,39 @@ class MinimapDrawable(val team1: TextureRegion, val team2: TextureRegion, val ne
     private val neutralEntities = level.ecs.getEntitiesFor(Family.all(VisualComponent::class.java, PositionComponent::class.java).exclude(Team1Component::class.java, Team2Component::class.java).get())
     
     private val projection = Matrix3()
+    private val invProjection = Matrix3()
     private val VEC = Vector2()
+    
+    private var scaleX: Float = 1f
+    private var scaleY: Float = 1f
     
     override fun draw(batch: Batch, x: Float, y: Float, width: Float, height: Float) {
         projection.setToTranslation(x - level.limits.minX, y - level.limits.minY)
-        val scaleX = width / level.limits.width
-        val scaleY = height / level.limits.height
+        scaleX = width / level.limits.width
+        scaleY = height / level.limits.height
         projection.scale(scaleX, scaleY)
+    
+        invProjection.set(projection).inv()
+    
+        batch.flush()
+        val pushed = ScissorStack.pushScissors(Rectangle(x, y, width, height))
         
         drawEntities(neutralEntities, batch, neutral, scaleX, scaleY)
         drawEntities(team2Entities, batch, team2, scaleX, scaleY)
         drawEntities(team1Entities, batch, team1, scaleX, scaleY)
+    
+        val x1 = VEC.set(screen.x, screen.y).mul(projection).x
+        val y1 = VEC.y
+        val x2 = VEC.set(screen.x + screen.width, screen.y + screen.height).mul(projection).x
+        val y2 = VEC.y
+    
+        batch.draw(white, x1, y1, x2 - x1, 1f) //Bottom
+        batch.draw(white, x1, y1, 1f, y2 - y1) //Left
+        batch.draw(white, x1, y2, x2 - x1, 1f) //Top
+        batch.draw(white, x2, y1, 1f, y2 - y1) //Right
+    
+        batch.flush()
+        if (pushed) ScissorStack.popScissors()
     }
     
     private fun drawEntities(array: ImmutableArray<Entity>,
@@ -97,6 +122,11 @@ class MinimapDrawable(val team1: TextureRegion, val team2: TextureRegion, val ne
     }
     
     override fun getMinHeight(): Float = _minHeight
+    
+    fun onClick(x: Float, y: Float) {
+        screen.x = x / scaleX + level.limits.minX - screen.width / 2
+        screen.y = y / scaleY + level.limits.minY - screen.height / 2
+    }
     
     private companion object {
         val defaultWidth = 10f

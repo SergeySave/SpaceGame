@@ -7,7 +7,9 @@ import com.badlogic.ashley.core.EntitySystem;
 import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.utils.ImmutableArray;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.badlogic.gdx.scenes.scene2d.ui.Container;
@@ -26,6 +28,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.TooltipManager;
 import com.badlogic.gdx.scenes.scene2d.ui.Value;
 import com.badlogic.gdx.scenes.scene2d.ui.VerticalGroup;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
+import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.sergey.spacegame.SpaceGame;
@@ -55,6 +58,7 @@ public class HUDSystem extends EntitySystem implements EntityListener {
     
     private TooltipManager tooltipManager;
     private Level          level;
+    private Rectangle      screen;
     private DrawingBatch   batch;
     private int            lastObjectives;
     
@@ -70,11 +74,12 @@ public class HUDSystem extends EntitySystem implements EntityListener {
     
     private List<CommandButton> buttons;
     
-    public HUDSystem(DrawingBatch batch, CommandUISystem commandUI, Level level) {
+    public HUDSystem(DrawingBatch batch, CommandUISystem commandUI, Level level, Rectangle screen) {
         super(6);
         this.batch = batch;
         this.commandUI = commandUI;
         this.level = level;
+        this.screen = screen;
         tooltipManager = new TooltipManager();
         tooltipManager.initialTime = 0.00f;
         tooltipManager.subsequentTime = tooltipManager.initialTime;
@@ -132,13 +137,31 @@ public class HUDSystem extends EntitySystem implements EntityListener {
         { //Right
             rightTable = new Table();
     
-            rightTable.add(new Image(new MinimapDrawable(SpaceGame.getInstance()
-                                                                 .getRegion("team1"), SpaceGame.getInstance()
-                                                                 .getRegion("team2"), SpaceGame.getInstance()
-                                                                 .getRegion("neutral"), level))).grow();
+            MinimapDrawable minimapDrawable = new MinimapDrawable(SpaceGame.getInstance()
+                                                                          .getRegion("team1"), SpaceGame.getInstance()
+                                                                          .getRegion("team2"), SpaceGame.getInstance()
+                                                                          .getRegion("neutral"), SpaceGame.getInstance()
+                                                                          .getRegion("whitePixel"), level, screen);
+            Image image = new Image(minimapDrawable);
+            image.addListener(new ClickListener() {
+                @Override
+                public void clicked(InputEvent event, float x, float y) {
+                    minimapDrawable.onClick(x, y);
+                }
+            });
+            rightTable.add().expandY();
+            rightTable.row();
+            rightTable.add(image)
+                    .expandX()
+                    .prefWidth(Value.percentHeight(
+                            level.getLimits().getWidth() / level.getLimits().getHeight(), rightTable))
+                    .prefHeight(Value.percentWidth(level.getLimits().getHeight() / level.getLimits().getWidth()))
+                    .align(Align.bottomRight);
             
             table.add(rightTable)
-                    .height(Value.percentWidth(0.20f, table))
+                    //.height(Value.percentWidth(0.20f, table))
+                    .expandY()
+                    .fillY()
                     .width(Value.percentWidth(0.20f, table))
                     .align(Align.bottomRight);
         }

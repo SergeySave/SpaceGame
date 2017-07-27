@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.math.Rectangle;
 import com.sergey.spacegame.SpaceGame;
 import com.sergey.spacegame.client.ecs.system.CommandUISystem;
 import com.sergey.spacegame.client.ecs.system.HUDSystem;
@@ -40,6 +41,8 @@ public class GameScreen extends BaseScreen {
     private Level        level;
     private DrawingBatch batch;
     
+    private Rectangle screen = new Rectangle();
+    
     public GameScreen(Level level) {
         this.level = level;
     }
@@ -62,7 +65,7 @@ public class GameScreen extends BaseScreen {
         ecsManager.addSystem(inConstructionRenderSystem = new InConstructionRenderSystem(batch));
         ecsManager.addSystem(commandUISystem = new CommandUISystem(camera, batch, level));
         ecsManager.addSystem(selectionControlSystem = new SelectionSystem(camera, batch, commandUISystem, level.getTeam1()));
-        ecsManager.addSystem(hudSystem = new HUDSystem(batch, commandUISystem, level));
+        ecsManager.addSystem(hudSystem = new HUDSystem(batch, commandUISystem, level, screen));
     
         SpaceGame.getInstance().getEventBus().post(new BeginLevelEvent(level));
     }
@@ -70,6 +73,10 @@ public class GameScreen extends BaseScreen {
     @Override
     public void render(float delta) {
         LevelLimits limits = level.getLimits();
+    
+        //In case foreign code updated camera position
+        camera.position.x = screen.x + screen.width / 2;
+        camera.position.y = screen.y + screen.height / 2;
     
         //Zoom controls
         if (Gdx.input.isKeyPressed(Keys.Q)) {
@@ -115,6 +122,12 @@ public class GameScreen extends BaseScreen {
         }
         
         camera.update();
+    
+        screen.width = camera.zoom * camera.viewportWidth;
+        screen.height = camera.zoom * camera.viewportHeight;
+        screen.x = camera.position.x - screen.width / 2;
+        screen.y = camera.position.y - screen.height / 2;
+        
         batch.setProjectionMatrix(camera.combined);
         batch.begin();
         ecsManager.update(Gdx.graphics.getDeltaTime());
