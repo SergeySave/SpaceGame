@@ -31,6 +31,7 @@ import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.sergey.spacegame.SpaceGame;
 import com.sergey.spacegame.client.ecs.component.SelectedComponent;
 import com.sergey.spacegame.client.gl.DrawingBatch;
+import com.sergey.spacegame.client.ui.scene2d.MinimapDrawable;
 import com.sergey.spacegame.client.ui.scene2d.RadialSprite;
 import com.sergey.spacegame.common.ecs.component.ControllableComponent;
 import com.sergey.spacegame.common.ecs.component.OrderComponent;
@@ -130,6 +131,12 @@ public class HUDSystem extends EntitySystem implements EntityListener {
         table.add().fill().expand();
         { //Right
             rightTable = new Table();
+    
+            rightTable.add(new Image(new MinimapDrawable(SpaceGame.getInstance()
+                                                                 .getRegion("team1"), SpaceGame.getInstance()
+                                                                 .getRegion("team2"), SpaceGame.getInstance()
+                                                                 .getRegion("neutral"), level))).grow();
+            
             table.add(rightTable)
                     .height(Value.percentWidth(0.20f, table))
                     .width(Value.percentWidth(0.20f, table))

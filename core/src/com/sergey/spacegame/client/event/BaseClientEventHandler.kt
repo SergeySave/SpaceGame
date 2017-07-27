@@ -12,6 +12,9 @@ class BaseClientEventHandler {
     fun onAtlasRegistry(event: AtlasRegistryEvent) {
         event.packer.load("missingTexture")
         event.packer.load("radialBar")
+        event.packer.load("team1")
+        event.packer.load("team2")
+        event.packer.load("neutral")
     }
     
     @EventHandle
