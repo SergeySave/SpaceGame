@@ -6,6 +6,7 @@ import com.badlogic.ashley.core.EntityListener;
 import com.badlogic.ashley.core.EntitySystem;
 import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.utils.ImmutableArray;
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.Touchable;
@@ -74,9 +75,10 @@ public class HUDSystem extends EntitySystem implements EntityListener {
         this.commandUI = commandUI;
         this.level = level;
         tooltipManager = new TooltipManager();
-        tooltipManager.initialTime = 0.50f;
-        tooltipManager.subsequentTime = 0.00f;
+        tooltipManager.initialTime = 0.00f;
+        tooltipManager.subsequentTime = tooltipManager.initialTime;
         tooltipManager.resetTime = 0.00f;
+        tooltipManager.hideAll();
     
         buttons = new ArrayList<>();
     }
@@ -87,8 +89,8 @@ public class HUDSystem extends EntitySystem implements EntityListener {
         selectedEntities = engine.getEntitiesFor(family);
         engine.addEntityListener(family, this);
         
-        
         stage = new Stage(new ScreenViewport());
+        stage.setDebugAll(true);
         SpaceGame.getInstance().getInputMultiplexer().addProcessor(0, stage);
         
         Table table = new Table();
@@ -152,7 +154,7 @@ public class HUDSystem extends EntitySystem implements EntityListener {
                     .expandY()
                     .fillY()
                     .width(Value.percentHeight(1f, bottomTable))
-                    .align(Align.left);
+                    .align(Align.right);
         }
         //table.setDebug(true); // This is optional, but enables debug lines for tables.
         
@@ -182,10 +184,11 @@ public class HUDSystem extends EntitySystem implements EntityListener {
                         buttons.add(button = newCommandButton());
                 
                         actionBar.add(button.stack)
-                                .height(Value.percentHeight(1f, actionBar))
-                                .width(Value.percentHeight(1f, actionBar))
+                                .expandY()
+                                .fillY()
+                                .width(Value.percentHeight(1f, button.stack))
                                 .align(Align.left)
-                                .pad(0, 5, 0, 5);
+                                .pad(0, 5, 5, 5);
                     } else {
                         button = buttons.get(i);
                     }
@@ -271,10 +274,14 @@ public class HUDSystem extends EntitySystem implements EntityListener {
         button.stack.setVisible(true);
         ImageButtonStyle style = button.button.getStyle();
         style.imageUp = skin.getDrawable(button.command.getDrawableName());
+        style.imageUp.setMinHeight(1f);
+        style.imageUp.setMinWidth(1f);
         if (button.command.getDrawableCheckedName() == null) {
             style.imageOver = null;
         } else {
             style.imageOver = skin.getDrawable(button.command.getDrawableCheckedName());
+            style.imageOver.setMinHeight(1f);
+            style.imageOver.setMinWidth(1f);
         }
     
         button.tooltipTable.clearChildren();
@@ -341,6 +348,8 @@ public class HUDSystem extends EntitySystem implements EntityListener {
     @Override
     public void update(float deltaTime) {
         batch.end();
+    
+        stage.getViewport().update(Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), true);
     
         int hash = level.getObjectives().hashCode() * 31 + level.getObjectives()
                 .size(); //So that a list of items with hashcode -30 won't be the same no matter the size
