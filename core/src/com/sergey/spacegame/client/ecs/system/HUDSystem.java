@@ -68,7 +68,7 @@ public class HUDSystem extends EntitySystem implements EntityListener {
     private Table      objectivesTable;
     private LabelStyle notCompletedStyle;
     private LabelStyle completedStyle;
-    private Table      rightTable;
+    private Image      minimap;
     private Table      actionBar;
     private TextButton collapseMinimap;
     
@@ -135,15 +135,15 @@ public class HUDSystem extends EntitySystem implements EntityListener {
         }
         table.add().fill().expand();
         { //Right
-            rightTable = new Table();
+            Table rightTable = new Table();
     
             MinimapDrawable minimapDrawable = new MinimapDrawable(SpaceGame.getInstance()
                                                                           .getRegion("team1"), SpaceGame.getInstance()
                                                                           .getRegion("team2"), SpaceGame.getInstance()
                                                                           .getRegion("neutral"), SpaceGame.getInstance()
                                                                           .getRegion("whitePixel"), level, screen);
-            Image image = new Image(minimapDrawable);
-            image.addListener(new ClickListener() {
+            minimap = new Image(minimapDrawable);
+            minimap.addListener(new ClickListener() {
                 @Override
                 public void clicked(InputEvent event, float x, float y) {
                     minimapDrawable.onClick(x, y);
@@ -151,7 +151,7 @@ public class HUDSystem extends EntitySystem implements EntityListener {
             });
             rightTable.add().expandY();
             rightTable.row();
-            rightTable.add(image)
+            rightTable.add(minimap)
                     .expandX()
                     .prefWidth(Value.percentHeight(
                             level.getLimits().getWidth() / level.getLimits().getHeight(), rightTable))
@@ -180,6 +180,13 @@ public class HUDSystem extends EntitySystem implements EntityListener {
             actionBar.align(Align.left);
             bottomTable.add(scroll).expand().fill().align(Align.left);
             collapseMinimap = new TextButton("V", skin);
+            collapseMinimap.addListener(new ChangeListener() {
+                @Override
+                public void changed(ChangeEvent event, Actor actor) {
+                    minimap.setVisible(!minimap.isVisible());
+                    collapseMinimap.setText(minimap.isVisible() ? "V" : "^");
+                }
+            });
             bottomTable.add(collapseMinimap)
                     .expandY()
                     .fillY()
