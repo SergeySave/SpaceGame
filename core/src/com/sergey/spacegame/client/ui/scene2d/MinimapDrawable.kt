@@ -3,6 +3,7 @@ package com.sergey.spacegame.client.ui.scene2d
 import com.badlogic.ashley.core.Entity
 import com.badlogic.ashley.core.Family
 import com.badlogic.ashley.utils.ImmutableArray
+import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.g2d.Batch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.math.Matrix3
@@ -42,6 +43,8 @@ class MinimapDrawable(val team1: TextureRegion, val team2: TextureRegion, val ne
     private var scaleX: Float = 1f
     private var scaleY: Float = 1f
     
+    private var dragging: Boolean = false
+    
     override fun draw(batch: Batch, x: Float, y: Float, width: Float, height: Float) {
         projection.setToTranslation(x - level.limits.minX, y - level.limits.minY)
         scaleX = width / level.limits.width
@@ -50,13 +53,7 @@ class MinimapDrawable(val team1: TextureRegion, val team2: TextureRegion, val ne
     
         invProjection.set(projection).inv()
     
-        batch.flush()
-        val pushed = ScissorStack.pushScissors(Rectangle(x, y, width, height))
-        
-        drawEntities(neutralEntities, batch, neutral, scaleX, scaleY)
-        drawEntities(team2Entities, batch, team2, scaleX, scaleY)
-        drawEntities(team1Entities, batch, team1, scaleX, scaleY)
-    
+        //Render the position of the camera as of this frame
         val x1 = VEC.set(screen.x, screen.y).mul(projection).x
         val y1 = VEC.y
         val x2 = VEC.set(screen.x + screen.width, screen.y + screen.height).mul(projection).x
@@ -66,6 +63,27 @@ class MinimapDrawable(val team1: TextureRegion, val team2: TextureRegion, val ne
         batch.draw(white, x1, y1, 1f, y2 - y1) //Left
         batch.draw(white, x1, y2, x2 - x1, 1f) //Top
         batch.draw(white, x2, y1, 1f, y2 - y1) //Right
+    
+        if (Gdx.input.justTouched() && Gdx.input.isTouched && Gdx.input.x in x..(x + width) && (Gdx.graphics.height - Gdx.input.y) in y..(y + height)) {
+            dragging = true
+        }
+    
+        //Allow the user to drag around the position of the camera (invalid locaitons will be corrected in GameScreen#render
+        if (dragging && Gdx.input.isTouched && Gdx.input.x in x..(x + width) && (Gdx.graphics.height - Gdx.input.y) in y..(y + height)) {
+            VEC.set(Gdx.input.x.toFloat(), (Gdx.graphics.height - Gdx.input.y).toFloat()).mul(invProjection).sub(screen.width / 2, screen.height / 2)
+            screen.x = VEC.x
+            screen.y = VEC.y
+        } else {
+            dragging = false
+        }
+    
+        //Draw the entities with clipping
+        batch.flush()
+        val pushed = ScissorStack.pushScissors(Rectangle(x, y, width, height))
+    
+        drawEntities(neutralEntities, batch, neutral, scaleX, scaleY)
+        drawEntities(team2Entities, batch, team2, scaleX, scaleY)
+        drawEntities(team1Entities, batch, team1, scaleX, scaleY)
     
         batch.flush()
         if (pushed) ScissorStack.popScissors()

@@ -162,7 +162,7 @@ public class HUDSystem extends EntitySystem implements EntityListener {
             minimap.addListener(new ClickListener() {
                 @Override
                 public void clicked(InputEvent event, float x, float y) {
-                    minimapDrawable.onClick(x, y);
+                    //Prevent touch events from going through
                 }
             });
             rightTable.add().expandY();
