@@ -65,6 +65,7 @@ public class HUDSystem extends EntitySystem implements EntityListener {
     private Stage      stage;
     private Table      topTable;
     private Label      moneyLabel;
+    private TextButton collapseObjectives;
     private Table      objectivesTable;
     private LabelStyle notCompletedStyle;
     private LabelStyle completedStyle;
@@ -113,6 +114,21 @@ public class HUDSystem extends EntitySystem implements EntityListener {
                     .align(Align.topLeft)
                     .colspan(3);
     
+            collapseObjectives = new TextButton("^", skin);
+            collapseObjectives.addListener(new ChangeListener() {
+                @Override
+                public void changed(ChangeEvent event, Actor actor) {
+                    objectivesTable.setVisible(!objectivesTable.isVisible());
+                    collapseObjectives.setText(objectivesTable.isVisible() ? "^" : "V");
+                }
+            });
+            topTable.add(collapseObjectives)
+                    .expandY()
+                    .fillY()
+                    .width(Value.percentHeight(1f))
+                    .align(Align.left)
+                    .padRight(5f);
+            
             topTable.add(new Label(SpaceGame.getInstance().localize("game.label.money"), skin, "small"))
                     .align(Align.left)
                     .pad(1, 5, 1, 1);
