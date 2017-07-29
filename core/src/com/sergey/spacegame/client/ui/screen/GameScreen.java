@@ -2,6 +2,7 @@ package com.sergey.spacegame.client.ui.screen;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
+import com.badlogic.gdx.InputAdapter;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.math.Rectangle;
@@ -43,6 +44,8 @@ public class GameScreen extends BaseScreen {
     
     private Rectangle screen = new Rectangle();
     
+    private InputAdapter gameInputAdapter;
+    
     public GameScreen(Level level) {
         this.level = level;
     }
@@ -68,6 +71,20 @@ public class GameScreen extends BaseScreen {
         ecsManager.addSystem(hudSystem = new HUDSystem(batch, commandUISystem, level, screen));
     
         SpaceGame.getInstance().getEventBus().post(new BeginLevelEvent(level));
+    
+        SpaceGame.getInstance().getInputMultiplexer().addProcessor(gameInputAdapter = new InputAdapter() {
+            private final float STRENGTH = 0.95f;
+        
+            @Override
+            public boolean scrolled(int amount) {
+                if (amount > 0) {
+                    camera.zoom *= STRENGTH;
+                } else if (amount < 0) {
+                    camera.zoom /= STRENGTH;
+                }
+                return false;
+            }
+        });
     }
     
     @Override
@@ -77,14 +94,6 @@ public class GameScreen extends BaseScreen {
         //In case foreign code updated camera position
         camera.position.x = screen.x + screen.width / 2;
         camera.position.y = screen.y + screen.height / 2;
-    
-        //Zoom controls
-        if (Gdx.input.isKeyPressed(Keys.Q)) {
-            camera.zoom *= 0.9;
-        }
-        if (Gdx.input.isKeyPressed(Keys.E)) {
-            camera.zoom /= 0.9;
-        }
     
         //Zoom limits
         if (camera.zoom * camera.viewportWidth > limits.getWidth() ||
@@ -151,6 +160,8 @@ public class GameScreen extends BaseScreen {
     
     @Override
     public void hide() {
+        SpaceGame.getInstance().getInputMultiplexer().removeProcessor(gameInputAdapter);
+        
         ecsManager.removeSystem(orderSystem);
         ecsManager.removeSystem(mainRenderSystem);
         ecsManager.removeSystem(lineSystem);
