@@ -27,6 +27,7 @@ import com.sergey.spacegame.common.ecs.component.BuildingComponent;
 import com.sergey.spacegame.common.ecs.component.InContructionComponent;
 import com.sergey.spacegame.common.ecs.component.PlanetComponent;
 import com.sergey.spacegame.common.ecs.system.BuildingSystem;
+import com.sergey.spacegame.common.ecs.system.MessageSystem;
 import com.sergey.spacegame.common.ecs.system.MoneyProducerSystem;
 import com.sergey.spacegame.common.ecs.system.MovementSystem;
 import com.sergey.spacegame.common.ecs.system.PlanetSystem;
@@ -106,6 +107,7 @@ public class Level {
         ecsManager.addSystem(new MoneyProducerSystem(this));
         ecsManager.addSystem(new SpacialQuadtreeSystem(this));
         ecsManager.addSystem(new WeaponSystem(this));
+        ecsManager.addSystem(new MessageSystem());
         
         planets = ecsManager.getEntitiesFor(Family.all(PlanetComponent.class).get());
         buildingsInConstruction = ecsManager.getEntitiesFor(Family.all(BuildingComponent.class, InContructionComponent.class)

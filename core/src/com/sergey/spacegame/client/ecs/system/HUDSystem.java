@@ -37,6 +37,7 @@ import com.sergey.spacegame.client.gl.DrawingBatch;
 import com.sergey.spacegame.client.ui.scene2d.MinimapDrawable;
 import com.sergey.spacegame.client.ui.scene2d.RadialSprite;
 import com.sergey.spacegame.common.ecs.component.ControllableComponent;
+import com.sergey.spacegame.common.ecs.component.MessageComponent;
 import com.sergey.spacegame.common.ecs.component.OrderComponent;
 import com.sergey.spacegame.common.game.Level;
 import com.sergey.spacegame.common.game.Objective;
@@ -56,22 +57,26 @@ public class HUDSystem extends EntitySystem implements EntityListener {
     private ImmutableArray<Entity> selectedEntities;
     private Skin skin = SpaceGame.getInstance().getSkin();
     
+    private ImmutableArray<Entity> messageEntities;
+    
     private TooltipManager tooltipManager;
     private Level          level;
     private Rectangle      screen;
     private DrawingBatch   batch;
     private int            lastObjectives;
+    private int            lastMessages;
     
-    private Stage      stage;
-    private Table      topTable;
-    private Label      moneyLabel;
-    private TextButton collapseObjectives;
-    private Table      objectivesTable;
-    private LabelStyle notCompletedStyle;
-    private LabelStyle completedStyle;
-    private Image      minimap;
-    private Table      actionBar;
-    private TextButton collapseMinimap;
+    private Stage         stage;
+    private Table         topTable;
+    private Label         moneyLabel;
+    private TextButton    collapseObjectives;
+    private Table         objectivesTable;
+    private LabelStyle    notCompletedStyle;
+    private LabelStyle    completedStyle;
+    private Image         minimap;
+    private Table         actionBar;
+    private TextButton    collapseMinimap;
+    private VerticalGroup messageGroup;
     
     private List<CommandButton> buttons;
     
@@ -94,6 +99,7 @@ public class HUDSystem extends EntitySystem implements EntityListener {
     public void addedToEngine(Engine engine) {
         Family family = Family.all(SelectedComponent.class, ControllableComponent.class).get();
         selectedEntities = engine.getEntitiesFor(family);
+        messageEntities = engine.getEntitiesFor(Family.all(MessageComponent.class).get());
         engine.addEntityListener(family, this);
         
         stage = new Stage(new ScreenViewport());
@@ -149,7 +155,13 @@ public class HUDSystem extends EntitySystem implements EntityListener {
             notCompletedStyle = skin.get("small", LabelStyle.class);
             completedStyle = skin.get("smallCompleted", LabelStyle.class);
         }
-        table.add().fill().expand();
+        {
+            messageGroup = new VerticalGroup();
+            messageGroup.align(Align.top);
+            messageGroup.expand();
+            messageGroup.fill();
+            table.add(messageGroup).grow();
+        }
         { //Right
             Table rightTable = new Table();
     
@@ -392,6 +404,7 @@ public class HUDSystem extends EntitySystem implements EntityListener {
     @Override
     public void removedFromEngine(Engine engine) {
         selectedEntities = null;
+        messageEntities = null;
         engine.removeEntityListener(this);
         
         SpaceGame.getInstance().getInputMultiplexer().removeProcessor(stage);
@@ -423,6 +436,25 @@ public class HUDSystem extends EntitySystem implements EntityListener {
         }
     
         moneyLabel.setText(String.format("%1$,.2f", level.getMoney()));
+    
+        hash = messageEntities.hashCode() * 31 + messageEntities.size();
+        if (lastMessages != hash) {
+            lastMessages = hash;
+            messageGroup.clear();
+            for (Entity messageEntity : messageEntities) {
+                MessageComponent messageComponent = MessageComponent.MAPPER.get(messageEntity);
+            
+                Image image = new Image(messageComponent.getRegion());
+                Label label = new Label(SpaceGame.getInstance().localize(messageComponent.getMessage()), skin, "small");
+            
+                Table smallTable = new Table();
+                smallTable.add(image).pad(5);
+                smallTable.add(label).pad(5);
+                smallTable.add().expandX();
+            
+                messageGroup.addActor(smallTable);
+            }
+        }
     
         updateCommands();
         

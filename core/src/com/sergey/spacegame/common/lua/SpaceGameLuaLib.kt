@@ -5,6 +5,7 @@ import com.badlogic.ashley.core.ComponentMapper
 import com.badlogic.ashley.core.Entity
 import com.sergey.spacegame.SpaceGame
 import com.sergey.spacegame.common.ecs.component.HealthComponent
+import com.sergey.spacegame.common.ecs.component.MessageComponent
 import com.sergey.spacegame.common.ecs.component.OrderComponent
 import com.sergey.spacegame.common.ecs.component.PositionComponent
 import com.sergey.spacegame.common.ecs.component.RotationComponent
@@ -137,6 +138,18 @@ class SpaceGameLuaLib private constructor() : TwoArgFunction() {
                     }
                     return NIL
                 }
+            })
+    
+            //Messages
+            set("sendMessage", lFuncU { imageL, messageL, timeL ->
+                val textureName = imageL.checkjstring()
+                val region = SpaceGame.getInstance().getRegion(textureName)
+                val message = messageL.checkjstring()
+                val millis = (timeL.checkdouble() * 1000).toLong() + System.currentTimeMillis()
+        
+                val entity = currLevel.ecs.newEntity()
+                entity.add(MessageComponent(textureName, region, message, millis))
+                currLevel.ecs.addEntity(entity)
             })
         }
         
