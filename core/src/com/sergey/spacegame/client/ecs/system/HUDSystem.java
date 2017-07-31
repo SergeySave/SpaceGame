@@ -48,6 +48,7 @@ import com.sergey.spacegame.common.lua.LuaPredicate;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map.Entry;
 
@@ -57,7 +58,8 @@ public class HUDSystem extends EntitySystem implements EntityListener {
     private ImmutableArray<Entity> selectedEntities;
     private Skin skin = SpaceGame.getInstance().getSkin();
     
-    private ImmutableArray<Entity> messageEntities;
+    private LinkedList<Entity> messageEntities;
+    private EntityListener     messageListener;
     
     private TooltipManager tooltipManager;
     private Level          level;
@@ -91,6 +93,7 @@ public class HUDSystem extends EntitySystem implements EntityListener {
         tooltipManager.subsequentTime = tooltipManager.initialTime;
         tooltipManager.resetTime = 0.00f;
         tooltipManager.hideAll();
+        messageEntities = new LinkedList<>();
     
         buttons = new ArrayList<>();
     }
@@ -99,7 +102,18 @@ public class HUDSystem extends EntitySystem implements EntityListener {
     public void addedToEngine(Engine engine) {
         Family family = Family.all(SelectedComponent.class, ControllableComponent.class).get();
         selectedEntities = engine.getEntitiesFor(family);
-        messageEntities = engine.getEntitiesFor(Family.all(MessageComponent.class).get());
+        messageEntities.clear();
+        engine.addEntityListener(Family.all(MessageComponent.class).get(), messageListener = new EntityListener() {
+            @Override
+            public void entityAdded(Entity entity) {
+                messageEntities.add(entity);
+            }
+        
+            @Override
+            public void entityRemoved(Entity entity) {
+                messageEntities.remove(entity);
+            }
+        });
         engine.addEntityListener(family, this);
         
         stage = new Stage(new ScreenViewport());
@@ -403,9 +417,10 @@ public class HUDSystem extends EntitySystem implements EntityListener {
     
     @Override
     public void removedFromEngine(Engine engine) {
+        engine.removeEntityListener(this);
+        engine.removeEntityListener(messageListener);
         selectedEntities = null;
         messageEntities = null;
-        engine.removeEntityListener(this);
         
         SpaceGame.getInstance().getInputMultiplexer().removeProcessor(stage);
         stage.dispose();
@@ -446,11 +461,13 @@ public class HUDSystem extends EntitySystem implements EntityListener {
             
                 Image image = new Image(messageComponent.getRegion());
                 Label label = new Label(SpaceGame.getInstance().localize(messageComponent.getMessage()), skin, "small");
+                label.setWrap(true);
+                label.setAlignment(Align.left);
             
                 Table smallTable = new Table();
                 smallTable.add(image).pad(5);
-                smallTable.add(label).pad(5);
-                smallTable.add().expandX();
+                smallTable.add(label).pad(5).expandX().fillX();
+                //smallTable.add().expandX();
             
                 messageGroup.addActor(smallTable);
             }
