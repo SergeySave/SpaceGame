@@ -1,10 +1,26 @@
 
 -- @author sergeys
 
--- id, title, description
-addObjective('obj.one-ship.id', 'obj.one-ship.title', 'obj.one-ship.desc')
+local id = event:getId()
 
-sendMessage('faces/guy', 'Message Test brd', 2.5) --image, message, seconds
-sendMessage('faces/guy', 'Message Test', 5) --image, message, seconds
-playSound('pew.wav') -- file
-sendMessage('faces/guy', 'Message Test tste', 2.5) --image, message, seconds
+if id == 0 then
+
+    sendMessage('faces/guy', 'msg.welcome', 5) --image, message, seconds
+    playSound('voices/welcome.wav') -- file
+    postDelayEvent(3500, 1, 0)
+elseif id == 1 then
+
+    -- id, title, description
+    addObjective('obj.one-ship.id', 'obj.one-ship.title', 'obj.one-ship.desc')
+
+    sendMessage('faces/guy', 'msg.one-ship', 5) --image, message, seconds
+    playSound('voices/one-ship.wav') -- file
+elseif id == 2 then
+
+    sendMessage('faces/guy', 'msg.enemy-NE', 5) --image, message, seconds
+    playSound('voices/enemy-NE.wav') -- file
+elseif id == 3 then
+
+    sendMessage('faces/computer', 'msg.enemies-detected', 5) --image, message, seconds
+    playSound('voices/enemies-detected.wav') -- file
+end

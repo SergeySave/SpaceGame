@@ -130,11 +130,15 @@ class SpaceGameLuaLib private constructor() : TwoArgFunction() {
                     if (args == LuaValue.NONE || args.narg() == 0) {
                         return argerror("Play sound needs at least one argument")
                     }
-                    when (args.narg()) {
-                        1 -> currLevel.playSound(args.arg1().checkjstring())
-                        2 -> currLevel.playSound(args.arg1().checkjstring(), args.arg(2).checkdouble().toFloat())
-                        3 -> currLevel.playSound(args.arg1().checkjstring(), args.arg(2).checkdouble().toFloat(), args.arg(3).checkdouble().toFloat())
-                        4 -> currLevel.playSound(args.arg1().checkjstring(), args.arg(2).checkdouble().toFloat(), args.arg(3).checkdouble().toFloat(), args.arg(4).checkdouble().toFloat())
+                    try {
+                        when (args.narg()) {
+                            1 -> currLevel.playSound(args.arg1().checkjstring())
+                            2 -> currLevel.playSound(args.arg1().checkjstring(), args.arg(2).checkdouble().toFloat())
+                            3 -> currLevel.playSound(args.arg1().checkjstring(), args.arg(2).checkdouble().toFloat(), args.arg(3).checkdouble().toFloat())
+                            4 -> currLevel.playSound(args.arg1().checkjstring(), args.arg(2).checkdouble().toFloat(), args.arg(3).checkdouble().toFloat(), args.arg(4).checkdouble().toFloat())
+                        }
+                    } catch (e: NullPointerException) {
+                        System.err.println("Unable to play sound: \"${args.arg1().checkjstring()}\". Sound not found.")
                     }
                     return NIL
                 }

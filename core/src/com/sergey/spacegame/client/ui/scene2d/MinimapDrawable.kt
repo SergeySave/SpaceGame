@@ -64,6 +64,12 @@ class MinimapDrawable(val team1: TextureRegion, val team2: TextureRegion, val ne
         batch.draw(white, x1, y2, x2 - x1, 1f) //Top
         batch.draw(white, x2, y1, 1f, y2 - y1) //Right
     
+        //Border
+        batch.draw(white, x, y, width, 1f) //Bottom
+        batch.draw(white, x, y, 1f, height) //Left
+        batch.draw(white, x, y + height, width, 1f) //Top
+        batch.draw(white, x + width, y, 1f, height) //Right
+    
         if (Gdx.input.justTouched() && Gdx.input.isTouched && Gdx.input.x in x..(x + width) && (Gdx.graphics.height - Gdx.input.y) in y..(y + height)) {
             dragging = true
         }

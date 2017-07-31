@@ -117,7 +117,6 @@ public class HUDSystem extends EntitySystem implements EntityListener {
         engine.addEntityListener(family, this);
         
         stage = new Stage(new ScreenViewport());
-        stage.setDebugAll(true);
         SpaceGame.getInstance().getInputMultiplexer().addProcessor(0, stage);
         
         Table table = new Table();
@@ -197,7 +196,8 @@ public class HUDSystem extends EntitySystem implements EntityListener {
                     .expandX()
                     .prefWidth(Value.percentHeight(
                             level.getLimits().getWidth() / level.getLimits().getHeight(), rightTable))
-                    .prefHeight(Value.percentWidth(level.getLimits().getHeight() / level.getLimits().getWidth()))
+                    .prefHeight(Value.percentWidth(
+                            level.getLimits().getHeight() / level.getLimits().getWidth(), rightTable))
                     .align(Align.bottomRight);
             
             table.add(rightTable)

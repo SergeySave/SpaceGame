@@ -15,6 +15,9 @@ if getTag(event:getEntity()) == 'enemy' then
             setMoney(300 + getMoney())
 
             addObjective('obj.build-factory.id', 'obj.build-factory.title', 'obj.build-factory.desc')
+
+            sendMessage('faces/guy', 'msg.build-factory', 5) --image, message, seconds
+            playSound('voices/build-factory.wav') -- file
         end
     elseif data.get1() == 10 then
         local objective = getObjective('obj.defeat-enemies-9.id')
@@ -22,7 +25,9 @@ if getTag(event:getEntity()) == 'enemy' then
         if (objective and not objective:getCompleted()) then
             objective:setCompleted(true)
 
-            --
+            sendMessage('faces/guy', 'msg.enemies-defeated', 5) --image, message, seconds
+            playSound('voices/enemies-defeated.wav') -- file
+            postDelayEvent(500, 3, 0)
         end
     end
 end

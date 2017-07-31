@@ -8,6 +8,9 @@ if event:getId() == 'default' then
             objective:setCompleted(true)
             setMoney(250)
             addObjective('obj.build-mine.id', 'obj.build-mine.title', 'obj.build-mine.desc')
+
+            sendMessage('faces/guy', 'msg.build-mine', 5) --image, message, seconds
+            playSound('voices/build-mine.wav') -- file
         end
     elseif event:getCount() == 10 then
         local objective = getObjective('obj.move-fleet-command.id')
@@ -32,6 +35,9 @@ if event:getId() == 'default' then
             end
 
             addObjective('obj.defeat-enemies-9.id', 'obj.defeat-enemies-9.title', 'obj.defeat-enemies-9.desc')
+
+            sendMessage('faces/guy', 'msg.defeat-enemies-9', 5) --image, message, seconds
+            playSound('voices/defeat-enemies-9.wav') -- file
         end
     end
 elseif event:getId() == 'triangle' or event:getId() == 'square' then
@@ -40,5 +46,8 @@ elseif event:getId() == 'triangle' or event:getId() == 'square' then
     if (objective and not objective:getCompleted()) then
         objective:setCompleted(true)
         addObjective('obj.move-fleet-command.id', 'obj.move-fleet-command.title', 'obj.move-fleet-command.desc')
+
+        sendMessage('faces/guy', 'msg.move-fleet-command', 5) --image, message, seconds
+        playSound('voices/move-fleet-command.wav') -- file
     end
 end

@@ -31,7 +31,7 @@ command.default.desc				=
 command.buildMine.name				=Build a mine
 command.buildMine.desc				=
 command.buildMine.req.money.name	=Price: 250
-command.buildFactory.name			=Build a Factory
+command.buildFactory.name			=Build a Shipyard
 command.buildFactory.desc			=
 command.buildFactory.req.money.name	=Price: 500
 command.buildFort.name				=Build a Fortification
@@ -44,3 +44,21 @@ command.square.name					=Square Formation
 command.square.desc					=Put the ships in a square formation
 command.triangle.name				=Triangle formation
 command.triangle.desc				=Put the ships in a triangle formation
+
+#Messages
+msg.welcome							=Welcome, Commander, to the MA51 sector. You must defend this sector from an upcoming attack.
+msg.one-ship						=Start off by selecting your construction ship by dragging left click around it.
+msg.move-command					=Give your ship a move command by selecting the move command in the action bar and then right clicking and dragging to set a location and direction to move to.
+msg.build-mine						=Build a mine on the nearby planet to start earning money.
+msg.build-fort						=Build a fortification on the nearby planet to defend from attack.
+msg.enemy-NE						=Here comes an enemy from the north east.
+msg.build-factory					=Build a shipyard on the nearby planet to build ships.
+msg.build-10ship					=Construct ten ships to help you defend the sector.
+msg.select-10ship					=Select the ships that you just built.
+msg.fleet-formation-command			=Put your fleet into a formation.
+msg.move-fleet-command				=Issue a move command to your fleet.
+msg.defeat-enemies-9				=Defeat the nine enemies that just appeared in the north east of this sector.
+msg.enemies-defeated				=Congratulations on defending this sector.
+msg.enemies-detected				=WARNING! Enemies detected coming out of warp.
+
+
