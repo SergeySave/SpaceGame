@@ -16,6 +16,7 @@ class BaseClientEventHandler {
         event.packer.load("team2")
         event.packer.load("neutral")
         event.packer.load("whitePixel")
+        event.packer.load("uncolored")
     }
     
     @EventHandle

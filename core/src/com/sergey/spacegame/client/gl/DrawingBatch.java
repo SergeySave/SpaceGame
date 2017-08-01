@@ -121,6 +121,38 @@ public class DrawingBatch {
         vertices[index++] = addTint;
     }
     
+    /**
+     * ADVANCED METHOD
+     */
+    public void draw(Texture texture, float[] sprite, int offset, int count) {
+        if (!drawing) throw new IllegalStateException("SpriteBatch.begin must be called before draw.");
+        
+        int verticesLength    = verticies.length;
+        int remainingVertices = verticesLength;
+        if (texture != lastTexture)
+            switchTexture(texture);
+        else {
+            remainingVertices -= index;
+            if (remainingVertices == 0) {
+                flush();
+                remainingVertices = verticesLength;
+            }
+        }
+        int copyCount = Math.min(remainingVertices, count);
+        
+        System.arraycopy(sprite, offset, verticies, index, copyCount);
+        index += copyCount;
+        count -= copyCount;
+        while (count > 0) {
+            offset += copyCount;
+            flush();
+            copyCount = Math.min(verticesLength, count);
+            System.arraycopy(sprite, offset, verticies, 0, copyCount);
+            index += copyCount;
+            count -= copyCount;
+        }
+    }
+    
     protected void switchTexture(Texture texture) {
         flush();
         lastTexture = texture;
@@ -287,12 +319,20 @@ public class DrawingBatch {
         this.multTint = multTint;
     }
     
+    public float getMultTint() {
+        return multTint;
+    }
+    
     public void setAddTint(Color addTint) {
         this.addTint = addTint.toFloatBits();
     }
     
     public void setAddTint(float addTint) {
         this.addTint = addTint;
+    }
+    
+    public float getAddTint() {
+        return addTint;
     }
     
     public void setForceColor(Color forceColor) {
