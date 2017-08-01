@@ -2,6 +2,7 @@ package com.sergey.spacegame.client.ecs.component;
 
 import com.badlogic.ashley.core.Component;
 import com.badlogic.ashley.core.ComponentMapper;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonDeserializer;
@@ -17,10 +18,15 @@ import java.lang.reflect.Type;
 
 public class VisualComponent implements ClonableComponent {
     
+    public static final float MULT_DEFAULT = Color.toFloatBits(1f, 1f, 1f, 1f);
+    public static final float ADD_DEFAULT  = Color.toFloatBits(0f, 0f, 0f, 0f);
+    
     public static final ComponentMapper<VisualComponent> MAPPER = ComponentMapper.getFor(VisualComponent.class);
     
     private TextureRegion region;
     private String        name;
+    private float multColor = MULT_DEFAULT;
+    private float addColor  = ADD_DEFAULT;
     
     public VisualComponent() {}
     
@@ -44,6 +50,22 @@ public class VisualComponent implements ClonableComponent {
     
     public String getName() {
         return name;
+    }
+    
+    public float getMultColor() {
+        return multColor;
+    }
+    
+    public void setMultColor(float multColor) {
+        this.multColor = multColor;
+    }
+    
+    public float getAddColor() {
+        return addColor;
+    }
+    
+    public void setAddColor(float addColor) {
+        this.addColor = addColor;
     }
     
     public static class Adapter implements JsonSerializer<VisualComponent>, JsonDeserializer<VisualComponent> {

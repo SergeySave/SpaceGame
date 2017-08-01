@@ -9,12 +9,11 @@ import com.badlogic.gdx.math.Rectangle;
 import com.sergey.spacegame.SpaceGame;
 import com.sergey.spacegame.client.ecs.system.CommandUISystem;
 import com.sergey.spacegame.client.ecs.system.HUDSystem;
-import com.sergey.spacegame.client.ecs.system.InConstructionRenderSystem;
 import com.sergey.spacegame.client.ecs.system.LineRenderSystem;
 import com.sergey.spacegame.client.ecs.system.MainRenderSystem;
 import com.sergey.spacegame.client.ecs.system.OrderRenderSystem;
-import com.sergey.spacegame.client.ecs.system.SelectedRenderSystem;
 import com.sergey.spacegame.client.ecs.system.SelectionSystem;
+import com.sergey.spacegame.client.ecs.system.VisualUpdateSystem;
 import com.sergey.spacegame.client.gl.DrawingBatch;
 import com.sergey.spacegame.client.ui.UIUtil;
 import com.sergey.spacegame.common.ecs.ECSManager;
@@ -27,15 +26,14 @@ public class GameScreen extends BaseScreen {
     
     private OrthographicCamera camera;
     
-    private OrderSystem                orderSystem;
-    private MainRenderSystem           mainRenderSystem;
-    private LineRenderSystem           lineSystem;
-    private OrderRenderSystem          orderRenderSystem;
-    private SelectedRenderSystem       selectedRenderSystem;
-    private InConstructionRenderSystem inConstructionRenderSystem;
-    private SelectionSystem            selectionControlSystem;
-    private CommandUISystem            commandUISystem;
-    private HUDSystem                  hudSystem;
+    private OrderSystem        orderSystem;
+    private MainRenderSystem   mainRenderSystem;
+    private LineRenderSystem   lineSystem;
+    private OrderRenderSystem  orderRenderSystem;
+    private VisualUpdateSystem visualUpdateSystem;
+    private SelectionSystem    selectionControlSystem;
+    private CommandUISystem    commandUISystem;
+    private HUDSystem          hudSystem;
     
     private ECSManager ecsManager;
     
@@ -64,8 +62,7 @@ public class GameScreen extends BaseScreen {
         ecsManager.addSystem(mainRenderSystem = new MainRenderSystem(batch));
         ecsManager.addSystem(lineSystem = new LineRenderSystem(batch));
         ecsManager.addSystem(orderRenderSystem = new OrderRenderSystem(batch));
-        ecsManager.addSystem(selectedRenderSystem = new SelectedRenderSystem(batch));
-        ecsManager.addSystem(inConstructionRenderSystem = new InConstructionRenderSystem(batch));
+        ecsManager.addSystem(visualUpdateSystem = new VisualUpdateSystem());
         ecsManager.addSystem(commandUISystem = new CommandUISystem(camera, batch, level));
         ecsManager.addSystem(selectionControlSystem = new SelectionSystem(camera, batch, commandUISystem, level.getTeam1()));
         ecsManager.addSystem(hudSystem = new HUDSystem(batch, commandUISystem, level, screen));
@@ -166,9 +163,8 @@ public class GameScreen extends BaseScreen {
         ecsManager.removeSystem(mainRenderSystem);
         ecsManager.removeSystem(lineSystem);
         ecsManager.removeSystem(orderRenderSystem);
-        ecsManager.removeSystem(selectedRenderSystem);
+        ecsManager.removeSystem(visualUpdateSystem);
         ecsManager.removeSystem(selectionControlSystem);
-        ecsManager.removeSystem(inConstructionRenderSystem);
         ecsManager.removeSystem(commandUISystem);
         ecsManager.removeSystem(hudSystem);
         

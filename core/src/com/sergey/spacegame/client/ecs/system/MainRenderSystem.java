@@ -5,19 +5,13 @@ import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.EntitySystem;
 import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.utils.ImmutableArray;
-import com.badlogic.gdx.graphics.Color;
-import com.sergey.spacegame.client.ecs.component.SelectedComponent;
 import com.sergey.spacegame.client.ecs.component.VisualComponent;
 import com.sergey.spacegame.client.gl.DrawingBatch;
-import com.sergey.spacegame.common.ecs.component.InContructionComponent;
 import com.sergey.spacegame.common.ecs.component.PositionComponent;
 import com.sergey.spacegame.common.ecs.component.RotationComponent;
 import com.sergey.spacegame.common.ecs.component.SizeComponent;
 
 public class MainRenderSystem extends EntitySystem {
-    
-    private static final float MULT = Color.toFloatBits(1f, 1f, 1f, 1f);
-    private static final float ADD  = Color.toFloatBits(0f, 0f, 0f, 0f);
     
     private DrawingBatch batch;
     
@@ -31,7 +25,6 @@ public class MainRenderSystem extends EntitySystem {
     @Override
     public void addedToEngine(Engine engine) {
         entities = engine.getEntitiesFor(Family.all(VisualComponent.class, SizeComponent.class, PositionComponent.class)
-                                                 .exclude(SelectedComponent.class, InContructionComponent.class)
                                                  .get());
     }
     
@@ -43,8 +36,6 @@ public class MainRenderSystem extends EntitySystem {
     @Override
     public void update(float deltaTime) {
         batch.enableBlending();
-        batch.setMultTint(MULT);
-        batch.setAddTint(ADD);
         
         PositionComponent posVar;
         SizeComponent     sizeVar;
@@ -56,7 +47,9 @@ public class MainRenderSystem extends EntitySystem {
             posVar = PositionComponent.MAPPER.get(entity);
             sizeVar = SizeComponent.MAPPER.get(entity);
             visVar = VisualComponent.MAPPER.get(entity);
-            
+    
+            batch.setMultTint(visVar.getMultColor());
+            batch.setAddTint(visVar.getAddColor());
             if (RotationComponent.MAPPER.has(entity)) {
                 rotVar = RotationComponent.MAPPER.get(entity);
                 float oX = rotVar.originX * sizeVar.w;
