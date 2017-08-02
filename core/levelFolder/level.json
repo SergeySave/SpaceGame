@@ -22,7 +22,7 @@
       "lua": "file://lua/BuildMineCommand.lua",
 			"requiresInput": true,
 			"requiresTwoInput": false,
-			"iconName": "building/factory",
+      "iconName": "building/mine",
 			"pressedIconName": "missingTexture",
       "req": {
         "money": "return getMoney() >= 250"
@@ -52,7 +52,7 @@
       "lua": "file://lua/BuildFortCommand.lua",
       "requiresInput": true,
       "requiresTwoInput": false,
-      "iconName": "building/factory",
+      "iconName": "building/fort",
       "pressedIconName": "missingTexture",
       "req": {
         "money": "return getMoney() >= 300"
@@ -192,7 +192,9 @@
       ]
     },
     "mine1": {
-			"com.sergey.spacegame.client.ecs.component.VisualComponent": { "image": "building/factory" },
+      "com.sergey.spacegame.client.ecs.component.VisualComponent": {
+        "image": "building/mine"
+      },
 			"com.sergey.spacegame.common.ecs.component.SizeComponent": {
 				"w": 25,
 				"h": 25
@@ -230,7 +232,7 @@
     },
     "fort1": {
       "com.sergey.spacegame.client.ecs.component.VisualComponent": {
-        "image": "building/factory"
+        "image": "building/fort"
       },
       "com.sergey.spacegame.common.ecs.component.SizeComponent": {
         "w": 37.5,
@@ -285,7 +287,9 @@
 			"com.sergey.spacegame.common.ecs.component.PlanetComponent": {}
 		},
 		{
-			"com.sergey.spacegame.client.ecs.component.VisualComponent": { "image": "ships/pew" },
+      "com.sergey.spacegame.client.ecs.component.VisualComponent": {
+        "image": "ships/builder"
+      },
 			"com.sergey.spacegame.common.ecs.component.PositionComponent":{ "x": 150, "y": 150 },
 			"com.sergey.spacegame.common.ecs.component.VelocityComponent": {},
 			"com.sergey.spacegame.common.ecs.component.SizeComponent": { "w": 25, "h": 25 },

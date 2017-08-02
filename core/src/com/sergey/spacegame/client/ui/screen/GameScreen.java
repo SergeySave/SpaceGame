@@ -162,9 +162,6 @@ public class GameScreen extends BaseScreen {
         
         ecsManager.update(Gdx.graphics.getDeltaTime());
         batch.end();
-    
-        System.out.println(batch.totalRenderCalls);
-        batch.totalRenderCalls = 0;
     }
     
     @Override
