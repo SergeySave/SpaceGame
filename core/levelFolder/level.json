@@ -125,7 +125,7 @@
           "accuracy": 0.8,
           "life": 0.25,
           "sound": {
-            "fileName": "pew.wav",
+            "fileName": "pew1.wav",
             "volume": 0.5,
             "pitch": 1.75
           }
@@ -139,7 +139,7 @@
           "accuracy": 0.95,
           "life": 0.5,
           "sound": {
-            "fileName": "pew.wav",
+            "fileName": "pew1.wav",
             "volume": 0.75,
             "pitch": 1
           }
@@ -181,7 +181,7 @@
           "accuracy": 0.9,
           "life": 0.4,
           "sound": {
-            "fileName": "pew.wav",
+            "fileName": "pew1.wav",
             "volume": 0.75,
             "pitch": 1
           }
@@ -252,7 +252,7 @@
           "accuracy": 0.95,
           "life": 0.75,
           "sound": {
-            "fileName": "pew.wav",
+            "fileName": "pew1.wav",
             "volume": 1,
             "pitch": 0.5
           }
@@ -266,7 +266,7 @@
           "accuracy": 0.6,
           "life": 0.1,
           "sound": {
-            "fileName": "pew.wav",
+            "fileName": "pew1.wav",
             "volume": 0.4,
             "pitch": 2
           }
