@@ -69,6 +69,7 @@ public class Level {
     private static FileSystem levelFile;
     
     private LevelLimits limits;
+    private Background  background;
     private HashMap<String, Command>                         commands     = new HashMap<>();
     private HashMap<String, EntityPrototype>                 entities     = new HashMap<>();
     private HashMap<Class<? extends Event>, LuaEventHandler> events       = new HashMap<>();
@@ -227,6 +228,10 @@ public class Level {
         return random;
     }
     
+    public Background getBackground() {
+        return background;
+    }
+    
     public long playSound(AudioPlayData audio) {
         return soundEffects.get(audio.getFileName())
                 .play(audio.getVolume(), audio.getPitch(), audio.getPan()); //If NPE allow it to propogate
@@ -339,6 +344,7 @@ public class Level {
             }
             
             level.limits = context.deserialize(obj.get("levelLimits"), LevelLimits.class);
+            level.background = context.deserialize(obj.get("background"), Background.class);
             
             level.friendlyTeam = new SpatialQuadtree<>(level.limits.getMinX(), level.limits.getMinY(), level.limits
                     .getMaxX(), level.limits

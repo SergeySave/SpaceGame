@@ -3,8 +3,10 @@ package com.sergey.spacegame.client.ui.screen;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.InputAdapter;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Rectangle;
 import com.sergey.spacegame.SpaceGame;
 import com.sergey.spacegame.client.ecs.system.CommandUISystem;
@@ -24,7 +26,11 @@ import com.sergey.spacegame.common.game.LevelLimits;
 
 public class GameScreen extends BaseScreen {
     
+    private static final float DEF_MULT = Color.toFloatBits(1f, 1f, 1f, 1f);
+    private static final float DEF_ADD  = Color.toFloatBits(0f, 0f, 0f, 0f);
+    
     private OrthographicCamera camera;
+    private OrthographicCamera screenCamera;
     
     private OrderSystem        orderSystem;
     private MainRenderSystem   mainRenderSystem;
@@ -50,6 +56,8 @@ public class GameScreen extends BaseScreen {
     
     @Override
     public void show() {
+        screenCamera = new OrthographicCamera(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+        
         camera = new OrthographicCamera(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         camera.position.x = 0;
         camera.position.y = 0;
@@ -133,17 +141,38 @@ public class GameScreen extends BaseScreen {
         screen.height = camera.zoom * camera.viewportHeight;
         screen.x = camera.position.x - screen.width / 2;
         screen.y = camera.position.y - screen.height / 2;
-        
-        batch.setProjectionMatrix(camera.combined);
+    
+        batch.setProjectionMatrix(screenCamera.combined);
+        batch.setMultTint(DEF_MULT);
+        batch.setAddTint(DEF_ADD);
         batch.begin();
+    
+        TextureRegion region = SpaceGame.getInstance().getRegion(level.getBackground().getImage());
+        float         width  = screenCamera.viewportWidth;
+        float         height = screenCamera.viewportHeight;
+        if (width < region.getRegionWidth() / region.getRegionHeight() * height) {
+            width = region.getRegionWidth() / region.getRegionHeight() * height;
+        } else if (height < region.getRegionHeight() / region.getRegionWidth() * width) {
+            height = region.getRegionHeight() / region.getRegionWidth() * width;
+        }
+    
+        batch.draw(region, screenCamera.position.x - height / 2, screenCamera.position.y - width / 2, width, height);
+    
+        batch.setProjectionMatrix(camera.combined);
+        
         ecsManager.update(Gdx.graphics.getDeltaTime());
         batch.end();
+    
+        System.out.println(batch.totalRenderCalls);
+        batch.totalRenderCalls = 0;
     }
     
     @Override
     public void resize(int width, int height) {
         camera.viewportWidth = width;
         camera.viewportHeight = height;
+    
+        screenCamera.setToOrtho(false, width, height);
         //camera.setToOrtho(false, camera.viewportWidth, camera.viewportWidth * height/width);
     }
     

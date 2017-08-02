@@ -5,6 +5,9 @@
     "maxX": 1000,
     "maxY": 1000
   },
+  "background": {
+    "image": "background"
+  },
 	"commands": {
 		"default": {
 			"type": "java",

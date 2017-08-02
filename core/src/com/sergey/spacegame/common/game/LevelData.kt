@@ -15,3 +15,5 @@ data class LevelLimits(val minX: Float, val maxX: Float, val minY: Float, val ma
     val centerY: Float
         get() = (maxY + minY) / 2f
 }
+
+data class Background(val image: String)

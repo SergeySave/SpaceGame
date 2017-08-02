@@ -153,7 +153,7 @@ public class SpaceGame extends Game {
     }
     
     public void regenerateAtlas() {
-        PixmapPacker packer = new PixmapPacker(1024, 1024, Pixmap.Format.RGBA8888, 1, false, new PixmapPacker.GuillotineStrategy());
+        PixmapPacker packer = new PixmapPacker(1024, 1024, Pixmap.Format.RGBA8888, 0, false, new PixmapPacker.SkylineStrategy());
         getEventBus().post(new AtlasRegistryEvent(packer));
         
         Gdx.app.postRunnable(() -> {
@@ -232,7 +232,7 @@ public class SpaceGame extends Game {
     }
     
     public void regenerateAtlasNow() {
-        PixmapPacker packer = new PixmapPacker(1024, 1024, Pixmap.Format.RGBA8888, 1, false, new PixmapPacker.GuillotineStrategy());
+        PixmapPacker packer = new PixmapPacker(1024, 1024, Pixmap.Format.RGBA8888, 0, false, new PixmapPacker.SkylineStrategy());
         getEventBus().post(new AtlasRegistryEvent(packer));
         
         //unload current atlas
