@@ -485,7 +485,10 @@ public class HUDSystem extends EntitySystem implements EntityListener {
                     label.setAlignment(Align.left);
                 
                     Table smallTable = new Table();
-                    smallTable.add(image).pad(5);
+                    smallTable.add(image)
+                            .pad(5)
+                            .width(Value.percentWidth(0.075f, messageGroup))
+                            .height(Value.percentWidth(1));
                     smallTable.add(label).pad(5).expandX().fillX();
                     //smallTable.add().expandX();
                 
