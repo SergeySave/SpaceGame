@@ -67,6 +67,8 @@ public class HUDSystem extends EntitySystem implements EntityListener {
     private DrawingBatch   batch;
     private int            lastObjectives;
     private int            lastMessages;
+    private int            lastWidth;
+    private int            lastHeight;
     
     private Stage         stage;
     private Table         topTable;
@@ -115,7 +117,10 @@ public class HUDSystem extends EntitySystem implements EntityListener {
             }
         });
         engine.addEntityListener(family, this);
-        
+        setup();
+    }
+    
+    private void setup() {
         stage = new Stage(new ScreenViewport());
         SpaceGame.getInstance().getInputMultiplexer().addProcessor(0, stage);
         
@@ -147,7 +152,7 @@ public class HUDSystem extends EntitySystem implements EntityListener {
                     .width(Value.percentHeight(1f))
                     .align(Align.left)
                     .padRight(5f);
-            
+    
             topTable.add(new Label(SpaceGame.getInstance().localize("game.label.money"), skin, "small"))
                     .align(Align.left)
                     .pad(1, 5, 1, 1);
@@ -199,7 +204,7 @@ public class HUDSystem extends EntitySystem implements EntityListener {
                     .prefHeight(Value.percentWidth(
                             level.getLimits().getHeight() / level.getLimits().getWidth(), rightTable))
                     .align(Align.bottomRight);
-            
+    
             table.add(rightTable)
                     //.height(Value.percentWidth(0.20f, table))
                     .expandY()
@@ -216,7 +221,7 @@ public class HUDSystem extends EntitySystem implements EntityListener {
                     .height(Value.percentHeight(0.075f, table))
                     .align(Align.bottom)
                     .colspan(3);
-            
+    
             actionBar = new Table();
             ScrollPane scroll = new ScrollPane(actionBar, skin, "noBg");
             actionBar.align(Align.left);
@@ -238,6 +243,16 @@ public class HUDSystem extends EntitySystem implements EntityListener {
         //table.setDebug(true); // This is optional, but enables debug lines for tables.
         
         recalculateUI();
+    }
+    
+    @Override
+    public void removedFromEngine(Engine engine) {
+        engine.removeEntityListener(this);
+        engine.removeEntityListener(messageListener);
+        selectedEntities = null;
+        messageEntities = null;
+        
+        unsetup();
     }
     
     private void recalculateUI() {
@@ -415,13 +430,7 @@ public class HUDSystem extends EntitySystem implements EntityListener {
         button.radialSpriteContainer.setVisible(false);
     }
     
-    @Override
-    public void removedFromEngine(Engine engine) {
-        engine.removeEntityListener(this);
-        engine.removeEntityListener(messageListener);
-        selectedEntities = null;
-        messageEntities = null;
-        
+    private void unsetup() {
         SpaceGame.getInstance().getInputMultiplexer().removeProcessor(stage);
         stage.dispose();
     }
@@ -430,46 +439,58 @@ public class HUDSystem extends EntitySystem implements EntityListener {
     public void update(float deltaTime) {
         batch.end();
     
-        stage.getViewport().update(Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), true);
-    
-        int hash = level.getObjectives().hashCode() * 31 + level.getObjectives()
-                .size(); //So that a list of items with hashcode -30 won't be the same no matter the size
-        if (lastObjectives != hash) {
-            lastObjectives = hash;
-            objectivesTable.clearChildren();
-            for (Objective objective : level.getObjectives()) {
-                Label label = new Label(SpaceGame.getInstance()
-                                                .localize(objective.getTitle()), objective.getCompleted() ?
-                                                completedStyle :
-                                                notCompletedStyle);
-                label.addListener(new Tooltip<Actor>(new Label(SpaceGame.getInstance()
-                                                                       .localize(objective.getDescription()), skin, "small"), tooltipManager));
-                objectivesTable.add(label).expandX().fillX().align(Align.topLeft).pad(1, 5, 1, 1);
-                objectivesTable.row();
+        if (Gdx.graphics.getWidth() != lastWidth || Gdx.graphics.getHeight() != lastHeight) {
+            unsetup();
+            setup();
+            lastWidth = Gdx.graphics.getWidth();
+            lastHeight = Gdx.graphics.getHeight();
+            lastObjectives = 0;
+            lastMessages = 0;
+        }
+        {
+            int hash = level.getObjectives().hashCode() * 31 + level.getObjectives()
+                    .size(); //So that a list of items with hashcode -30 won't be the same no matter the size
+            if (lastObjectives != hash) {
+                lastObjectives = hash;
+                objectivesTable.clearChildren();
+                for (Objective objective : level.getObjectives()) {
+                    Label label = new Label(SpaceGame.getInstance()
+                                                    .localize(objective.getTitle()), objective.getCompleted() ?
+                                                    completedStyle :
+                                                    notCompletedStyle);
+                    label.setWrap(true);
+                    label.addListener(new Tooltip<Actor>(new Label(SpaceGame.getInstance()
+                                                                           .localize(objective.getDescription()), skin, "small"), tooltipManager));
+                    objectivesTable.add(label).expandX().fillX().align(Align.topLeft).pad(1, 5, 1, 1);
+                    objectivesTable.row();
+                }
+                objectivesTable.add().expand();
             }
-            objectivesTable.add().expand();
         }
     
         moneyLabel.setText(String.format("%1$,.2f", level.getMoney()));
     
-        hash = messageEntities.hashCode() * 31 + messageEntities.size();
-        if (lastMessages != hash) {
-            lastMessages = hash;
-            messageGroup.clear();
-            for (Entity messageEntity : messageEntities) {
-                MessageComponent messageComponent = MessageComponent.MAPPER.get(messageEntity);
-            
-                Image image = new Image(messageComponent.getRegion());
-                Label label = new Label(SpaceGame.getInstance().localize(messageComponent.getMessage()), skin, "small");
-                label.setWrap(true);
-                label.setAlignment(Align.left);
-            
-                Table smallTable = new Table();
-                smallTable.add(image).pad(5);
-                smallTable.add(label).pad(5).expandX().fillX();
-                //smallTable.add().expandX();
-            
-                messageGroup.addActor(smallTable);
+        {
+            int hash = messageEntities.hashCode() * 31 + messageEntities.size();
+            if (lastMessages != hash) {
+                lastMessages = hash;
+                messageGroup.clear();
+                for (Entity messageEntity : messageEntities) {
+                    MessageComponent messageComponent = MessageComponent.MAPPER.get(messageEntity);
+                
+                    Image image = new Image(messageComponent.getRegion());
+                    Label label = new Label(SpaceGame.getInstance()
+                                                    .localize(messageComponent.getMessage()), skin, "small");
+                    label.setWrap(true);
+                    label.setAlignment(Align.left);
+                
+                    Table smallTable = new Table();
+                    smallTable.add(image).pad(5);
+                    smallTable.add(label).pad(5).expandX().fillX();
+                    //smallTable.add().expandX();
+                
+                    messageGroup.addActor(smallTable);
+                }
             }
         }
     
