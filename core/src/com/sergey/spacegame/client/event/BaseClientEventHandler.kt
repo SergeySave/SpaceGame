@@ -17,6 +17,8 @@ class BaseClientEventHandler {
         event.packer.load("neutral")
         event.packer.load("whitePixel")
         event.packer.load("uncolored")
+        event.packer.load("upArrow")
+        event.packer.load("downArrow")
     }
     
     @EventHandle

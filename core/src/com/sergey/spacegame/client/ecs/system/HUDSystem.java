@@ -22,7 +22,6 @@ import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Stack;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
-import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.ui.Tooltip;
 import com.badlogic.gdx.scenes.scene2d.ui.TooltipManager;
 import com.badlogic.gdx.scenes.scene2d.ui.Value;
@@ -73,13 +72,13 @@ public class HUDSystem extends EntitySystem implements EntityListener {
     private Stage         stage;
     private Table         topTable;
     private Label         moneyLabel;
-    private TextButton    collapseObjectives;
+    private ImageButton   collapseObjectives;
     private Table         objectivesTable;
     private LabelStyle    notCompletedStyle;
     private LabelStyle    completedStyle;
     private Image         minimap;
     private Table         actionBar;
-    private TextButton    collapseMinimap;
+    private ImageButton   collapseMinimap;
     private VerticalGroup messageGroup;
     
     private List<CommandButton> buttons;
@@ -129,6 +128,16 @@ public class HUDSystem extends EntitySystem implements EntityListener {
         
         stage.addActor(table);
     
+        ImageButtonStyle upArrow = new ImageButtonStyle(skin.get("uncheckable", ImageButtonStyle.class));
+        upArrow.imageUp = skin.getDrawable("upArrow");
+        upArrow.imageUp.setMinHeight(1f);
+        upArrow.imageUp.setMinWidth(1f);
+    
+        ImageButtonStyle downArrow = new ImageButtonStyle(skin.get("uncheckable", ImageButtonStyle.class));
+        downArrow.imageUp = skin.getDrawable("downArrow");
+        downArrow.imageUp.setMinHeight(1f);
+        downArrow.imageUp.setMinWidth(1f);
+    
         { //Top
             topTable = new Table();
             table.add(topTable)
@@ -138,18 +147,19 @@ public class HUDSystem extends EntitySystem implements EntityListener {
                     .align(Align.topLeft)
                     .colspan(3);
     
-            collapseObjectives = new TextButton("^", skin);
+            collapseObjectives = new ImageButton(upArrow);
+            collapseObjectives.getImageCell().grow();
             collapseObjectives.addListener(new ChangeListener() {
                 @Override
                 public void changed(ChangeEvent event, Actor actor) {
                     objectivesTable.setVisible(!objectivesTable.isVisible());
-                    collapseObjectives.setText(objectivesTable.isVisible() ? "^" : "V");
+                    collapseObjectives.setStyle(objectivesTable.isVisible() ? upArrow : downArrow);
                 }
             });
             topTable.add(collapseObjectives)
                     .expandY()
                     .fillY()
-                    .width(Value.percentHeight(1f))
+                    .width(Value.percentHeight(1f, topTable))
                     .align(Align.left)
                     .padRight(5f);
     
@@ -226,12 +236,13 @@ public class HUDSystem extends EntitySystem implements EntityListener {
             ScrollPane scroll = new ScrollPane(actionBar, skin, "noBg");
             actionBar.align(Align.left);
             bottomTable.add(scroll).expand().fill().align(Align.left);
-            collapseMinimap = new TextButton("V", skin);
+            collapseMinimap = new ImageButton(downArrow);
+            collapseMinimap.getImageCell().grow();
             collapseMinimap.addListener(new ChangeListener() {
                 @Override
                 public void changed(ChangeEvent event, Actor actor) {
                     minimap.setVisible(!minimap.isVisible());
-                    collapseMinimap.setText(minimap.isVisible() ? "V" : "^");
+                    collapseMinimap.setStyle(minimap.isVisible() ? downArrow : upArrow);
                 }
             });
             bottomTable.add(collapseMinimap)
