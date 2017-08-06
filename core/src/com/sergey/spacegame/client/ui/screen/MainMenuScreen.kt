@@ -51,7 +51,7 @@ class MainMenuScreen : BaseScreen() {
         play.pad(Value.percentHeight(0.1f))
         play.addListener(object : ChangeListener() {
             override fun changed(event: ChangeEvent, actor: Actor) {
-                SpaceGame.getInstance().screen = GameScreen(Level.tempLevelGet())
+                SpaceGame.getInstance().screen = LevelSelectionScreen(this@MainMenuScreen, "level.tutorial.name" to Level::tempLevelGet)
             }
         })
         table.row()
@@ -87,10 +87,9 @@ class MainMenuScreen : BaseScreen() {
     }
     
     override fun resize(width: Int, height: Int) {
+        hide()
         dispose()
         show()
-        //super.resize(width, height)
-        //stage.getViewport().update(width, height, true)
     }
     
     override fun pause() {

@@ -1,8 +1,17 @@
 
+#Common buttons
+common.button.back=Back
+
 #Main menu buttons
 mainmenu.button.play=Play Game
 mainmenu.button.options=Options
 mainmenu.button.exit=Exit
+
+#Level seleciton screen
+levelselect.name=Level Selection
+
+#Levels
+level.tutorial.name=Tutorial
 
 #Game labels
 game.label.money=Money:

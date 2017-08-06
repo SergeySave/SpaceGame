@@ -50,9 +50,10 @@
 		default-vertical: { background: default-slider, knob: default-round-large }
 	},
 	com.badlogic.gdx.scenes.scene2d.ui.Label$LabelStyle: {
-		default: { font: font_medium, fontColor: white }
-		small: { font: font_small, fontColor: white }
-		smallCompleted: { font: font_small, fontColor: green }
+		default: { font: font_medium, fontColor: white },
+		small: { font: font_small, fontColor: white },
+		smallCompleted: { font: font_small, fontColor: green },
+		big: { font: font_large, fontColor: white }
 	},
 	com.badlogic.gdx.scenes.scene2d.ui.TextField$TextFieldStyle: {
 		default: { selection: selection, background: textfield, font: font_medium, fontColor: white, cursor: cursor }
