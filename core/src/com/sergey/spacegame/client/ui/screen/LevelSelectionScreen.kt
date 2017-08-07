@@ -58,11 +58,15 @@ class LevelSelectionScreen(private val parent: Screen,
                 for ((levelName, generatorFunc) in levels) {
                     
                     add(TextButton(levelName.localize(), skin, "noBackground")).apply {
+                        val button = this.actor
+    
                         expandX()
                         align(Align.left)
                         addListener(object : ChangeListener() {
                             override fun changed(event: ChangeEvent, actor: Actor) {
-                                SpaceGame.getInstance().screen = GameScreen(generatorFunc())
+                                if (actor == button) {
+                                    SpaceGame.getInstance().setScreenAndDisposeOld(GameScreen(generatorFunc()))
+                                }
                             }
                         })
                     }
@@ -79,12 +83,16 @@ class LevelSelectionScreen(private val parent: Screen,
             row()
             
             add(TextButton("common.button.back".localize(), skin, "noBackground")).apply {
+                val button = this.actor
+    
                 align(Align.left)
                 expandX()
-                
+    
                 addListener(object : ChangeListener() {
                     override fun changed(event: ChangeEvent, actor: Actor) {
-                        SpaceGame.getInstance().setScreenAndDisposeOld(this@LevelSelectionScreen.parent)
+                        if (actor == button) {
+                            SpaceGame.getInstance().setScreenAndDisposeOld(this@LevelSelectionScreen.parent)
+                        }
                     }
                 })
             }

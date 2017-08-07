@@ -144,7 +144,7 @@ public class SelectionSystem extends EntitySystem implements InputProcessor {
     
     @Override
     public boolean touchDown(int screenX, int screenY, int pointer, int button) {
-        if (button == Buttons.LEFT) {
+        if (checkProcessing() && button == Buttons.LEFT) {
             Vector3 vec = camera.unproject(new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0));
             selectionBegin = new Vector2(vec.x, vec.y);
             return true;
@@ -154,7 +154,7 @@ public class SelectionSystem extends EntitySystem implements InputProcessor {
     
     @Override
     public boolean touchUp(int screenX, int screenY, int pointer, int button) {
-        if (button == Buttons.LEFT) {
+        if (checkProcessing() && button == Buttons.LEFT) {
             Vector3 vec = camera.unproject(new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0));
             selectionEnd = new Vector2(vec.x, vec.y);
             return true;

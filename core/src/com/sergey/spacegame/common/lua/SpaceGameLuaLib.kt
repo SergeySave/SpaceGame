@@ -155,6 +155,14 @@ class SpaceGameLuaLib private constructor() : TwoArgFunction() {
                 entity.add(MessageComponent(textureName, region, message, millis))
                 currLevel.ecs.addEntity(entity)
             })
+    
+            //Misc
+            set("setControllable", lFuncU { isControllable ->
+                currLevel.isControllable = isControllable.checkboolean()
+            })
+            set("isControllable", lFunc { ->
+                LuaValue.valueOf(currLevel.isControllable)
+            })
         }
         
         return NIL

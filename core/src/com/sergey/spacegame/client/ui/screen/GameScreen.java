@@ -49,6 +49,7 @@ public class GameScreen extends BaseScreen {
     private Rectangle screen = new Rectangle();
     
     private InputAdapter gameInputAdapter;
+    private boolean lastControllable = true;
     
     public GameScreen(Level level) {
         this.level = level;
@@ -94,6 +95,13 @@ public class GameScreen extends BaseScreen {
     
     @Override
     public void render(float delta) {
+        if (lastControllable != level.isControllable()) {
+            lastControllable = level.isControllable();
+            selectionControlSystem.setProcessing(lastControllable);
+            commandUISystem.setProcessing(lastControllable);
+            orderRenderSystem.setProcessing(lastControllable);
+        }
+        
         LevelLimits limits = level.getLimits();
     
         //In case foreign code updated camera position

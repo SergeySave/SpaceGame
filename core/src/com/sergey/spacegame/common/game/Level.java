@@ -76,6 +76,7 @@ public class Level {
     private HashMap<String, String>                          localization = new HashMap<>();
     private HashMap<String, Sound> soundEffects;
     
+    private transient boolean isControllable = true;
     private transient Random                  random;
     private transient LuaValue[]              luaStores;
     private transient double                  money;
@@ -251,6 +252,14 @@ public class Level {
     
     public long playSound(String fileName, float volume, float pitch, float pan) {
         return soundEffects.get(fileName).play(volume, pitch, pan); //If NPE allow it to propogate
+    }
+    
+    public boolean isControllable() {
+        return isControllable;
+    }
+    
+    public void setControllable(boolean controllable) {
+        isControllable = controllable;
     }
     
     public static class LevelEventRegistry {
