@@ -4,9 +4,11 @@ import com.badlogic.ashley.core.Component
 import com.badlogic.ashley.core.ComponentMapper
 import com.badlogic.ashley.core.Entity
 import com.sergey.spacegame.SpaceGame
+import com.sergey.spacegame.client.ecs.component.VisualComponent
 import com.sergey.spacegame.common.ecs.component.HealthComponent
 import com.sergey.spacegame.common.ecs.component.MessageComponent
 import com.sergey.spacegame.common.ecs.component.OrderComponent
+import com.sergey.spacegame.common.ecs.component.ParticleComponent
 import com.sergey.spacegame.common.ecs.component.PositionComponent
 import com.sergey.spacegame.common.ecs.component.RotationComponent
 import com.sergey.spacegame.common.ecs.component.RotationVelocityComponent
@@ -87,6 +89,34 @@ class SpaceGameLuaLib private constructor() : TwoArgFunction() {
                 }
                 val orderObj = CoerceLuaToJava.coerce(order, CoerceLuaToJava.coerce(className, Class::class.java) as Class<*>) as IOrder
                 orderComp.addOrder(orderObj)
+            })
+            set("spawnParticle", object : VarArgFunction() {
+                override fun invoke(args: Varargs): Varargs {
+                    if (args == LuaValue.NONE || args.narg() != 8) {
+                        return argerror("spawnParticle needs 8 arguments")
+                    }
+            
+                    val imageName = args.arg(1).checkjstring()
+                    val x = args.arg(2).checkdouble().toFloat()
+                    val y = args.arg(3).checkdouble().toFloat()
+                    val w = args.arg(4).checkdouble().toFloat()
+                    val h = args.arg(5).checkdouble().toFloat()
+                    val vx = args.arg(6).checkdouble().toFloat()
+                    val vy = args.arg(7).checkdouble().toFloat()
+                    val life = args.arg(8).checklong()
+            
+                    val entity = currLevel.ecs.newEntity()
+            
+                    entity.add(VisualComponent(imageName))
+                    entity.add(PositionComponent(x, y))
+                    entity.add(SizeComponent(w, h))
+                    entity.add(VelocityComponent(vx, vy))
+                    entity.add(ParticleComponent(System.currentTimeMillis() + life))
+            
+                    currLevel.ecs.addEntity(entity)
+                    println("added")
+                    return CoerceJavaToLua.coerce(entity)
+                }
             })
             
             //Lua Global data
@@ -237,6 +267,7 @@ class SpaceGameLuaLib private constructor() : TwoArgFunction() {
             COMPONENTS.add(Quadruple("velocity", VelocityComponent.MAPPER, { VelocityComponent() }, listOf("vel", "v")))
             COMPONENTS.add(Quadruple("ship", ShipComponent.MAPPER, { ShipComponent() }, listOf()))
             COMPONENTS.add(Quadruple("health", HealthComponent.MAPPER, { HealthComponent() }, listOf("h")))
+            COMPONENTS.add(Quadruple("particle", PositionComponent.MAPPER, { ParticleComponent(System.currentTimeMillis()) }, listOf("prtl")))
         }
     }
 }
