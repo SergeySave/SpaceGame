@@ -44,6 +44,7 @@ import com.sergey.spacegame.common.game.command.Command;
 import com.sergey.spacegame.common.io.PathFileHandle;
 import com.sergey.spacegame.common.lua.LuaUtils;
 import com.sergey.spacegame.common.math.SpatialQuadtree;
+import com.sergey.spacegame.common.ui.IViewport;
 import org.luaj.vm2.LuaValue;
 
 import java.io.IOException;
@@ -77,6 +78,7 @@ public class Level {
     private HashMap<String, String>                          localization = new HashMap<>();
     private HashMap<String, Sound> soundEffects;
     
+    private transient IViewport viewport;
     private transient boolean isControllable = true;
     private transient Random                  random;
     private transient LuaValue[]              luaStores;
@@ -262,6 +264,14 @@ public class Level {
     
     public void setControllable(boolean controllable) {
         isControllable = controllable;
+    }
+    
+    public IViewport getViewport() {
+        return viewport;
+    }
+    
+    public void setViewport(IViewport viewport) {
+        this.viewport = viewport;
     }
     
     public static class LevelEventRegistry {

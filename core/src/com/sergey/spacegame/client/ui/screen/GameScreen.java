@@ -23,8 +23,9 @@ import com.sergey.spacegame.common.ecs.system.OrderSystem;
 import com.sergey.spacegame.common.event.BeginLevelEvent;
 import com.sergey.spacegame.common.game.Level;
 import com.sergey.spacegame.common.game.LevelLimits;
+import com.sergey.spacegame.common.ui.IViewport;
 
-public class GameScreen extends BaseScreen {
+public class GameScreen extends BaseScreen implements IViewport {
     
     private static final float DEF_MULT = Color.toFloatBits(1f, 1f, 1f, 1f);
     private static final float DEF_ADD  = Color.toFloatBits(0f, 0f, 0f, 0f);
@@ -51,6 +52,8 @@ public class GameScreen extends BaseScreen {
     private InputAdapter gameInputAdapter;
     private boolean lastControllable = true;
     
+    private boolean viewportControllable = true;
+    
     public GameScreen(Level level) {
         this.level = level;
     }
@@ -64,7 +67,8 @@ public class GameScreen extends BaseScreen {
         camera.position.y = 0;
         batch = new DrawingBatch(1000, UIUtil.compileShader(Gdx.files.internal("shaders/basic.vertex.glsl"), Gdx.files.internal("shaders/basic.fragment.glsl")), true);
         batch.setBlendFunction(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
-        
+    
+        level.setViewport(this);
         ecsManager = level.getECS();
         ecsManager.addSystem(orderSystem = new OrderSystem(level));
         
@@ -83,10 +87,12 @@ public class GameScreen extends BaseScreen {
         
             @Override
             public boolean scrolled(int amount) {
-                if (amount > 0) {
-                    camera.zoom *= STRENGTH;
-                } else if (amount < 0) {
-                    camera.zoom /= STRENGTH;
+                if (viewportControllable) {
+                    if (amount > 0) {
+                        camera.zoom *= STRENGTH;
+                    } else if (amount < 0) {
+                        camera.zoom /= STRENGTH;
+                    }
                 }
                 return false;
             }
@@ -105,8 +111,8 @@ public class GameScreen extends BaseScreen {
         LevelLimits limits = level.getLimits();
     
         //In case foreign code updated camera position
-        camera.position.x = screen.x + screen.width / 2;
-        camera.position.y = screen.y + screen.height / 2;
+        camera.position.x = screen.x;// + screen.width / 2;
+        camera.position.y = screen.y;// + screen.height / 2;
     
         //Zoom limits
         if (camera.zoom * camera.viewportWidth > limits.getWidth() ||
@@ -115,18 +121,20 @@ public class GameScreen extends BaseScreen {
                     limits.getWidth() / camera.viewportWidth, limits.getHeight() / camera.viewportHeight);
         }
     
-        //Translate controls
-        if (Gdx.input.isKeyPressed(Keys.W)) {
-            camera.position.y += camera.zoom * camera.viewportHeight * 0.01;
-        }
-        if (Gdx.input.isKeyPressed(Keys.S)) {
-            camera.position.y -= camera.zoom * camera.viewportHeight * 0.01;
-        }
-        if (Gdx.input.isKeyPressed(Keys.D)) {
-            camera.position.x += camera.zoom * camera.viewportWidth * 0.01;
-        }
-        if (Gdx.input.isKeyPressed(Keys.A)) {
-            camera.position.x -= camera.zoom * camera.viewportWidth * 0.01;
+        if (viewportControllable) {
+            //Translate controls
+            if (Gdx.input.isKeyPressed(Keys.W)) {
+                camera.position.y += camera.zoom * camera.viewportHeight * 0.01;
+            }
+            if (Gdx.input.isKeyPressed(Keys.S)) {
+                camera.position.y -= camera.zoom * camera.viewportHeight * 0.01;
+            }
+            if (Gdx.input.isKeyPressed(Keys.D)) {
+                camera.position.x += camera.zoom * camera.viewportWidth * 0.01;
+            }
+            if (Gdx.input.isKeyPressed(Keys.A)) {
+                camera.position.x -= camera.zoom * camera.viewportWidth * 0.01;
+            }
         }
     
         //Translate limits
@@ -147,8 +155,8 @@ public class GameScreen extends BaseScreen {
     
         screen.width = camera.zoom * camera.viewportWidth;
         screen.height = camera.zoom * camera.viewportHeight;
-        screen.x = camera.position.x - screen.width / 2;
-        screen.y = camera.position.y - screen.height / 2;
+        screen.x = camera.position.x;// - screen.width / 2;
+        screen.y = camera.position.y;// - screen.height / 2;
     
         batch.setProjectionMatrix(screenCamera.combined);
         batch.setMultTint(DEF_MULT);
@@ -207,4 +215,54 @@ public class GameScreen extends BaseScreen {
     
     @Override
     public void dispose() {}
+    
+    @Override
+    public boolean isViewportControllable() {
+        return viewportControllable;
+    }
+    
+    @Override
+    public void setViewportControllable(boolean controllable) {
+        viewportControllable = controllable;
+    }
+    
+    @Override
+    public float getViewportX() {
+        return screen.x;
+    }
+    
+    @Override
+    public void setViewportX(float x) {
+        screen.x = x;
+    }
+    
+    @Override
+    public float getViewportY() {
+        return screen.y;
+    }
+    
+    @Override
+    public void setViewportY(float y) {
+        screen.y = y;
+    }
+    
+    @Override
+    public float getViewportWidth() {
+        return screen.width;
+    }
+    
+    @Override
+    public void setViewportWidth(float width) {
+        screen.width = width;
+    }
+    
+    @Override
+    public float getViewportHeight() {
+        return screen.height;
+    }
+    
+    @Override
+    public void setViewportHeight(float height) {
+        screen.height = height;
+    }
 }

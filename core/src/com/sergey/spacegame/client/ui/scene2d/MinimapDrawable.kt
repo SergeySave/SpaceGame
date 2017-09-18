@@ -54,9 +54,9 @@ class MinimapDrawable(val team1: TextureRegion, val team2: TextureRegion, val ne
         invProjection.set(projection).inv()
     
         //Render the position of the camera as of this frame
-        val x1 = VEC.set(screen.x, screen.y).mul(projection).x
+        val x1 = VEC.set(screen.x - screen.width / 2, screen.y - screen.height / 2).mul(projection).x
         val y1 = VEC.y
-        val x2 = VEC.set(screen.x + screen.width, screen.y + screen.height).mul(projection).x
+        val x2 = VEC.set(screen.x + screen.width / 2, screen.y + screen.height / 2).mul(projection).x
         val y2 = VEC.y
     
         batch.draw(white, x1, y1, x2 - x1, 1f) //Bottom
@@ -70,15 +70,19 @@ class MinimapDrawable(val team1: TextureRegion, val team2: TextureRegion, val ne
         batch.draw(white, x, y + height, width, 1f) //Top
         batch.draw(white, x + width, y, 1f, height) //Right
     
-        if (Gdx.input.justTouched() && Gdx.input.isTouched && Gdx.input.x in x..(x + width) && (Gdx.graphics.height - Gdx.input.y) in y..(y + height)) {
-            dragging = true
-        }
-    
-        //Allow the user to drag around the position of the camera (invalid locaitons will be corrected in GameScreen#render
-        if (dragging && Gdx.input.isTouched && Gdx.input.x in x..(x + width) && (Gdx.graphics.height - Gdx.input.y) in y..(y + height)) {
-            VEC.set(Gdx.input.x.toFloat(), (Gdx.graphics.height - Gdx.input.y).toFloat()).mul(invProjection).sub(screen.width / 2, screen.height / 2)
-            screen.x = VEC.x
-            screen.y = VEC.y
+        if (level.viewport.isViewportControllable()) {
+            if (Gdx.input.justTouched() && Gdx.input.isTouched && Gdx.input.x in x..(x + width) && (Gdx.graphics.height - Gdx.input.y) in y..(y + height)) {
+                dragging = true
+            }
+        
+            //Allow the user to drag around the position of the camera (invalid locaitons will be corrected in GameScreen#render
+            if (dragging && Gdx.input.isTouched && Gdx.input.x in x..(x + width) && (Gdx.graphics.height - Gdx.input.y) in y..(y + height)) {
+                VEC.set(Gdx.input.x.toFloat(), (Gdx.graphics.height - Gdx.input.y).toFloat()).mul(invProjection)
+                screen.x = VEC.x
+                screen.y = VEC.y
+            } else {
+                dragging = false
+            }
         } else {
             dragging = false
         }

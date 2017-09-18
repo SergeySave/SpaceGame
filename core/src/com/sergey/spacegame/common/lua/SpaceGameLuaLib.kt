@@ -186,13 +186,50 @@ class SpaceGameLuaLib private constructor() : TwoArgFunction() {
                 currLevel.ecs.addEntity(entity)
             })
     
-            //Misc
+            //Viewport
+            val viewport = LuaTable().apply {
+                set("setControllable", lFuncU { isControllable ->
+                    currLevel.viewport.setViewportControllable(isControllable.checkboolean())
+                })
+                set("isControllable", lFunc { ->
+                    LuaValue.valueOf(currLevel.viewport.isViewportControllable())
+                })
+                set("setX", lFuncU { x ->
+                    currLevel.viewport.setViewportX(x.checkdouble().toFloat())
+                })
+                set("getX", lFunc { ->
+                    LuaValue.valueOf(currLevel.viewport.getViewportX().toDouble())
+                })
+                set("setY", lFuncU { y ->
+                    currLevel.viewport.setViewportY(y.checkdouble().toFloat())
+                })
+                set("getY", lFunc { ->
+                    LuaValue.valueOf(currLevel.viewport.getViewportY().toDouble())
+                })
+                set("setWidth", lFuncU { w ->
+                    currLevel.viewport.setViewportWidth(w.checkdouble().toFloat())
+                })
+                set("getWidth", lFunc { ->
+                    LuaValue.valueOf(currLevel.viewport.getViewportWidth().toDouble())
+                })
+                set("setHeight", lFuncU { h ->
+                    currLevel.viewport.setViewportHeight(h.checkdouble().toFloat())
+                })
+                set("getHeight", lFunc { ->
+                    LuaValue.valueOf(currLevel.viewport.getViewportHeight().toDouble())
+                })
+            }
+            set("viewport", viewport)
+    
+            //Is controllable
             set("setControllable", lFuncU { isControllable ->
                 currLevel.isControllable = isControllable.checkboolean()
             })
             set("isControllable", lFunc { ->
                 LuaValue.valueOf(currLevel.isControllable)
             })
+    
+    
         }
         
         return NIL
