@@ -65,6 +65,7 @@ class LevelSelectionScreen(private val parent: Screen,
                         addListener(object : ChangeListener() {
                             override fun changed(event: ChangeEvent, actor: Actor) {
                                 if (actor == button) {
+                                    this@LevelSelectionScreen.parent.dispose()
                                     SpaceGame.getInstance().setScreenAndDisposeOld(GameScreen(generatorFunc()))
                                 }
                             }

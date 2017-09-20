@@ -16,12 +16,7 @@ import com.sergey.spacegame.common.game.Level
 
 class MainMenuScreen : BaseScreen() {
     
-    private var _stage: Stage? = null
-    private var stage: Stage
-        get() = _stage!!
-        set(value) {
-            _stage = value
-        }
+    private lateinit var stage: Stage
     
     private var needsValidation: ArrayList<Layout> = ArrayList()
     
@@ -51,7 +46,8 @@ class MainMenuScreen : BaseScreen() {
         play.pad(Value.percentHeight(0.1f))
         play.addListener(object : ChangeListener() {
             override fun changed(event: ChangeEvent, actor: Actor) {
-                SpaceGame.getInstance().screen = LevelSelectionScreen(this@MainMenuScreen, "level.tutorial.name" to Level::tempLevelGet)
+                SpaceGame.getInstance().screen = LevelSelectionScreen(
+                        this@MainMenuScreen, "level.tutorial.name" to { Level.getLevelFromInternalPath("level.sgl") })
             }
         })
         table.row()

@@ -229,7 +229,33 @@ class SpaceGameLuaLib private constructor() : TwoArgFunction() {
                 LuaValue.valueOf(currLevel.isControllable)
             })
     
-    
+            //Switch levels
+            set("switchLevel", lFuncU { level ->
+                if (level == LuaValue.NIL) {
+                    SpaceGame.getInstance().dispatchDelayedRunnable(0) {
+                        SpaceGame.getInstance().clearDelayedEventsNow()
+                        currLevel.deinit()
+                        currLevel.viewport.close()
+                    }
+                } else {
+                    val levelString = level.checkjstring()
+                    if (levelString.startsWith("internal://")) {
+                        SpaceGame.getInstance().dispatchDelayedRunnable(0) {
+                            SpaceGame.getInstance().clearDelayedEventsNow()
+                            currLevel.deinit()
+                            val newLevel = Level.getLevelFromInternalPath(levelString.substring(11))
+                            currLevel.viewport.setLevel(newLevel)
+                        }
+                    } else {
+                        SpaceGame.getInstance().dispatchDelayedRunnable(0) {
+                            SpaceGame.getInstance().clearDelayedEventsNow()
+                            currLevel.deinit()
+                            val newLevel = Level.getLevelFromAbsolutePath("${currLevel.parentDirectory}/$levelString")
+                            currLevel.viewport.setLevel(newLevel)
+                        }
+                    }
+                }
+            })
         }
         
         return NIL

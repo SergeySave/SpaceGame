@@ -1,0 +1,17 @@
+{
+  "levelLimits": {
+    "minX": 0,
+    "minY": 0,
+    "maxX": 1000,
+    "maxY": 1000
+  },
+  "background": {
+    "image": "background"
+  },
+  "commands": {},
+  "entities": {},
+  "state": [],
+  "events": {
+    "com.sergey.spacegame.common.event.BeginLevelEvent": "file://lua/BeginLevelEvent.lua"
+  }
+}

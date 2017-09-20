@@ -17,11 +17,15 @@ public class EventBus {
     private HashMap<Object, HashMap<Class, List<EventConsumer>>> handlers = new HashMap<>();
     
     public void registerAnnotated(Object handler) {
-        if (handlers.containsKey(handler)) {
+        registerAnnotated(handler, handler);
+    }
+    
+    public void registerAnnotated(Object registeredHandler, Object eventHandler) {
+        if (handlers.containsKey(eventHandler)) {
             throw new IllegalStateException("This handler has already been registered.");
         }
         
-        Method[]                            methods     = handler.getClass().getMethods();
+        Method[]                            methods     = eventHandler.getClass().getMethods();
         HashMap<Class, List<EventConsumer>> thisHandler = new HashMap<>();
         
         for (Method method : methods) {
@@ -45,12 +49,13 @@ public class EventBus {
                 try {
                     MethodHandles.Lookup lookup                 = MethodHandles.lookup();
                     MethodHandle         methodHandle           = lookup.unreflect(method);
-                    MethodType           invokedType            = MethodType.methodType(EventConsumer.class, handler.getClass());//, handler.getClass()
+                    MethodType invokedType = MethodType.methodType(EventConsumer.class, eventHandler
+                            .getClass());//, handler.getClass()
                     MethodType           samType                = MethodType.methodType(void.class, Event.class);
                     MethodType           instantiatedMethodType = MethodType.methodType(void.class, parameter);
                     EventConsumer lambda = (EventConsumer) LambdaMetafactory.metafactory(lookup, "accept", invokedType, samType, methodHandle, instantiatedMethodType)
                             .getTarget()
-                            .invoke(handler);
+                            .invoke(eventHandler);
                     
                     handles.get(parameter).add(lambda);
                     thisHandler.get(parameter).add(lambda);
@@ -61,10 +66,10 @@ public class EventBus {
         }
         
         if (!thisHandler.isEmpty()) {
-            if (handlers.containsKey(handler)) {
-                handlers.get(handler).putAll(thisHandler);
+            if (handlers.containsKey(registeredHandler)) {
+                handlers.get(registeredHandler).putAll(thisHandler);
             } else {
-                handlers.put(handler, thisHandler);
+                handlers.put(registeredHandler, thisHandler);
             }
         }
     }

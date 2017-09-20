@@ -32,8 +32,7 @@ public final class ECSManager {
     }
     
     public Entity newEntity() {
-        Entity entity = new Entity();
-        return entity;
+        return new Entity();
     }
     
     public ImmutableArray<Entity> getEntities() {
@@ -52,5 +51,11 @@ public final class ECSManager {
     public void removeEntity(Entity entity) {
         SpaceGame.getInstance().getEventBus().post(removedEvent.get(entity));
         engine.removeEntity(entity);
+    }
+    
+    public void removeAllSystems() {
+        for (EntitySystem system : engine.getSystems()) {
+            engine.removeSystem(system);
+        }
     }
 }

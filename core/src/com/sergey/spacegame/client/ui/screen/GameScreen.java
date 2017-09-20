@@ -24,6 +24,7 @@ import com.sergey.spacegame.common.event.BeginLevelEvent;
 import com.sergey.spacegame.common.game.Level;
 import com.sergey.spacegame.common.game.LevelLimits;
 import com.sergey.spacegame.common.ui.IViewport;
+import org.jetbrains.annotations.NotNull;
 
 public class GameScreen extends BaseScreen implements IViewport {
     
@@ -68,35 +69,7 @@ public class GameScreen extends BaseScreen implements IViewport {
         batch = new DrawingBatch(1000, UIUtil.compileShader(Gdx.files.internal("shaders/basic.vertex.glsl"), Gdx.files.internal("shaders/basic.fragment.glsl")), true);
         batch.setBlendFunction(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
     
-        level.setViewport(this);
-        ecsManager = level.getECS();
-        ecsManager.addSystem(orderSystem = new OrderSystem(level));
-        
-        ecsManager.addSystem(mainRenderSystem = new MainRenderSystem(batch));
-        ecsManager.addSystem(lineSystem = new LineRenderSystem(batch));
-        ecsManager.addSystem(orderRenderSystem = new OrderRenderSystem(batch));
-        ecsManager.addSystem(visualUpdateSystem = new VisualUpdateSystem());
-        ecsManager.addSystem(commandUISystem = new CommandUISystem(camera, batch, level));
-        ecsManager.addSystem(selectionControlSystem = new SelectionSystem(camera, batch, commandUISystem, level.getTeam1()));
-        ecsManager.addSystem(hudSystem = new HUDSystem(batch, commandUISystem, level, screen));
-    
-        SpaceGame.getInstance().getEventBus().post(new BeginLevelEvent(level));
-    
-        SpaceGame.getInstance().getInputMultiplexer().addProcessor(gameInputAdapter = new InputAdapter() {
-            private final float STRENGTH = 0.95f;
-        
-            @Override
-            public boolean scrolled(int amount) {
-                if (viewportControllable) {
-                    if (amount > 0) {
-                        camera.zoom *= STRENGTH;
-                    } else if (amount < 0) {
-                        camera.zoom /= STRENGTH;
-                    }
-                }
-                return false;
-            }
-        });
+        setLevel(level);
     }
     
     @Override
@@ -252,8 +225,58 @@ public class GameScreen extends BaseScreen implements IViewport {
     }
     
     @Override
-    public void setViewportWidth(float width) {
-        screen.width = width;
+    public void setLevel(
+            @NotNull
+                    Level level) {
+        if (this.ecsManager != null) {
+            ecsManager.removeSystem(orderSystem);
+            ecsManager.removeSystem(mainRenderSystem);
+            ecsManager.removeSystem(lineSystem);
+            ecsManager.removeSystem(orderRenderSystem);
+            ecsManager.removeSystem(visualUpdateSystem);
+            ecsManager.removeSystem(selectionControlSystem);
+            ecsManager.removeSystem(commandUISystem);
+            ecsManager.removeSystem(hudSystem);
+        }
+    
+        this.level = level;
+    
+        camera.position.x = 0;
+        camera.position.y = 0;
+    
+        level.setViewport(this);
+        ecsManager = level.getECS();
+        ecsManager.addSystem(orderSystem = new OrderSystem(level));
+    
+        ecsManager.addSystem(mainRenderSystem = new MainRenderSystem(batch));
+        ecsManager.addSystem(lineSystem = new LineRenderSystem(batch));
+        ecsManager.addSystem(orderRenderSystem = new OrderRenderSystem(batch));
+        ecsManager.addSystem(visualUpdateSystem = new VisualUpdateSystem());
+        ecsManager.addSystem(commandUISystem = new CommandUISystem(camera, batch, level));
+        ecsManager.addSystem(selectionControlSystem = new SelectionSystem(camera, batch, commandUISystem, level.getTeam1()));
+        ecsManager.addSystem(hudSystem = new HUDSystem(batch, commandUISystem, level, screen));
+    
+        SpaceGame.getInstance().getEventBus().post(new BeginLevelEvent(level));
+    
+        if (gameInputAdapter != null) {
+            SpaceGame.getInstance().getInputMultiplexer().removeProcessor(gameInputAdapter);
+        }
+    
+        SpaceGame.getInstance().getInputMultiplexer().addProcessor(gameInputAdapter = new InputAdapter() {
+            private final float STRENGTH = 0.95f;
+        
+            @Override
+            public boolean scrolled(int amount) {
+                if (viewportControllable) {
+                    if (amount > 0) {
+                        camera.zoom *= STRENGTH;
+                    } else if (amount < 0) {
+                        camera.zoom /= STRENGTH;
+                    }
+                }
+                return false;
+            }
+        });
     }
     
     @Override
@@ -262,7 +285,17 @@ public class GameScreen extends BaseScreen implements IViewport {
     }
     
     @Override
+    public void setViewportWidth(float width) {
+        camera.zoom = width / camera.viewportWidth;
+    }
+    
+    @Override
     public void setViewportHeight(float height) {
-        screen.height = height;
+        camera.zoom = height / camera.viewportHeight;
+    }
+    
+    @Override
+    public void close() {
+        SpaceGame.getInstance().setScreenAndDisposeOld(new MainMenuScreen());
     }
 }

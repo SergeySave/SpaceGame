@@ -41,6 +41,7 @@ import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.PriorityQueue;
 
@@ -62,7 +63,7 @@ public class SpaceGame extends Game {
     
     private EventBus eventBus;
     
-    private PriorityQueue<Pair<Long, Event>> delayedEvents;
+    private PriorityQueue<Pair<Long, Runnable>> delayedRunnables;
     
     private HashMap<String, String> localizations = new HashMap<>();
     
@@ -91,8 +92,8 @@ public class SpaceGame extends Game {
         instance = this;
         
         setScreen(new LoadingScreen());
-        
-        delayedEvents = new PriorityQueue<>();
+    
+        delayedRunnables = new PriorityQueue<>(Comparator.comparing(Pair<Long, Runnable>::getFirst));
         
         eventBus = new EventBus();
         
@@ -269,9 +270,9 @@ public class SpaceGame extends Game {
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
         //Gdx.gl.
         super.render();
-        
-        while (!delayedEvents.isEmpty() && System.currentTimeMillis() >= delayedEvents.peek().component1()) {
-            eventBus.post(delayedEvents.poll().component2());
+    
+        while (!delayedRunnables.isEmpty() && System.currentTimeMillis() >= delayedRunnables.peek().component1()) {
+            delayedRunnables.poll().component2().run();
         }
     }
     
@@ -362,7 +363,22 @@ public class SpaceGame extends Game {
     }
     
     public void dispatchDelayedEvent(long millis, Event e) {
-        delayedEvents.add(new Pair<>(System.currentTimeMillis() + millis, e));
+        delayedRunnables.add(new Pair<>(System.currentTimeMillis() + millis, () -> eventBus.post(e)));
+    }
+    
+    public void dispatchDelayedRunnable(long millis, Runnable runnable) {
+        delayedRunnables.add(new Pair<>(System.currentTimeMillis() + millis, runnable));
+    }
+    
+    public void clearDelayedEvents() {
+        delayedRunnables.add(new Pair<>(System.currentTimeMillis(), delayedRunnables::clear));
+    }
+    
+    /**
+     * Warning this needs to be run from the render thread and preferably from inside a delayed event
+     */
+    public void clearDelayedEventsNow() {
+        delayedRunnables.clear();
     }
     
     public HashMap<String, String> getLocalizations() {

@@ -47,6 +47,7 @@ import com.sergey.spacegame.common.math.SpatialQuadtree;
 import com.sergey.spacegame.common.ui.IViewport;
 import org.luaj.vm2.LuaValue;
 
+import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Type;
 import java.nio.file.FileSystem;
@@ -78,6 +79,7 @@ public class Level {
     private HashMap<String, String>                          localization = new HashMap<>();
     private HashMap<String, Sound> soundEffects;
     
+    private transient String    parentDirectory;
     private transient IViewport viewport;
     private transient boolean isControllable = true;
     private transient Random                  random;
@@ -120,13 +122,13 @@ public class Level {
                                                                     .get());
     }
     
-    public static Level tempLevelGet() {
-        Path levelZip = SpaceGame.getInstance().getAsset("level.sgl");
+    public static Level getLevelFromInternalPath(String internalPath) {
+        Path levelZip = SpaceGame.getInstance().getAsset(internalPath);
     
         try {
             Path tempFile = Files.createTempFile("tmp.", ".sgl");
     
-            System.out.println(tempFile);
+            System.out.println("Temporary file created for internal sgl: " + tempFile);
     
             Files.copy(levelZip, Files.newOutputStream(tempFile));
     
@@ -135,6 +137,16 @@ public class Level {
             Files.delete(tempFile);
             
             return level;
+        } catch (IOException e) {
+            e.printStackTrace();
+            Gdx.app.exit();
+        }
+        return null;
+    }
+    
+    public static Level getLevelFromAbsolutePath(String absolutePath) {
+        try {
+            return deserialize((new File(absolutePath)).toPath());
         } catch (IOException e) {
             e.printStackTrace();
             Gdx.app.exit();
@@ -175,10 +187,19 @@ public class Level {
     }
     
     public void deinit() {
-        SpaceGame.getInstance().getEventBus().unregisterAll(levelEventRegistry);
+        ecsManager.removeAllSystems();
+    
+        EventBus eventBus = SpaceGame.getInstance().getEventBus();
+    
+        eventBus.unregisterAll(levelEventRegistry);
+    
+        //Lua events are registered under this level as the handler
+        eventBus.unregisterAll(this);
+        
         for (Sound sound : soundEffects.values()) {
             sound.dispose();
         }
+    
     }
     
     public HashMap<String, Command> getCommands() {
@@ -274,6 +295,10 @@ public class Level {
         this.viewport = viewport;
     }
     
+    public String getParentDirectory() {
+        return parentDirectory;
+    }
+    
     public static class LevelEventRegistry {
         
         private FileSystem fileSystem;
@@ -285,7 +310,11 @@ public class Level {
         @EventHandle
         public void onAtlasRegistry(AtlasRegistryEvent event) {
             try {
-                Files.walkFileTree(fileSystem.getPath("images"), new ImageFileWalker(event.getPacker()));
+    
+                Path images = fileSystem.getPath("images");
+                if (Files.exists(images)) {
+                    Files.walkFileTree(images, new ImageFileWalker(event.getPacker()));
+                }
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -359,7 +388,11 @@ public class Level {
             
             level.soundEffects = new HashMap<>();
             try {
-                Files.walkFileTree(levelFile.getPath("sounds"), new SoundFileWalker(level.soundEffects::put));
+    
+                Path sounds = levelFile.getPath("sounds");
+                if (Files.exists(sounds)) {
+                    Files.walkFileTree(sounds, new SoundFileWalker(level.soundEffects::put));
+                }
             } catch (IOException e) {
                 e.printStackTrace();
             }
