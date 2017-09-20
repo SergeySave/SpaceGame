@@ -5,7 +5,7 @@ if event:getId() == 'mine1' then
 
     if (objective and not objective:getCompleted()) then
         objective:setCompleted(true)
-        setMoney(200 + getMoney())
+        setPlayer1Money(200 + getPlayer1Money())
         addObjective('obj.build-fort.id', 'obj.build-fort.title', 'obj.build-fort.desc')
 
         sendMessage('faces/guy', 'msg.build-fort', 5) --image, message, seconds

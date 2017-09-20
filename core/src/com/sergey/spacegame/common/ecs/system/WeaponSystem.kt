@@ -23,7 +23,7 @@ class WeaponSystem(
         val weaponComponent = WeaponComponent.MAPPER.get(entity)
         val positionComponent = PositionComponent.MAPPER.get(entity)
         //Since it has to have one of Team1 or Team2 components if it doesnt have Team1 that means it must have Team2
-        val quadtree = if (Team1Component.MAPPER.has(entity)) level.team2 else level.team1
+        val quadtree = if (Team1Component.MAPPER.has(entity)) level.player2.team else level.player1.team
         
         if (weaponComponent.target != null && PositionComponent.MAPPER.get(weaponComponent.target).setVector(TMP).dst2(positionComponent.x, positionComponent.y) > weaponComponent.maxRange2) {
             weaponComponent.target = null

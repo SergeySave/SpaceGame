@@ -10,6 +10,8 @@ import com.sergey.spacegame.common.ecs.component.PositionComponent;
 import com.sergey.spacegame.common.ecs.component.RotationComponent;
 import com.sergey.spacegame.common.ecs.component.RotationVelocityComponent;
 import com.sergey.spacegame.common.ecs.component.ShipComponent;
+import com.sergey.spacegame.common.ecs.component.Team1Component;
+import com.sergey.spacegame.common.ecs.component.Team2Component;
 import com.sergey.spacegame.common.ecs.component.VelocityComponent;
 import com.sergey.spacegame.common.ecs.system.BuildingSystem;
 import com.sergey.spacegame.common.ecs.system.OrderSystem;
@@ -131,7 +133,11 @@ public class BuildBuildingOrder implements IOrder {
             level.getECS().addEntity(building);
             orderSystem.registerNewInConstruction(building);
     
-            level.setMoney(level.getMoney() - price);
+            if (Team1Component.MAPPER.has(building)) {
+                level.getPlayer1().setMoney(level.getPlayer1().getMoney() - price);
+            } else if (Team2Component.MAPPER.has(building)) {
+                level.getPlayer2().setMoney(level.getPlayer2().getMoney() - price);
+            }
             
             this.building = building;
             ++inContructionComponent.building;
@@ -246,7 +252,11 @@ public class BuildBuildingOrder implements IOrder {
                 --icc.building;
                 if (icc.building == 0) {
                     level.getECS().removeEntity(building);
-                    level.setMoney(level.getMoney() + icc.price);
+                    if (Team1Component.MAPPER.has(building)) {
+                        level.getPlayer1().setMoney(level.getPlayer1().getMoney() + price);
+                    } else if (Team2Component.MAPPER.has(building)) {
+                        level.getPlayer2().setMoney(level.getPlayer2().getMoney() + price);
+                    }
                 }
             }
         }

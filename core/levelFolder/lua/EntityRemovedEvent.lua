@@ -12,7 +12,7 @@ if getTag(event:getEntity()) == 'enemy' then
         if (objective and not objective:getCompleted()) then
             objective:setCompleted(true)
 
-            setMoney(300 + getMoney())
+            setPlayer1Money(300 + getPlayer1Money())
 
             addObjective('obj.build-factory.id', 'obj.build-factory.title', 'obj.build-factory.desc')
 

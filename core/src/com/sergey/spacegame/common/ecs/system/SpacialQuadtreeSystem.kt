@@ -59,10 +59,10 @@ class SpacialQuadtreeSystem(private val level: Level) : EntitySystem(), EntityLi
                 position.clamp(levelLimits.minX, levelLimits.maxX, levelLimits.minY, levelLimits.maxY)
                 
                 TMP.set(position.oldX, position.oldY)
-                level.team1.remove(entity, TMP)
+                level.player1.team.remove(entity, TMP)
                 
                 position.setVector(TMP)
-                level.team1.put(entity, TMP.cpy())
+                level.player1.team.put(entity, TMP.cpy())
                 
                 position.setNotDirty()
             }
@@ -75,10 +75,10 @@ class SpacialQuadtreeSystem(private val level: Level) : EntitySystem(), EntityLi
                 position.clamp(levelLimits.minX, levelLimits.maxX, levelLimits.minY, levelLimits.maxY)
 
                 TMP.set(position.oldX, position.oldY)
-                level.team2.remove(entity, TMP)
+                level.player2.team.remove(entity, TMP)
                 
                 position.setVector(TMP)
-                level.team2.put(entity, TMP.cpy())
+                level.player2.team.put(entity, TMP.cpy())
                 
                 position.setNotDirty()
             }

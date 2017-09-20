@@ -84,14 +84,14 @@ public class Level {
     private transient boolean isControllable = true;
     private transient Random                  random;
     private transient LuaValue[]              luaStores;
-    private transient double                  money;
     private transient List<Objective>         objectives;
     private transient ECSManager              ecsManager;
     private transient ImmutableArray<Entity>  planets;
     private transient ImmutableArray<Entity>  buildingsInConstruction;
     private transient LevelEventRegistry      levelEventRegistry;
-    private transient SpatialQuadtree<Entity> friendlyTeam;
-    private transient SpatialQuadtree<Entity> enemyTeam;
+    
+    private transient Player player1;
+    private transient Player player2;
     
     private Level() {
         _deserializing = this;
@@ -226,28 +226,12 @@ public class Level {
         return objectives;
     }
     
-    public double getMoney() {
-        return money;
-    }
-    
-    public void setMoney(double money) {
-        this.money = money;
-    }
-    
     public LuaValue[] getLuaStores() {
         return luaStores;
     }
     
     public LevelLimits getLimits() {
         return limits;
-    }
-    
-    public SpatialQuadtree<Entity> getTeam1() {
-        return friendlyTeam;
-    }
-    
-    public SpatialQuadtree<Entity> getTeam2() {
-        return enemyTeam;
     }
     
     public Random getRandom() {
@@ -297,6 +281,14 @@ public class Level {
     
     public String getParentDirectory() {
         return parentDirectory;
+    }
+    
+    public Player getPlayer1() {
+        return player1;
+    }
+    
+    public Player getPlayer2() {
+        return player2;
     }
     
     public static class LevelEventRegistry {
@@ -399,12 +391,11 @@ public class Level {
             
             level.limits = context.deserialize(obj.get("levelLimits"), LevelLimits.class);
             level.background = context.deserialize(obj.get("background"), Background.class);
-            
-            level.friendlyTeam = new SpatialQuadtree<>(level.limits.getMinX(), level.limits.getMinY(), level.limits
-                    .getMaxX(), level.limits
-                                                               .getMaxY(), 9);
-            level.enemyTeam = new SpatialQuadtree<>(level.limits.getMinX(), level.limits.getMinY(), level.limits.getMaxX(), level.limits
-                    .getMaxY(), 9);
+    
+            level.player1 = new Player(0, new SpatialQuadtree<>(level.limits.getMinX(), level.limits.getMinY(), level.limits
+                    .getMaxX(), level.limits.getMaxY(), 9));
+            level.player2 = new Player(0, new SpatialQuadtree<>(level.limits.getMinX(), level.limits.getMinY(), level.limits
+                    .getMaxX(), level.limits.getMaxY(), 9));
             
             //level.commands = context.deserialize(obj.get("commands"), new TypeToken<HashMap<String, Command>>() {}.getType());
             Set<Entry<String, JsonElement>> commands = obj.get("commands").getAsJsonObject().entrySet();

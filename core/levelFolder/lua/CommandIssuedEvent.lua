@@ -6,7 +6,7 @@ if event:getId() == 'default' then
 
         if (objective and not objective:getCompleted()) then
             objective:setCompleted(true)
-            setMoney(250)
+            setPlayer1Money(250)
             addObjective('obj.build-mine.id', 'obj.build-mine.title', 'obj.build-mine.desc')
 
             sendMessage('faces/guy', 'msg.build-mine', 5) --image, message, seconds

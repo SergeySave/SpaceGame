@@ -3,9 +3,12 @@ package com.sergey.spacegame.common.game.orders;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.math.Vector2;
 import com.sergey.spacegame.common.ecs.component.BuildingComponent;
+import com.sergey.spacegame.common.ecs.component.ClonableComponent;
 import com.sergey.spacegame.common.ecs.component.PositionComponent;
+import com.sergey.spacegame.common.ecs.component.Team1Component;
 import com.sergey.spacegame.common.ecs.system.OrderSystem;
 import com.sergey.spacegame.common.game.Level;
+import com.sergey.spacegame.common.game.Player;
 
 public class BuildShipOrder implements IOrder {
     
@@ -14,6 +17,7 @@ public class BuildShipOrder implements IOrder {
     private float  time;
     private float  totalTime;
     private double price;
+    private Player player;
     
     public BuildShipOrder(String entityName, float time, double price) {
         this.entity = entityName;
@@ -25,7 +29,15 @@ public class BuildShipOrder implements IOrder {
     
     @Override
     public void init(Entity e, Level level, OrderSystem orderSystem) {
-        level.setMoney(level.getMoney() - price);
+        ClonableComponent team = level.getEntities().get(entity).getTeam();
+        if (team != null) {
+            if (team == Team1Component.INSTANCE) {
+                player = level.getPlayer1();
+            } else {
+                player = level.getPlayer2();
+            }
+            player.setMoney(player.getMoney() - price);
+        }
     }
     
     @Override
@@ -62,7 +74,9 @@ public class BuildShipOrder implements IOrder {
     
     @Override
     public void onCancel(Entity e, Level level) {
-        level.setMoney(level.getMoney() + price);
+        if (player != null) {
+            player.setMoney(player.getMoney() + price);
+        }
     }
     
     @Override

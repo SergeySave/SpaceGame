@@ -253,7 +253,8 @@ public class GameScreen extends BaseScreen implements IViewport {
         ecsManager.addSystem(orderRenderSystem = new OrderRenderSystem(batch));
         ecsManager.addSystem(visualUpdateSystem = new VisualUpdateSystem());
         ecsManager.addSystem(commandUISystem = new CommandUISystem(camera, batch, level));
-        ecsManager.addSystem(selectionControlSystem = new SelectionSystem(camera, batch, commandUISystem, level.getTeam1()));
+        ecsManager.addSystem(selectionControlSystem = new SelectionSystem(camera, batch, commandUISystem, level.getPlayer1()
+                .getTeam()));
         ecsManager.addSystem(hudSystem = new HUDSystem(batch, commandUISystem, level, screen));
     
         SpaceGame.getInstance().getEventBus().post(new BeginLevelEvent(level));

@@ -479,7 +479,7 @@ public class HUDSystem extends EntitySystem implements EntityListener {
             }
         }
     
-        moneyLabel.setText(String.format("%1$,.2f", level.getMoney()));
+        moneyLabel.setText(String.format("%1$,.2f", level.getPlayer1().getMoney()));
     
         {
             int hash = messageEntities.hashCode() * 31 + messageEntities.size();
@@ -518,7 +518,7 @@ public class HUDSystem extends EntitySystem implements EntityListener {
     
     private void updateCommands() {
         for (CommandButton button : buttons) {
-            if (button.command == null) return;
+            if (button.command == null || !button.stack.isVisible()) return;
     
             button.button.setChecked(button.command.equals(commandUI.getCommand()));
     

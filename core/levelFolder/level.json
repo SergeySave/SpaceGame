@@ -25,7 +25,7 @@
       "iconName": "building/mine",
 			"pressedIconName": "missingTexture",
       "req": {
-        "money": "return getMoney() >= 250"
+        "money": "return getPlayer1Money() >= 250"
       },
 			"cursor": {
 				"class": "com.sergey.spacegame.client.ui.cursor.BuildingConstructionCursorOverride",
@@ -40,7 +40,7 @@
       "iconName": "building/factory",
       "pressedIconName": "missingTexture",
       "req": {
-        "money": "return getMoney() >= 500"
+        "money": "return getPlayer1Money() >= 500"
       },
       "cursor": {
         "class": "com.sergey.spacegame.client.ui.cursor.BuildingConstructionCursorOverride",
@@ -55,7 +55,7 @@
       "iconName": "building/fort",
       "pressedIconName": "missingTexture",
       "req": {
-        "money": "return getMoney() >= 300"
+        "money": "return getPlayer1Money() >= 300"
       },
       "cursor": {
         "class": "com.sergey.spacegame.client.ui.cursor.BuildingConstructionCursorOverride",
@@ -72,7 +72,7 @@
       "iconName": "ships/pew",
       "pressedIconName": "missingTexture",
       "req": {
-        "money": "return getMoney() >= 50"
+        "money": "return getPlayer1Money() >= 50"
       }
     },
     "square": {

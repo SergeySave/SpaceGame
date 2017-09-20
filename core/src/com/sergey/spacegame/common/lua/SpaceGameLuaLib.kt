@@ -65,8 +65,10 @@ class SpaceGameLuaLib private constructor() : TwoArgFunction() {
                                           }))
             
             //Money
-            set("getMoney", lFunc { -> LuaValue.valueOf(currLevel.money) })
-            set("setMoney", lFuncU { money -> currLevel.money = money.checkdouble() })
+            set("getPlayer1Money", lFunc { -> LuaValue.valueOf(currLevel.player1.money) })
+            set("setPlayer1Money", lFuncU { money -> currLevel.player1.money = money.checkdouble() })
+            set("getPlayer2Money", lFunc { -> LuaValue.valueOf(currLevel.player2.money) })
+            set("setPlayer2Money", lFuncU { money -> currLevel.player2.money = money.checkdouble() })
             
             //ECS Helper
             set("getTag", lFunc { entity ->

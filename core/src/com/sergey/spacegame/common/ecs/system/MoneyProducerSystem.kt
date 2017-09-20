@@ -7,28 +7,52 @@ import com.badlogic.ashley.core.Family
 import com.badlogic.ashley.systems.IntervalSystem
 import com.sergey.spacegame.common.ecs.component.InContructionComponent
 import com.sergey.spacegame.common.ecs.component.MoneyProducerComponent
+import com.sergey.spacegame.common.ecs.component.Team1Component
+import com.sergey.spacegame.common.ecs.component.Team2Component
 import com.sergey.spacegame.common.game.Level
 
-class MoneyProducerSystem(private val level: Level) : IntervalSystem(deltaTime.toFloat()), EntityListener {
+class MoneyProducerSystem(val level: Level) : IntervalSystem(deltaTime.toFloat()) {
     
-    private var perUpdate: Double = 0.0
+    private var perUpdatePlayer1: Double = 0.0
+    private lateinit var player1Listener: EntityListener
+    
+    private var perUpdatePlayer2: Double = 0.0
+    private lateinit var player2Listener: EntityListener
     
     override fun updateInterval() {
-        level.money += perUpdate
+        level.player1.money += perUpdatePlayer1
+        level.player2.money += perUpdatePlayer2
     }
     
     override fun addedToEngine(engine: Engine) {
-        val family = Family.all(MoneyProducerComponent::class.java).exclude(InContructionComponent::class.java).get()
-        perUpdate = engine.getEntitiesFor(family).sumByDouble { e -> MoneyProducerComponent.MAPPER.get(e).amount } * deltaTime
-        engine.addEntityListener(family, this)
+        val player1Family = Family.all(MoneyProducerComponent::class.java, Team1Component::class.java).exclude(InContructionComponent::class.java).get()
+        perUpdatePlayer1 = engine.getEntitiesFor(player1Family).sumByDouble { e -> MoneyProducerComponent.MAPPER.get(e).amount } * deltaTime
+        engine.addEntityListener(player1Family, object : EntityListener {
+            override fun entityAdded(entity: Entity) {
+                perUpdatePlayer1 += MoneyProducerComponent.MAPPER.get(entity).amount * deltaTime
+            }
+        
+            override fun entityRemoved(entity: Entity) {
+                perUpdatePlayer1 -= MoneyProducerComponent.MAPPER.get(entity).amount * deltaTime
+            }
+        }.also { listener -> player1Listener = listener })
+    
+        val player2Family = Family.all(MoneyProducerComponent::class.java, Team2Component::class.java).exclude(InContructionComponent::class.java).get()
+        perUpdatePlayer2 = engine.getEntitiesFor(player2Family).sumByDouble { e -> MoneyProducerComponent.MAPPER.get(e).amount } * deltaTime
+        engine.addEntityListener(player2Family, object : EntityListener {
+            override fun entityAdded(entity: Entity) {
+                perUpdatePlayer2 += MoneyProducerComponent.MAPPER.get(entity).amount * deltaTime
+            }
+        
+            override fun entityRemoved(entity: Entity) {
+                perUpdatePlayer2 -= MoneyProducerComponent.MAPPER.get(entity).amount * deltaTime
+            }
+        }.also { listener -> player2Listener = listener })
     }
     
-    override fun entityAdded(entity: Entity) {
-        perUpdate += MoneyProducerComponent.MAPPER.get(entity).amount * deltaTime
-    }
-    
-    override fun entityRemoved(entity: Entity) {
-        perUpdate -= MoneyProducerComponent.MAPPER.get(entity).amount * deltaTime
+    override fun removedFromEngine(engine: Engine) {
+        engine.removeEntityListener(player1Listener)
+        engine.removeEntityListener(player2Listener)
     }
     
     private companion object {

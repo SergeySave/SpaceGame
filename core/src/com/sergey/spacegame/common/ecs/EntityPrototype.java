@@ -22,6 +22,7 @@ import java.util.Set;
 public final class EntityPrototype {
     
     private ClonableComponent[] components;
+    private ClonableComponent   team;
     
     public Entity createEntity(Level level) {
         Entity e = level.getECS().newEntity();
@@ -31,6 +32,10 @@ public final class EntityPrototype {
         }
         
         return e;
+    }
+    
+    public ClonableComponent getTeam() {
+        return team;
     }
     
     public static class Adapter implements JsonSerializer<EntityPrototype>, JsonDeserializer<EntityPrototype> {
@@ -43,8 +48,8 @@ public final class EntityPrototype {
             
             Set<Entry<String, JsonElement>> entries = obj.entrySet();
     
-            boolean hasTeam   = false;
-            boolean hasHealth = false;
+            boolean           hasHealth = false;
+            ClonableComponent team      = null;
             
             for (Entry<String, JsonElement> entry : entries) {
                 String className = entry.getKey();
@@ -54,19 +59,22 @@ public final class EntityPrototype {
                     components.add(component);
     
                     if (component instanceof HealthComponent) hasHealth = true;
-                    if (component instanceof Team1Component || component instanceof Team2Component) hasTeam = true;
+                    if (component instanceof Team1Component || component instanceof Team2Component) {
+                        team = component;
+                    }
                 } catch (ClassNotFoundException e) {
                     throw new JsonParseException("Class " + className + " not found. ", e);
                 }
             }
     
-            if (hasTeam != hasHealth) { //xor
+            if ((team == null) == hasHealth) { //xor on if it has a team and it has a health
                 System.err.println("Entity has only one of HealthComponent and TeamComponent");
             }
             
             EntityPrototype proto = new EntityPrototype();
             
             proto.components = components.toArray(new ClonableComponent[]{});
+            proto.team = team;
             
             return proto;
         }
