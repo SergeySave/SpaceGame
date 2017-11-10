@@ -288,11 +288,15 @@ public class GameScreen extends BaseScreen implements IViewport {
     @Override
     public void setViewportWidth(float width) {
         camera.zoom = width / camera.viewportWidth;
+        screen.width = camera.zoom * camera.viewportWidth;
+        screen.height = camera.zoom * camera.viewportHeight;
     }
     
     @Override
     public void setViewportHeight(float height) {
         camera.zoom = height / camera.viewportHeight;
+        screen.width = camera.zoom * camera.viewportWidth;
+        screen.height = camera.zoom * camera.viewportHeight;
     }
     
     @Override
