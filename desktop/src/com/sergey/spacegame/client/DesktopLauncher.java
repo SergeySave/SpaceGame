@@ -1,9 +1,9 @@
-package com.sergey.spacegame.desktop;
+package com.sergey.spacegame.client;
 
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration.HdpiMode;
-import com.sergey.spacegame.SpaceGame;
+import com.sergey.spacegame.common.SpaceGame;
 
 import java.util.Arrays;
 import java.util.List;
@@ -18,7 +18,7 @@ public class DesktopLauncher {
         config.setWindowedMode(1600, 900);
         
         List<String> args = Arrays.asList(arg);
-        
-        new Lwjgl3Application(new SpaceGame(), config);
+            
+            new Lwjgl3Application(new SpaceGame(SpaceGameClient.INSTANCE), config);
     }
 }

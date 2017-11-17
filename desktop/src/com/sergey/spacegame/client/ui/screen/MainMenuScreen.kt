@@ -11,7 +11,8 @@ import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener
 import com.badlogic.gdx.scenes.scene2d.utils.Layout
 import com.badlogic.gdx.utils.Scaling
 import com.badlogic.gdx.utils.viewport.ScreenViewport
-import com.sergey.spacegame.SpaceGame
+import com.sergey.spacegame.client.SpaceGameClient
+import com.sergey.spacegame.common.SpaceGame
 import com.sergey.spacegame.common.game.Level
 
 class MainMenuScreen : BaseScreen() {
@@ -22,10 +23,10 @@ class MainMenuScreen : BaseScreen() {
     
     override fun show() {
         stage = Stage(ScreenViewport())
-        
-        SpaceGame.getInstance().inputMultiplexer.addProcessor(stage)
-        
-        val skin = SpaceGame.getInstance().skin
+    
+        SpaceGameClient.inputMultiplexer.addProcessor(stage)
+    
+        val skin = SpaceGameClient.skin
         
         val table = Table()
         table.setFillParent(true)
@@ -35,12 +36,12 @@ class MainMenuScreen : BaseScreen() {
         table.defaults().padBottom(Value.percentHeight(0.005f, table))
         table.defaults().padLeft(Value.percentWidth(0.005f, table))
         table.defaults().padRight(Value.percentWidth(0.005f, table))
-        
-        val image = Image(SpaceGame.getInstance().getRegion("screen/mainMenu_title"))
+    
+        val image = Image(SpaceGameClient.getRegion("screen/mainMenu_title"))
         image.setScaling(Scaling.fit)
         table.add(image).grow().padTop(Value.percentHeight(0.01f, table))
     
-        val loc = SpaceGame.getInstance().localizations
+        val loc = SpaceGameClient.localizations
     
         val play = TextButton(loc["mainmenu.button.play"], skin, "noBackgroundLarge")
         play.pad(Value.percentHeight(0.1f))
@@ -95,7 +96,7 @@ class MainMenuScreen : BaseScreen() {
     }
     
     override fun hide() {
-        SpaceGame.getInstance().inputMultiplexer.removeProcessor(stage)
+        SpaceGameClient.inputMultiplexer.removeProcessor(stage)
     }
     
     override fun dispose() {

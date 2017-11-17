@@ -3,7 +3,7 @@ package com.sergey.spacegame.common.ecs.component;
 import com.badlogic.ashley.core.Component;
 import com.badlogic.ashley.core.ComponentMapper;
 import com.badlogic.ashley.core.Entity;
-import com.sergey.spacegame.SpaceGame;
+import com.sergey.spacegame.common.SpaceGame;
 import com.sergey.spacegame.common.ecs.system.OrderSystem;
 import com.sergey.spacegame.common.event.OrderInitializedEvent;
 import com.sergey.spacegame.common.game.Level;

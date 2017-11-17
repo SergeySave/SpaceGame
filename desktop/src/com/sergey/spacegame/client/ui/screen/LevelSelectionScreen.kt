@@ -11,7 +11,8 @@ import com.badlogic.gdx.scenes.scene2d.ui.Value
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener
 import com.badlogic.gdx.utils.Align
 import com.badlogic.gdx.utils.viewport.ScreenViewport
-import com.sergey.spacegame.SpaceGame
+import com.sergey.spacegame.client.SpaceGameClient
+import com.sergey.spacegame.common.SpaceGame
 import com.sergey.spacegame.common.game.Level
 
 /**
@@ -24,10 +25,10 @@ class LevelSelectionScreen(private val parent: Screen,
     
     override fun show() {
         stage = Stage(ScreenViewport())
-        
-        SpaceGame.getInstance().inputMultiplexer.addProcessor(stage)
-        
-        val skin = SpaceGame.getInstance().skin
+    
+        SpaceGameClient.inputMultiplexer.addProcessor(stage)
+    
+        val skin = SpaceGameClient.skin
         
         stage.addActor(Table().apply {
             val mainTable = this
@@ -118,12 +119,12 @@ class LevelSelectionScreen(private val parent: Screen,
     override fun resume() {}
     
     override fun hide() {
-        SpaceGame.getInstance().inputMultiplexer.removeProcessor(stage)
+        SpaceGameClient.inputMultiplexer.removeProcessor(stage)
     }
     
     override fun dispose() {
         stage.dispose()
     }
     
-    private fun String.localize() = SpaceGame.getInstance().localize(this)
+    private fun String.localize() = SpaceGameClient.localize(this)
 }

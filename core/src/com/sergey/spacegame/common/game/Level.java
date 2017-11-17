@@ -5,8 +5,6 @@ import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.utils.ImmutableArray;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.audio.Sound;
-import com.badlogic.gdx.graphics.Pixmap;
-import com.badlogic.gdx.graphics.g2d.PixmapPacker;
 import com.badlogic.gdx.utils.GdxRuntimeException;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonDeserializationContext;
@@ -17,9 +15,7 @@ import com.google.gson.JsonParseException;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
 import com.google.gson.reflect.TypeToken;
-import com.sergey.spacegame.SpaceGame;
-import com.sergey.spacegame.client.event.AtlasRegistryEvent;
-import com.sergey.spacegame.client.event.LocalizationRegistryEvent;
+import com.sergey.spacegame.common.SpaceGame;
 import com.sergey.spacegame.common.data.AudioPlayData;
 import com.sergey.spacegame.common.ecs.ECSManager;
 import com.sergey.spacegame.common.ecs.EntityPrototype;
@@ -38,7 +34,6 @@ import com.sergey.spacegame.common.ecs.system.TickableSystem;
 import com.sergey.spacegame.common.ecs.system.WeaponSystem;
 import com.sergey.spacegame.common.event.Event;
 import com.sergey.spacegame.common.event.EventBus;
-import com.sergey.spacegame.common.event.EventHandle;
 import com.sergey.spacegame.common.event.LuaEventHandler;
 import com.sergey.spacegame.common.game.command.Command;
 import com.sergey.spacegame.common.io.PathFileHandle;
@@ -82,13 +77,13 @@ public class Level {
     private transient String    parentDirectory;
     private transient IViewport viewport;
     private transient boolean isControllable = true;
-    private transient Random                  random;
-    private transient LuaValue[]              luaStores;
-    private transient List<Objective>         objectives;
-    private transient ECSManager              ecsManager;
-    private transient ImmutableArray<Entity>  planets;
-    private transient ImmutableArray<Entity>  buildingsInConstruction;
-    private transient LevelEventRegistry      levelEventRegistry;
+    private transient Random                 random;
+    private transient LuaValue[]             luaStores;
+    private transient List<Objective>        objectives;
+    private transient ECSManager             ecsManager;
+    private transient ImmutableArray<Entity> planets;
+    private transient ImmutableArray<Entity> buildingsInConstruction;
+    private transient Object                 levelEventRegistry;
     
     private transient Player player1;
     private transient Player player2;
@@ -160,12 +155,11 @@ public class Level {
         
         Path jsonPath = fileSystem.getPath("level.json");
         
-        EventBus           eventBus = SpaceGame.getInstance().getEventBus();
-        LevelEventRegistry ler      = new LevelEventRegistry(fileSystem);
+        EventBus eventBus = SpaceGame.getInstance().getEventBus();
+        Object   ler      = SpaceGame.getInstance().getContext().createLevelEventHandler(fileSystem);
         eventBus.registerAnnotated(ler);
-        
-        SpaceGame.getInstance().regenerateAtlasNow();
-        SpaceGame.getInstance().reloadLocalizations();
+    
+        SpaceGame.getInstance().getContext().reload();
         
         Level level = SpaceGame.getInstance().getGson().fromJson(Files.newBufferedReader(jsonPath), Level.class);
         _deserializing = null;
@@ -174,7 +168,7 @@ public class Level {
         return level;
     }
     
-    public void init(LevelEventRegistry ler) {
+    public void init(Object ler) {
         levelEventRegistry = ler;
     }
     
@@ -289,83 +283,6 @@ public class Level {
     
     public Player getPlayer2() {
         return player2;
-    }
-    
-    public static class LevelEventRegistry {
-        
-        private FileSystem fileSystem;
-        
-        public LevelEventRegistry(FileSystem fileSystem) {
-            this.fileSystem = fileSystem;
-        }
-        
-        @EventHandle
-        public void onAtlasRegistry(AtlasRegistryEvent event) {
-            try {
-    
-                Path images = fileSystem.getPath("images");
-                if (Files.exists(images)) {
-                    Files.walkFileTree(images, new ImageFileWalker(event.getPacker()));
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-        
-        @EventHandle
-        public void onLocalizationRegistry(LocalizationRegistryEvent event) {
-            try {
-                Files.lines(fileSystem.getPath("localization", event.getLocale() + ".loc"))
-                        .filter(s -> !s.startsWith("#") && s.matches("([^=]+)\\s*=([^=]+)?"))
-                        .forEach(s -> {
-                            String[] parts = s.split("\\s*=");
-                            event.getLocalizationMap().put(parts[0], parts.length > 1 ? parts[1] : "");
-                        });
-            } catch (IOException e) {
-                System.out.println("Localization file not found: " + event.getLocale());
-            }
-        }
-    
-        private static class ImageFileWalker implements FileVisitor<Path> {
-            
-            private PixmapPacker packer;
-        
-            public ImageFileWalker(PixmapPacker packer) {
-                this.packer = packer;
-            }
-            
-            @Override
-            public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) throws IOException {
-                return FileVisitResult.CONTINUE;
-            }
-            
-            @Override
-            public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
-                if (!Files.isHidden(file) && Files.exists(file, LinkOption.NOFOLLOW_LINKS)) {
-                    try {
-                        String name = file.toString()
-                                .substring(0, file.toString().lastIndexOf('.'))
-                                .replaceFirst("/images/", "");
-                        byte[] bytes = Files.readAllBytes(file);
-                        packer.pack(name, new Pixmap(bytes, 0, bytes.length));
-                    } catch (GdxRuntimeException e) {
-                        System.err.println("Failed to load file: " + file + " as an image.");
-                    }
-                }
-                return FileVisitResult.CONTINUE;
-            }
-            
-            @Override
-            public FileVisitResult visitFileFailed(Path file, IOException exc) throws IOException {
-                System.err.println("ERROR: Cannot visit path: " + file);
-                return FileVisitResult.CONTINUE;
-            }
-            
-            @Override
-            public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
-                return FileVisitResult.CONTINUE;
-            }
-        }
     }
     
     

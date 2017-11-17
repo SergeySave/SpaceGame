@@ -7,7 +7,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion
 /**
  * @author sergeys
  */
-class MessageComponent(val imageName: String, val region: TextureRegion, val message: String,
+class MessageComponent(val imageName: String, val region: TextureRegion?, val message: String,
                        val endTime: Long) : Component {
     
     companion object MAP {

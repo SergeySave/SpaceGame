@@ -30,8 +30,9 @@ import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
-import com.sergey.spacegame.SpaceGame;
+import com.sergey.spacegame.client.SpaceGameClient;
 import com.sergey.spacegame.client.ecs.component.SelectedComponent;
+import com.sergey.spacegame.client.game.command.ClientCommand;
 import com.sergey.spacegame.client.gl.DrawingBatch;
 import com.sergey.spacegame.client.ui.scene2d.MinimapDrawable;
 import com.sergey.spacegame.client.ui.scene2d.RadialSprite;
@@ -55,7 +56,7 @@ public class HUDSystem extends EntitySystem implements EntityListener {
     
     private CommandUISystem        commandUI;
     private ImmutableArray<Entity> selectedEntities;
-    private Skin skin = SpaceGame.getInstance().getSkin();
+    private Skin skin = SpaceGameClient.INSTANCE.getSkin();
     
     private LinkedList<Entity> messageEntities;
     private EntityListener     messageListener;
@@ -119,141 +120,60 @@ public class HUDSystem extends EntitySystem implements EntityListener {
         setup();
     }
     
-    private void setup() {
-        stage = new Stage(new ScreenViewport());
-        SpaceGame.getInstance().getInputMultiplexer().addProcessor(0, stage);
-        
-        Table table = new Table();
-        table.setFillParent(true);
-        
-        stage.addActor(table);
-    
-        ImageButtonStyle upArrow = new ImageButtonStyle(skin.get("uncheckable", ImageButtonStyle.class));
-        upArrow.imageUp = skin.getDrawable("upArrow");
-        upArrow.imageUp.setMinHeight(1f);
-        upArrow.imageUp.setMinWidth(1f);
-    
-        ImageButtonStyle downArrow = new ImageButtonStyle(skin.get("uncheckable", ImageButtonStyle.class));
-        downArrow.imageUp = skin.getDrawable("downArrow");
-        downArrow.imageUp.setMinHeight(1f);
-        downArrow.imageUp.setMinWidth(1f);
-    
-        { //Top
-            topTable = new Table();
-            table.add(topTable)
-                    .fillX()
-                    .expandX()
-                    .height(Value.percentHeight(0.035f, table))
-                    .align(Align.topLeft)
-                    .colspan(3);
-    
-            collapseObjectives = new ImageButton(upArrow);
-            collapseObjectives.getImageCell().grow();
-            collapseObjectives.addListener(new ChangeListener() {
+    private CommandButton newCommandButton() {
+        CommandButton commandButton = new CommandButton();
+        commandButton.stack = new Stack();
+        {
+            ImageButtonStyle ibs = skin.get(ImageButtonStyle.class);
+            ibs = new ImageButtonStyle(ibs);
+            
+            commandButton.button = new ImageButton(ibs);
+            commandButton.button.getImageCell().grow();
+            commandButton.button.setProgrammaticChangeEvents(false);
+            commandButton.button.addListener(new ChangeListener() {
                 @Override
                 public void changed(ChangeEvent event, Actor actor) {
-                    objectivesTable.setVisible(!objectivesTable.isVisible());
-                    collapseObjectives.setStyle(objectivesTable.isVisible() ? upArrow : downArrow);
+                    commandButton.button.setChecked(true);
+                    if (commandButton.command instanceof ClientCommand) {
+                        commandUI.setCommand((ClientCommand) commandButton.command);
+                    } else {
+                        System.err.println("ERROR: Command not a ClientCommand on Client side");
+                    }
                 }
             });
-            topTable.add(collapseObjectives)
-                    .expandY()
-                    .fillY()
-                    .width(Value.percentHeight(1f, topTable))
-                    .align(Align.left)
-                    .padRight(5f);
-    
-            topTable.add(new Label(SpaceGame.getInstance().localize("game.label.money"), skin, "small"))
-                    .align(Align.left)
-                    .pad(1, 5, 1, 1);
-    
-            moneyLabel = new Label("", skin, "small");
-            topTable.add(moneyLabel).align(Align.left).pad(1, 5, 1, 1);
-    
-            topTable.add().expand();
-        }
-        table.row();
-        {  //Left
-            Table leftTable = new Table();
-            table.add(leftTable).fillY().expandY().width(Value.percentWidth(0.20f, table)).align(Align.topLeft);
-    
-            objectivesTable = new Table();
-            leftTable.add(objectivesTable).fill().expand().align(Align.topLeft);
-    
-            notCompletedStyle = skin.get("small", LabelStyle.class);
-            completedStyle = skin.get("smallCompleted", LabelStyle.class);
+            
+            commandButton.tooltipTable = new Table();
+            commandButton.tooltipTable.pad(15f).background(skin.getDrawable("default-rect"));
+            
+            commandButton.tooltipTitle = new Label("", skin);
+            commandButton.tooltipDesc = new Label("", skin, "small");
+            commandButton.tooltipReqLabel = new Label("Requirements:", skin, "small");
+            commandButton.tooltipReqs = new VerticalGroup();
+            
+            commandButton.button.addListener(new Tooltip<>(commandButton.tooltipTable, tooltipManager));
+            
+            commandButton.stack.add(commandButton.button);
         }
         {
-            messageGroup = new VerticalGroup();
-            messageGroup.align(Align.top);
-            messageGroup.expand();
-            messageGroup.fill();
-            table.add(messageGroup).grow();
+            commandButton.radialSprite = new RadialSprite(SpaceGameClient.INSTANCE.getRegion("radialBar"));
+            
+            Image radialImage = new Image(commandButton.radialSprite);
+            commandButton.radialSpriteContainer = new Container<>(radialImage);
+            commandButton.radialSpriteContainer.fill();
+            commandButton.radialSpriteContainer.setVisible(false);
+            commandButton.radialSpriteContainer.setTouchable(Touchable.disabled);
+            
+            commandButton.stack.add(commandButton.radialSpriteContainer);
         }
-        { //Right
-            Table rightTable = new Table();
-    
-            MinimapDrawable minimapDrawable = new MinimapDrawable(SpaceGame.getInstance()
-                                                                          .getRegion("team1"), SpaceGame.getInstance()
-                                                                          .getRegion("team2"), SpaceGame.getInstance()
-                                                                          .getRegion("neutral"), SpaceGame.getInstance()
-                                                                          .getRegion("whitePixel"), level, screen);
-            minimap = new Image(minimapDrawable);
-            minimap.addListener(new ClickListener() {
-                @Override
-                public void clicked(InputEvent event, float x, float y) {
-                    //Prevent touch events from going through
-                }
-            });
-            rightTable.add().expandY();
-            rightTable.row();
-            rightTable.add(minimap)
-                    .expandX()
-                    .prefWidth(Value.percentHeight(
-                            level.getLimits().getWidth() / level.getLimits().getHeight(), rightTable))
-                    .prefHeight(Value.percentWidth(
-                            level.getLimits().getHeight() / level.getLimits().getWidth(), rightTable))
-                    .align(Align.bottomRight);
-    
-            table.add(rightTable)
-                    //.height(Value.percentWidth(0.20f, table))
-                    .expandY()
-                    .fillY()
-                    .width(Value.percentWidth(0.20f, table))
-                    .align(Align.bottomRight);
+        {
+            commandButton.label = new Label("", skin, "small");
+            commandButton.label.setAlignment(Align.bottomLeft);
+            commandButton.label.setVisible(false);
+            commandButton.label.setTouchable(Touchable.disabled);
+            commandButton.stack.add(commandButton.label);
         }
-        table.row();
-        { //Bottom
-            Table bottomTable = new Table();
-            table.add(bottomTable)
-                    .fillX()
-                    .expandX()
-                    .height(Value.percentHeight(0.075f, table))
-                    .align(Align.bottom)
-                    .colspan(3);
-    
-            actionBar = new Table();
-            ScrollPane scroll = new ScrollPane(actionBar, skin, "noBg");
-            actionBar.align(Align.left);
-            bottomTable.add(scroll).expand().fill().align(Align.left);
-            collapseMinimap = new ImageButton(downArrow);
-            collapseMinimap.getImageCell().grow();
-            collapseMinimap.addListener(new ChangeListener() {
-                @Override
-                public void changed(ChangeEvent event, Actor actor) {
-                    minimap.setVisible(!minimap.isVisible());
-                    collapseMinimap.setStyle(minimap.isVisible() ? downArrow : upArrow);
-                }
-            });
-            bottomTable.add(collapseMinimap)
-                    .expandY()
-                    .fillY()
-                    .width(Value.percentHeight(1f, bottomTable))
-                    .align(Align.right);
-        }
-        //table.setDebug(true); // This is optional, but enables debug lines for tables.
         
-        recalculateUI();
+        return commandButton;
     }
     
     @Override
@@ -321,58 +241,6 @@ public class HUDSystem extends EntitySystem implements EntityListener {
         }
     }
     
-    private CommandButton newCommandButton() {
-        CommandButton commandButton = new CommandButton();
-        commandButton.stack = new Stack();
-        {
-            ImageButtonStyle ibs = skin.get(ImageButtonStyle.class);
-            ibs = new ImageButtonStyle(ibs);
-            
-            commandButton.button = new ImageButton(ibs);
-            commandButton.button.getImageCell().grow();
-            commandButton.button.setProgrammaticChangeEvents(false);
-            commandButton.button.addListener(new ChangeListener() {
-                @Override
-                public void changed(ChangeEvent event, Actor actor) {
-                    commandButton.button.setChecked(true);
-                    commandUI.setCommand(commandButton.command);
-                }
-            });
-    
-            commandButton.tooltipTable = new Table();
-            commandButton.tooltipTable.pad(15f).background(skin.getDrawable("default-rect"));
-    
-            commandButton.tooltipTitle = new Label("", skin);
-            commandButton.tooltipDesc = new Label("", skin, "small");
-            commandButton.tooltipReqLabel = new Label("Requirements:", skin, "small");
-            commandButton.tooltipReqs = new VerticalGroup();
-    
-            commandButton.button.addListener(new Tooltip<>(commandButton.tooltipTable, tooltipManager));
-            
-            commandButton.stack.add(commandButton.button);
-        }
-        {
-            commandButton.radialSprite = new RadialSprite(SpaceGame.getInstance().getRegion("radialBar"));
-        
-            Image radialImage = new Image(commandButton.radialSprite);
-            commandButton.radialSpriteContainer = new Container<>(radialImage);
-            commandButton.radialSpriteContainer.fill();
-            commandButton.radialSpriteContainer.setVisible(false);
-            commandButton.radialSpriteContainer.setTouchable(Touchable.disabled);
-        
-            commandButton.stack.add(commandButton.radialSpriteContainer);
-        }
-        {
-            commandButton.label = new Label("", skin, "small");
-            commandButton.label.setAlignment(Align.bottomLeft);
-            commandButton.label.setVisible(false);
-            commandButton.label.setTouchable(Touchable.disabled);
-            commandButton.stack.add(commandButton.label);
-        }
-        
-        return commandButton;
-    }
-    
     private void setVisible(CommandButton button, Command command) {
         button.command = command;
         button.button.setChecked(button.command.equals(commandUI.getCommand()));
@@ -391,11 +259,11 @@ public class HUDSystem extends EntitySystem implements EntityListener {
     
         button.tooltipTable.clearChildren();
     
-        button.tooltipTitle.setText(SpaceGame.getInstance().localize(button.command.getName()));
+        button.tooltipTitle.setText(SpaceGameClient.INSTANCE.localize(button.command.getName()));
         button.tooltipTable.add(button.tooltipTitle).align(Align.left);
         button.tooltipTable.row();
     
-        String desc = SpaceGame.getInstance().localize(button.command.getDesc());
+        String desc = SpaceGameClient.INSTANCE.localize(button.command.getDesc());
         button.tooltipDesc.setText(desc);
         if (!desc.isEmpty()) {
             button.tooltipTable.add(button.tooltipDesc).align(Align.left);
@@ -416,7 +284,7 @@ public class HUDSystem extends EntitySystem implements EntityListener {
                     } else {
                         Entry<String, LuaPredicate> entry = iterator.next();
                         Label                       label = (Label) actor;
-                        label.setText(SpaceGame.getInstance()
+                        label.setText(SpaceGameClient.INSTANCE
                                               .localize("command." + command.getId() + ".req." + entry.getKey() +
                                                         ".name"));
                     }
@@ -431,7 +299,7 @@ public class HUDSystem extends EntitySystem implements EntityListener {
                         label = new Label("", skin, "small");
                         button.tooltipReqs.addActor(label);
                     }
-                    label.setText(SpaceGame.getInstance()
+                    label.setText(SpaceGameClient.INSTANCE
                                           .localize("command." + command.getId() + ".req." + entry.getKey() + ".name"));
                 }
             }
@@ -439,11 +307,6 @@ public class HUDSystem extends EntitySystem implements EntityListener {
         
         button.label.setVisible(false);
         button.radialSpriteContainer.setVisible(false);
-    }
-    
-    private void unsetup() {
-        SpaceGame.getInstance().getInputMultiplexer().removeProcessor(stage);
-        stage.dispose();
     }
     
     @Override
@@ -465,12 +328,12 @@ public class HUDSystem extends EntitySystem implements EntityListener {
                 lastObjectives = hash;
                 objectivesTable.clearChildren();
                 for (Objective objective : level.getObjectives()) {
-                    Label label = new Label(SpaceGame.getInstance()
+                    Label label = new Label(SpaceGameClient.INSTANCE
                                                     .localize(objective.getTitle()), objective.getCompleted() ?
                                                     completedStyle :
                                                     notCompletedStyle);
                     label.setWrap(true);
-                    label.addListener(new Tooltip<Actor>(new Label(SpaceGame.getInstance()
+                    label.addListener(new Tooltip<Actor>(new Label(SpaceGameClient.INSTANCE
                                                                            .localize(objective.getDescription()), skin, "small"), tooltipManager));
                     objectivesTable.add(label).expandX().fillX().align(Align.topLeft).pad(1, 5, 1, 1);
                     objectivesTable.row();
@@ -490,7 +353,7 @@ public class HUDSystem extends EntitySystem implements EntityListener {
                     MessageComponent messageComponent = MessageComponent.MAPPER.get(messageEntity);
                 
                     Image image = new Image(messageComponent.getRegion());
-                    Label label = new Label(SpaceGame.getInstance()
+                    Label label = new Label(SpaceGameClient.INSTANCE
                                                     .localize(messageComponent.getMessage()), skin, "small");
                     label.setWrap(true);
                     label.setAlignment(Align.left);
@@ -514,6 +377,148 @@ public class HUDSystem extends EntitySystem implements EntityListener {
         stage.draw();
     
         batch.begin();
+    }
+    
+    private void unsetup() {
+        SpaceGameClient.INSTANCE.getInputMultiplexer().removeProcessor(stage);
+        stage.dispose();
+    }
+    
+    private void setup() {
+        stage = new Stage(new ScreenViewport());
+        SpaceGameClient.INSTANCE.getInputMultiplexer().addProcessor(0, stage);
+        
+        Table table = new Table();
+        table.setFillParent(true);
+        
+        stage.addActor(table);
+        
+        ImageButtonStyle upArrow = new ImageButtonStyle(skin.get("uncheckable", ImageButtonStyle.class));
+        upArrow.imageUp = skin.getDrawable("upArrow");
+        upArrow.imageUp.setMinHeight(1f);
+        upArrow.imageUp.setMinWidth(1f);
+        
+        ImageButtonStyle downArrow = new ImageButtonStyle(skin.get("uncheckable", ImageButtonStyle.class));
+        downArrow.imageUp = skin.getDrawable("downArrow");
+        downArrow.imageUp.setMinHeight(1f);
+        downArrow.imageUp.setMinWidth(1f);
+        
+        { //Top
+            topTable = new Table();
+            table.add(topTable)
+                    .fillX()
+                    .expandX()
+                    .height(Value.percentHeight(0.035f, table))
+                    .align(Align.topLeft)
+                    .colspan(3);
+            
+            collapseObjectives = new ImageButton(upArrow);
+            collapseObjectives.getImageCell().grow();
+            collapseObjectives.addListener(new ChangeListener() {
+                @Override
+                public void changed(ChangeEvent event, Actor actor) {
+                    objectivesTable.setVisible(!objectivesTable.isVisible());
+                    collapseObjectives.setStyle(objectivesTable.isVisible() ? upArrow : downArrow);
+                }
+            });
+            topTable.add(collapseObjectives)
+                    .expandY()
+                    .fillY()
+                    .width(Value.percentHeight(1f, topTable))
+                    .align(Align.left)
+                    .padRight(5f);
+            
+            topTable.add(new Label(SpaceGameClient.INSTANCE.localize("game.label.money"), skin, "small"))
+                    .align(Align.left)
+                    .pad(1, 5, 1, 1);
+            
+            moneyLabel = new Label("", skin, "small");
+            topTable.add(moneyLabel).align(Align.left).pad(1, 5, 1, 1);
+            
+            topTable.add().expand();
+        }
+        table.row();
+        {  //Left
+            Table leftTable = new Table();
+            table.add(leftTable).fillY().expandY().width(Value.percentWidth(0.20f, table)).align(Align.topLeft);
+            
+            objectivesTable = new Table();
+            leftTable.add(objectivesTable).fill().expand().align(Align.topLeft);
+            
+            notCompletedStyle = skin.get("small", LabelStyle.class);
+            completedStyle = skin.get("smallCompleted", LabelStyle.class);
+        }
+        {
+            messageGroup = new VerticalGroup();
+            messageGroup.align(Align.top);
+            messageGroup.expand();
+            messageGroup.fill();
+            table.add(messageGroup).grow();
+        }
+        { //Right
+            Table rightTable = new Table();
+            
+            MinimapDrawable minimapDrawable = new MinimapDrawable(SpaceGameClient.INSTANCE
+                                                                          .getRegion("team1"), SpaceGameClient.INSTANCE
+                                                                          .getRegion("team2"), SpaceGameClient.INSTANCE
+                                                                          .getRegion("neutral"), SpaceGameClient.INSTANCE
+                                                                          .getRegion("whitePixel"), level, screen);
+            minimap = new Image(minimapDrawable);
+            minimap.addListener(new ClickListener() {
+                @Override
+                public void clicked(InputEvent event, float x, float y) {
+                    //Prevent touch events from going through
+                }
+            });
+            rightTable.add().expandY();
+            rightTable.row();
+            rightTable.add(minimap)
+                    .expandX()
+                    .prefWidth(Value.percentHeight(
+                            level.getLimits().getWidth() / level.getLimits().getHeight(), rightTable))
+                    .prefHeight(Value.percentWidth(
+                            level.getLimits().getHeight() / level.getLimits().getWidth(), rightTable))
+                    .align(Align.bottomRight);
+            
+            table.add(rightTable)
+                    //.height(Value.percentWidth(0.20f, table))
+                    .expandY()
+                    .fillY()
+                    .width(Value.percentWidth(0.20f, table))
+                    .align(Align.bottomRight);
+        }
+        table.row();
+        { //Bottom
+            Table bottomTable = new Table();
+            table.add(bottomTable)
+                    .fillX()
+                    .expandX()
+                    .height(Value.percentHeight(0.075f, table))
+                    .align(Align.bottom)
+                    .colspan(3);
+            
+            actionBar = new Table();
+            ScrollPane scroll = new ScrollPane(actionBar, skin, "noBg");
+            actionBar.align(Align.left);
+            bottomTable.add(scroll).expand().fill().align(Align.left);
+            collapseMinimap = new ImageButton(downArrow);
+            collapseMinimap.getImageCell().grow();
+            collapseMinimap.addListener(new ChangeListener() {
+                @Override
+                public void changed(ChangeEvent event, Actor actor) {
+                    minimap.setVisible(!minimap.isVisible());
+                    collapseMinimap.setStyle(minimap.isVisible() ? downArrow : upArrow);
+                }
+            });
+            bottomTable.add(collapseMinimap)
+                    .expandY()
+                    .fillY()
+                    .width(Value.percentHeight(1f, bottomTable))
+                    .align(Align.right);
+        }
+        //table.setDebug(true); // This is optional, but enables debug lines for tables.
+        
+        recalculateUI();
     }
     
     private void updateCommands() {

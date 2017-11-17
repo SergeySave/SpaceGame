@@ -8,7 +8,7 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Rectangle;
-import com.sergey.spacegame.SpaceGame;
+import com.sergey.spacegame.client.SpaceGameClient;
 import com.sergey.spacegame.client.ecs.system.CommandUISystem;
 import com.sergey.spacegame.client.ecs.system.HUDSystem;
 import com.sergey.spacegame.client.ecs.system.LineRenderSystem;
@@ -18,6 +18,7 @@ import com.sergey.spacegame.client.ecs.system.SelectionSystem;
 import com.sergey.spacegame.client.ecs.system.VisualUpdateSystem;
 import com.sergey.spacegame.client.gl.DrawingBatch;
 import com.sergey.spacegame.client.ui.UIUtil;
+import com.sergey.spacegame.common.SpaceGame;
 import com.sergey.spacegame.common.ecs.ECSManager;
 import com.sergey.spacegame.common.ecs.system.OrderSystem;
 import com.sergey.spacegame.common.event.BeginLevelEvent;
@@ -136,7 +137,7 @@ public class GameScreen extends BaseScreen implements IViewport {
         batch.setAddTint(DEF_ADD);
         batch.begin();
     
-        TextureRegion region = SpaceGame.getInstance().getRegion(level.getBackground().getImage());
+        TextureRegion region = SpaceGameClient.INSTANCE.getRegion(level.getBackground().getImage());
         float         width  = screenCamera.viewportWidth;
         float         height = screenCamera.viewportHeight;
         if (width < region.getRegionWidth() / region.getRegionHeight() * height) {
@@ -172,7 +173,7 @@ public class GameScreen extends BaseScreen implements IViewport {
     
     @Override
     public void hide() {
-        SpaceGame.getInstance().getInputMultiplexer().removeProcessor(gameInputAdapter);
+        SpaceGameClient.INSTANCE.getInputMultiplexer().removeProcessor(gameInputAdapter);
         
         ecsManager.removeSystem(orderSystem);
         ecsManager.removeSystem(mainRenderSystem);
@@ -260,10 +261,10 @@ public class GameScreen extends BaseScreen implements IViewport {
         SpaceGame.getInstance().getEventBus().post(new BeginLevelEvent(level));
     
         if (gameInputAdapter != null) {
-            SpaceGame.getInstance().getInputMultiplexer().removeProcessor(gameInputAdapter);
+            SpaceGameClient.INSTANCE.getInputMultiplexer().removeProcessor(gameInputAdapter);
         }
     
-        SpaceGame.getInstance().getInputMultiplexer().addProcessor(gameInputAdapter = new InputAdapter() {
+        SpaceGameClient.INSTANCE.getInputMultiplexer().addProcessor(gameInputAdapter = new InputAdapter() {
             private final float STRENGTH = 0.95f;
         
             @Override

@@ -11,9 +11,10 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
-import com.sergey.spacegame.SpaceGame;
 import com.sergey.spacegame.client.ecs.component.SelectedComponent;
+import com.sergey.spacegame.client.game.command.ClientCommand;
 import com.sergey.spacegame.client.gl.DrawingBatch;
+import com.sergey.spacegame.common.SpaceGame;
 import com.sergey.spacegame.common.ecs.component.ControllableComponent;
 import com.sergey.spacegame.common.game.Level;
 import com.sergey.spacegame.common.game.LevelLimits;
@@ -34,7 +35,7 @@ public class CommandUISystem extends EntitySystem {
     
     private Vector2 orderCenter;
     
-    private Command command;
+    private ClientCommand command;
     
     private ImmutableArray<Entity> selectedEntities;
     
@@ -61,7 +62,11 @@ public class CommandUISystem extends EntitySystem {
     @Override
     public void update(float deltaTime) {
         if (command == null) {
-            command = level.getCommands().get("default");
+            if (!(level.getCommands().get("default") instanceof ClientCommand)) {
+                System.err.println("ERROR: Command not a ClientCommand on Client side");
+                return;
+            }
+            command = (ClientCommand) level.getCommands().get("default");
             if (command == null) {
                 return;
             }
@@ -171,7 +176,7 @@ public class CommandUISystem extends EntitySystem {
         return command;
     }
     
-    public void setCommand(Command command) {
+    public void setCommand(ClientCommand command) {
         this.command = command;
     }
 }

@@ -13,9 +13,10 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
-import com.sergey.spacegame.SpaceGame;
+import com.sergey.spacegame.client.SpaceGameClient;
 import com.sergey.spacegame.client.ecs.component.SelectedComponent;
 import com.sergey.spacegame.client.gl.DrawingBatch;
+import com.sergey.spacegame.common.SpaceGame;
 import com.sergey.spacegame.common.ecs.component.ControllableComponent;
 import com.sergey.spacegame.common.ecs.component.PositionComponent;
 import com.sergey.spacegame.common.ecs.component.RotationComponent;
@@ -58,16 +59,16 @@ public class SelectionSystem extends EntitySystem implements InputProcessor {
         //controllableEntities = engine.getEntitiesFor(Family.all(ControllableComponent.class, PositionComponent.class)
         //                                                     .exclude(InContructionComponent.class)
         //                                                     .get());
-        
-        SpaceGame.getInstance().getInputMultiplexer().addProcessor(this);
+    
+        SpaceGameClient.INSTANCE.getInputMultiplexer().addProcessor(this);
     }
     
     @Override
     public void removedFromEngine(Engine engine) {
         selectedEntities = null;
         //controllableEntities = null;
-        
-        SpaceGame.getInstance().getInputMultiplexer().removeProcessor(this);
+    
+        SpaceGameClient.INSTANCE.getInputMultiplexer().removeProcessor(this);
     }
     
     @Override

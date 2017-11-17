@@ -5,7 +5,7 @@ import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.EntitySystem;
 import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.utils.ImmutableArray;
-import com.sergey.spacegame.SpaceGame;
+import com.sergey.spacegame.common.SpaceGame;
 import com.sergey.spacegame.common.event.EntityAddedEvent;
 import com.sergey.spacegame.common.event.EntityRemovedEvent;
 

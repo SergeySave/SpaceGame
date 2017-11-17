@@ -2,7 +2,7 @@ package com.sergey.spacegame.common.game.command;
 
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.math.Vector2;
-import com.sergey.spacegame.SpaceGame;
+import com.sergey.spacegame.common.SpaceGame;
 import com.sergey.spacegame.common.event.CommandIssuedEvent;
 import com.sergey.spacegame.common.game.Level;
 

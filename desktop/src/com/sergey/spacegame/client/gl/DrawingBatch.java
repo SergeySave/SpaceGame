@@ -12,7 +12,7 @@ import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector2;
-import com.sergey.spacegame.SpaceGame;
+import com.sergey.spacegame.client.SpaceGameClient;
 
 public class DrawingBatch {
     
@@ -170,7 +170,8 @@ public class DrawingBatch {
         int count = quads * 6; //6 indicies per quad
         
         if (lastTexture == null) {
-            lastTexture = SpaceGame.getInstance().getAtlas().getTextures().first();
+            //noinspection ConstantConditions
+            lastTexture = SpaceGameClient.INSTANCE.getAtlas().getTextures().first();
         }
         
         lastTexture.bind();

@@ -3,8 +3,7 @@ package com.sergey.spacegame.common.lua
 import com.badlogic.ashley.core.Component
 import com.badlogic.ashley.core.ComponentMapper
 import com.badlogic.ashley.core.Entity
-import com.sergey.spacegame.SpaceGame
-import com.sergey.spacegame.client.ecs.component.VisualComponent
+import com.sergey.spacegame.common.SpaceGame
 import com.sergey.spacegame.common.ecs.component.HealthComponent
 import com.sergey.spacegame.common.ecs.component.MessageComponent
 import com.sergey.spacegame.common.ecs.component.OrderComponent
@@ -16,6 +15,7 @@ import com.sergey.spacegame.common.ecs.component.ShipComponent
 import com.sergey.spacegame.common.ecs.component.SizeComponent
 import com.sergey.spacegame.common.ecs.component.TagComponent
 import com.sergey.spacegame.common.ecs.component.VelocityComponent
+import com.sergey.spacegame.common.ecs.component.VisualComponent
 import com.sergey.spacegame.common.event.BeginLevelEvent
 import com.sergey.spacegame.common.event.EventHandle
 import com.sergey.spacegame.common.event.LuaDelayEvent
@@ -179,7 +179,7 @@ class SpaceGameLuaLib private constructor() : TwoArgFunction() {
             //Messages
             set("sendMessage", lFuncU { imageL, messageL, timeL ->
                 val textureName = imageL.checkjstring()
-                val region = SpaceGame.getInstance().getRegion(textureName)
+                val region = SpaceGame.getInstance().context.getRegion(textureName)
                 val message = messageL.checkjstring()
                 val millis = (timeL.checkdouble() * 1000).toLong() + System.currentTimeMillis()
         

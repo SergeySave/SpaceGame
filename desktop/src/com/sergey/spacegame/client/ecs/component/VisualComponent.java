@@ -11,7 +11,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
-import com.sergey.spacegame.SpaceGame;
+import com.sergey.spacegame.client.SpaceGameClient;
 import com.sergey.spacegame.common.ecs.component.ClonableComponent;
 
 import java.lang.reflect.Type;
@@ -44,7 +44,7 @@ public class VisualComponent implements ClonableComponent {
     }
     
     public void setRegion(String name) {
-        this.region = SpaceGame.getInstance().getRegion(name);
+        this.region = SpaceGameClient.INSTANCE.getRegion(name);
         this.name = name;
     }
     

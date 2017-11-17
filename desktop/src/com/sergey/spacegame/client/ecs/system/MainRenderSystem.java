@@ -6,7 +6,7 @@ import com.badlogic.ashley.core.EntitySystem;
 import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.utils.ImmutableArray;
 import com.badlogic.gdx.graphics.Color;
-import com.sergey.spacegame.SpaceGame;
+import com.sergey.spacegame.client.SpaceGameClient;
 import com.sergey.spacegame.client.ecs.component.VisualComponent;
 import com.sergey.spacegame.client.gl.DrawingBatch;
 import com.sergey.spacegame.client.ui.scene2d.RadialDrawingBatchSprite;
@@ -33,7 +33,7 @@ public class MainRenderSystem extends EntitySystem {
     public MainRenderSystem(DrawingBatch batch) {
         super(2);
         this.batch = batch;
-        this.rdbs = new RadialDrawingBatchSprite(SpaceGame.getInstance().getRegion("uncolored"));
+        this.rdbs = new RadialDrawingBatchSprite(SpaceGameClient.INSTANCE.getRegion("uncolored"));
     }
     
     @Override

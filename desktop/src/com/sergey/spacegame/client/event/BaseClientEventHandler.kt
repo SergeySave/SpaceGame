@@ -3,7 +3,14 @@ package com.sergey.spacegame.client.event
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Pixmap
 import com.badlogic.gdx.graphics.g2d.PixmapPacker
+import com.google.gson.GsonBuilder
+import com.sergey.spacegame.client.ecs.component.VisualComponent
+import com.sergey.spacegame.client.game.command.ClientCommand
+import com.sergey.spacegame.client.game.weapon.ClientWeapon
 import com.sergey.spacegame.common.event.EventHandle
+import com.sergey.spacegame.common.event.GsonRegisterEvent
+import com.sergey.spacegame.common.game.command.Command
+import com.sergey.spacegame.common.game.weapon.Weapon
 
 
 class BaseClientEventHandler {
@@ -34,4 +41,18 @@ class BaseClientEventHandler {
     private fun PixmapPacker.load(name: String) {
         this.pack(name, Pixmap(Gdx.files.internal("$name.png")))
     }
+    
+    
+    @EventHandle
+    fun onGsonRegister(event: GsonRegisterEvent) {
+        val gson = event.gson
+        gson.registerTypeAdapter(VisualComponent.Adapter())
+        gson.registerTypeAdapter(Weapon::class.java, ClientWeapon.Adapter())
+        gson.registerTypeAdapter(Command::class.java, ClientCommand.Adapter())
+    }
+    
+    private fun GsonBuilder.registerTypeAdapter(adapter: Any) {
+        this.registerTypeAdapter(adapter::class.java.enclosingClass, adapter)
+    }
+    
 }

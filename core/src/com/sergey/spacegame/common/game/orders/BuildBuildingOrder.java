@@ -2,7 +2,7 @@ package com.sergey.spacegame.common.game.orders;
 
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.math.Vector2;
-import com.sergey.spacegame.SpaceGame;
+import com.sergey.spacegame.common.SpaceGame;
 import com.sergey.spacegame.common.ecs.component.BuildingComponent;
 import com.sergey.spacegame.common.ecs.component.InContructionComponent;
 import com.sergey.spacegame.common.ecs.component.PlanetComponent;

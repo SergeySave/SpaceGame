@@ -5,7 +5,7 @@ import com.badlogic.ashley.core.Entity
 import com.badlogic.ashley.core.Family
 import com.badlogic.ashley.systems.IntervalSystem
 import com.badlogic.ashley.utils.ImmutableArray
-import com.sergey.spacegame.SpaceGame
+import com.sergey.spacegame.common.SpaceGame
 import com.sergey.spacegame.common.ecs.component.InContructionComponent
 import com.sergey.spacegame.common.ecs.component.TickableComponent
 import com.sergey.spacegame.common.event.EntityTickEvent
