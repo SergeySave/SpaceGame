@@ -7,6 +7,14 @@ sourceSets.main.java.srcDirs = [ "src/" ]
 project.ext.mainClassName = "com.sergey.spacegame.client.DesktopLauncher"
 project.ext.assetsDir = new File("../core/assets")
 
+dependencies {
+    compile project(":core")
+    compile "com.badlogicgames.gdx:gdx-backend-lwjgl3:$gdxVersion"
+    compile "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
+    compile "com.badlogicgames.gdx:gdx-freetype:$gdxVersion"
+    compile "com.badlogicgames.gdx:gdx-freetype-platform:$gdxVersion:natives-desktop"
+}
+
 task run(dependsOn: classes, type: JavaExec) {
     main = project.mainClassName
     classpath = sourceSets.main.runtimeClasspath
@@ -41,13 +49,13 @@ eclipse {
 }
 
 task afterEclipseImport(description: "Post processing after project generation", group: "IDE") {
-  doLast {
-    def classpath = new XmlParser().parse(file(".classpath"))
-      //noinspection GroovyResultOfObjectAllocationIgnored
-      new Node(classpath, "classpathentry", [ kind: 'src', path: 'assets' ])
-      def writer = new FileWriter(file(".classpath"))
-    def printer = new XmlNodePrinter(new PrintWriter(writer))
-    printer.setPreserveWhitespace(true)
-    printer.print(classpath)
-  }
+    doLast {
+        def classpath = new XmlParser().parse(file(".classpath"))
+        //noinspection GroovyResultOfObjectAllocationIgnored
+        new Node(classpath, "classpathentry", [ kind: 'src', path: 'assets' ])
+        def writer = new FileWriter(file(".classpath"))
+        def printer = new XmlNodePrinter(new PrintWriter(writer))
+        printer.setPreserveWhitespace(true)
+        printer.print(classpath)
+    }
 }

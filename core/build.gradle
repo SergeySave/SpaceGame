@@ -6,6 +6,19 @@ sourceCompatibility = 1.8
 
 sourceSets.main.java.srcDirs = [ "src/" ]
 
+dependencies {
+    compile "com.badlogicgames.gdx:gdx:$gdxVersion"
+    compile "com.badlogicgames.ashley:ashley:$ashleyVersion"
+    compile "org.jetbrains.kotlin:kotlin-stdlib-jre8"
+
+    // https://mvnrepository.com/artifact/org.apache.bcel/bcel
+    compile group: 'org.apache.bcel', name: 'bcel', version: '6.0'
+    compile 'org.luaj:luaj-jse:3.0.1'
+
+    //GSON
+    compile "com.google.code.gson:gson:2.6.2"
+    compile "com.google.code.gson:gson:2.6.2:sources"
+}
 
 eclipse.project {
     name = appName + "-core"

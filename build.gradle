@@ -5,8 +5,6 @@ buildscript {
         mavenCentral()
         maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
     }
-    dependencies {
-    }
 }
 
 allprojects {
@@ -16,11 +14,8 @@ allprojects {
     version = '0.0.1'
     ext {
         appName = "spacegame"
-        gdxVersion = '1.9.6'
-        roboVMVersion = '2.2.0'
-        box2DLightsVersion = '1.4'
-        ashleyVersion = '1.7.0'
-        aiVersion = '1.8.0'
+        gdxVersion = '1.9.7'
+        ashleyVersion = '1.7.3'
     }
 
     repositories {
@@ -33,42 +28,8 @@ allprojects {
 
 buildscript {
     dependencies {
-    	classpath "com.badlogicgames.gdx:gdx-tools:1.9.6"
+    	classpath "com.badlogicgames.gdx:gdx-tools:1.9.7"
     	classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:1.1.60"
-    }
-}
-
-project(":desktop") {
-    apply plugin: "java"
-    apply plugin: "kotlin"
-
-    dependencies {
-        compile project(":core")
-        compile "com.badlogicgames.gdx:gdx-backend-lwjgl3:$gdxVersion"
-        compile "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
-        compile "com.badlogicgames.gdx:gdx-box2d-platform:$gdxVersion:natives-desktop"
-        compile "com.badlogicgames.gdx:gdx-freetype-platform:$gdxVersion:natives-desktop"
-    }
-}
-
-project(":core") {
-    apply plugin: "java"
-    apply plugin: "kotlin"
-
-    dependencies {
-        compile "com.badlogicgames.gdx:gdx:$gdxVersion"
-        compile "com.badlogicgames.gdx:gdx-box2d:$gdxVersion"
-        compile "com.badlogicgames.gdx:gdx-freetype:$gdxVersion"
-        compile "com.badlogicgames.ashley:ashley:$ashleyVersion"
-        compile "org.jetbrains.kotlin:kotlin-stdlib-jre8"
-        
-        // https://mvnrepository.com/artifact/org.apache.bcel/bcel
-		compile group: 'org.apache.bcel', name: 'bcel', version: '6.0'
-        compile 'org.luaj:luaj-jse:3.0.1'
-        
-        //GSON
-		compile "com.google.code.gson:gson:2.6.2"
-		compile "com.google.code.gson:gson:2.6.2:sources"
     }
 }
 
