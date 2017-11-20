@@ -7,6 +7,8 @@ public class InContructionComponent implements Component {
     
     public static final ComponentMapper<InContructionComponent> MAPPER = ComponentMapper.getFor(InContructionComponent.class);
     
+    public double finalHealth;
+    public float  originalTimeRemaining;
     public float  timeRemaining;
     public String entityID;
     public double price;

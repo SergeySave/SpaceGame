@@ -83,17 +83,19 @@ public class MainRenderSystem extends EntitySystem {
         
                 if (HealthComponent.MAPPER.has(entity)) {
                     healthComponent = HealthComponent.MAPPER.get(entity);
-                    batch.setMultTint(MULTCOLOR);
-                    batch.setAddTint(Team1Component.MAPPER.has(entity) ?
-                                             TEAM1COLOR :
-                                             (Team2Component.MAPPER.has(entity) ? TEAM2COLOR : NEUTRALCOLOR));
-            
-                    rdbs.draw(batch,
-                              posVar.getX() - sizeVar.w * 0.75f,
-                              posVar.getY() - sizeVar.h * 0.75f,
-                              sizeVar.w * 1.5f,
-                              sizeVar.h * 1.5f,
-                              360 - (float) (360 * healthComponent.getHealth() / healthComponent.getMaxHealth()));
+                    if (healthComponent.getHealth() > 0) {
+                        batch.setMultTint(MULTCOLOR);
+                        batch.setAddTint(Team1Component.MAPPER.has(entity) ?
+                                                 TEAM1COLOR :
+                                                 (Team2Component.MAPPER.has(entity) ? TEAM2COLOR : NEUTRALCOLOR));
+        
+                        rdbs.draw(batch,
+                                  posVar.getX() - sizeVar.w * 0.75f,
+                                  posVar.getY() - sizeVar.h * 0.75f,
+                                  sizeVar.w * 1.5f,
+                                  sizeVar.h * 1.5f,
+                                  360 - (float) (360 * healthComponent.getHealth() / healthComponent.getMaxHealth()));
+                    }
                 }
             }
         }

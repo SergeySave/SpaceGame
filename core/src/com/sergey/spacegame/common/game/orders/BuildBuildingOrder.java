@@ -4,6 +4,7 @@ import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.math.Vector2;
 import com.sergey.spacegame.common.SpaceGame;
 import com.sergey.spacegame.common.ecs.component.BuildingComponent;
+import com.sergey.spacegame.common.ecs.component.HealthComponent;
 import com.sergey.spacegame.common.ecs.component.InContructionComponent;
 import com.sergey.spacegame.common.ecs.component.PlanetComponent;
 import com.sergey.spacegame.common.ecs.component.PositionComponent;
@@ -74,8 +75,15 @@ public class BuildBuildingOrder implements IOrder {
             
             Entity                 building               = level.getEntities().get(entity).createEntity(level); //Copy of building
             InContructionComponent inContructionComponent = new InContructionComponent(entity, price);
+            HealthComponent        healthComponent        = HealthComponent.MAPPER.get(building);
+            inContructionComponent.finalHealth = healthComponent != null ? healthComponent.getHealth() : -1;
+            inContructionComponent.originalTimeRemaining = time;
             inContructionComponent.timeRemaining = time;
             building.add(inContructionComponent);
+    
+            if (healthComponent != null) {
+                healthComponent.setHealth(0);
+            }
     
             planetPos = PositionComponent.MAPPER.get(planet);
             
@@ -154,6 +162,9 @@ public class BuildBuildingOrder implements IOrder {
             isDone = true;
             return;
         }
+    
+        InContructionComponent inContructionComponent = InContructionComponent.MAPPER.get(building);
+        HealthComponent        healthComponent        = HealthComponent.MAPPER.get(building);
         
         if (ShipComponent.MAPPER.has(e) && PositionComponent.MAPPER.has(e)) {
             PositionComponent pos = PositionComponent.MAPPER.get(e);
@@ -179,7 +190,12 @@ public class BuildBuildingOrder implements IOrder {
                 pos.setX(desired.x);
                 pos.setY(desired.y);
                 e.remove(VelocityComponent.class);
-                InContructionComponent.MAPPER.get(building).timeRemaining -= deltaTime;
+                inContructionComponent.timeRemaining -= deltaTime;
+                if (healthComponent != null) {
+                    healthComponent.setHealth(
+                            inContructionComponent.finalHealth * (1 - inContructionComponent.timeRemaining /
+                                                                      inContructionComponent.originalTimeRemaining));
+                }
             } else {
                 if (RotationComponent.MAPPER.has(e)) {
                     RotationComponent rotationComponent = RotationComponent.MAPPER.get(e);
@@ -222,13 +238,21 @@ public class BuildBuildingOrder implements IOrder {
                 
             }
         } else {
-            InContructionComponent.MAPPER.get(building).timeRemaining -= deltaTime;
+            inContructionComponent.timeRemaining -= deltaTime;
+            if (healthComponent != null) {
+                healthComponent.setHealth(
+                        inContructionComponent.finalHealth * (1 - inContructionComponent.timeRemaining /
+                                                                  inContructionComponent.originalTimeRemaining));
+            }
         }
     
-        if (InContructionComponent.MAPPER.get(building).timeRemaining < 0) {
+        if (inContructionComponent.timeRemaining < 0) {
             SpaceGame.getInstance()
                     .getEventBus()
-                    .post(buildingConstructedEvent.get(building, InContructionComponent.MAPPER.get(building).entityID));
+                    .post(buildingConstructedEvent.get(building, inContructionComponent.entityID));
+            if (healthComponent != null) {
+                healthComponent.setHealth(inContructionComponent.finalHealth);
+            }
             building.remove(InContructionComponent.class);
             isDone = true;
         }
