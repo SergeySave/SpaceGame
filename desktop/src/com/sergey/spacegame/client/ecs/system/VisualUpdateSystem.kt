@@ -6,9 +6,10 @@ import com.badlogic.ashley.core.EntityListener
 import com.badlogic.ashley.core.EntitySystem
 import com.badlogic.ashley.core.Family
 import com.badlogic.gdx.graphics.Color
+import com.sergey.spacegame.client.data.ClientVisualData
 import com.sergey.spacegame.client.ecs.component.SelectedComponent
-import com.sergey.spacegame.client.ecs.component.VisualComponent
 import com.sergey.spacegame.common.ecs.component.InContructionComponent
+import com.sergey.spacegame.common.ecs.component.VisualComponent
 
 class VisualUpdateSystem : EntitySystem(2) {
     
@@ -35,9 +36,7 @@ class VisualUpdateSystem : EntitySystem(2) {
         engine.removeEntityListener(inConstructionListener)
     }
     
-    override fun update(deltaTime: Float) {
-        //Should not run
-    }
+    override fun update(deltaTime: Float) = Unit
     
     private companion object {
         
@@ -50,15 +49,19 @@ class VisualUpdateSystem : EntitySystem(2) {
     
     private class Colorizer(val mult: Float, val add: Float) : EntityListener {
         override fun entityAdded(entity: Entity) {
-            val visualComponent = VisualComponent.MAPPER.get(entity)
-            visualComponent.multColor = mult
-            visualComponent.addColor = add
+            val visualData = VisualComponent.MAPPER.get(entity).visualData
+            if (visualData is ClientVisualData) {
+                visualData.multColor = mult
+                visualData.addColor = add
+            }
         }
         
         override fun entityRemoved(entity: Entity) {
-            val visualComponent = VisualComponent.MAPPER.get(entity)
-            visualComponent.multColor = VisualComponent.MULT_DEFAULT
-            visualComponent.addColor = VisualComponent.ADD_DEFAULT
+            val visualData = VisualComponent.MAPPER.get(entity).visualData
+            if (visualData is ClientVisualData) {
+                visualData.multColor = ClientVisualData.MULT_DEFAULT
+                visualData.addColor = ClientVisualData.ADD_DEFAULT
+            }
         }
     }
 }

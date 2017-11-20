@@ -11,11 +11,11 @@ import com.badlogic.gdx.math.Rectangle
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable
 import com.badlogic.gdx.scenes.scene2d.utils.ScissorStack
-import com.sergey.spacegame.client.ecs.component.VisualComponent
 import com.sergey.spacegame.common.ecs.component.PositionComponent
 import com.sergey.spacegame.common.ecs.component.SizeComponent
 import com.sergey.spacegame.common.ecs.component.Team1Component
 import com.sergey.spacegame.common.ecs.component.Team2Component
+import com.sergey.spacegame.common.ecs.component.VisualComponent
 import com.sergey.spacegame.common.game.Level
 
 /**

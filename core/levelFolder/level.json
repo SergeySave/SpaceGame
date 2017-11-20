@@ -94,7 +94,9 @@
 	},
 	"entities": {
     "ship1": {
-			"com.sergey.spacegame.client.ecs.component.VisualComponent": { "image": "ships/pew" },
+      "com.sergey.spacegame.common.ecs.component.VisualComponent": {
+        "image": "ships/pew"
+      },
 			"com.sergey.spacegame.common.ecs.component.PositionComponent": {},
       "com.sergey.spacegame.common.ecs.component.SizeComponent": {
         "w": 50,
@@ -150,7 +152,7 @@
       ]
 		},
     "enemy1": {
-      "com.sergey.spacegame.client.ecs.component.VisualComponent": {
+      "com.sergey.spacegame.common.ecs.component.VisualComponent": {
         "image": "ships/enepew"
       },
       "com.sergey.spacegame.common.ecs.component.PositionComponent": {},
@@ -192,7 +194,7 @@
       ]
     },
     "mine1": {
-      "com.sergey.spacegame.client.ecs.component.VisualComponent": {
+      "com.sergey.spacegame.common.ecs.component.VisualComponent": {
         "image": "building/mine"
       },
 			"com.sergey.spacegame.common.ecs.component.SizeComponent": {
@@ -210,7 +212,7 @@
       "com.sergey.spacegame.common.ecs.component.Team1Component": {}
     },
     "factory1": {
-      "com.sergey.spacegame.client.ecs.component.VisualComponent": {
+      "com.sergey.spacegame.common.ecs.component.VisualComponent": {
         "image": "building/factory"
       },
       "com.sergey.spacegame.common.ecs.component.SizeComponent": {
@@ -231,7 +233,7 @@
       "com.sergey.spacegame.common.ecs.component.Team1Component": {}
     },
     "fort1": {
-      "com.sergey.spacegame.client.ecs.component.VisualComponent": {
+      "com.sergey.spacegame.common.ecs.component.VisualComponent": {
         "image": "building/fort"
       },
       "com.sergey.spacegame.common.ecs.component.SizeComponent": {
@@ -281,13 +283,15 @@
 	},
 	"state": [
 		{
-			"com.sergey.spacegame.client.ecs.component.VisualComponent": { "image": "planets/1" },
+      "com.sergey.spacegame.common.ecs.component.VisualComponent": {
+        "image": "planets/1"
+      },
 			"com.sergey.spacegame.common.ecs.component.PositionComponent": { "x": 250, "y": 250 },
 			"com.sergey.spacegame.common.ecs.component.SizeComponent": { "w": 200, "h": 200 },
 			"com.sergey.spacegame.common.ecs.component.PlanetComponent": {}
 		},
 		{
-      "com.sergey.spacegame.client.ecs.component.VisualComponent": {
+      "com.sergey.spacegame.common.ecs.component.VisualComponent": {
         "image": "ships/builder"
       },
 			"com.sergey.spacegame.common.ecs.component.PositionComponent":{ "x": 150, "y": 150 },

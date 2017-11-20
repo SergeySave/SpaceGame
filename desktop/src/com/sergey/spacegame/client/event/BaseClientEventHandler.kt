@@ -4,7 +4,6 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Pixmap
 import com.badlogic.gdx.graphics.g2d.PixmapPacker
 import com.google.gson.GsonBuilder
-import com.sergey.spacegame.client.ecs.component.VisualComponent
 import com.sergey.spacegame.client.game.command.ClientCommand
 import com.sergey.spacegame.client.game.weapon.ClientWeapon
 import com.sergey.spacegame.common.event.EventHandle
@@ -46,7 +45,6 @@ class BaseClientEventHandler {
     @EventHandle
     fun onGsonRegister(event: GsonRegisterEvent) {
         val gson = event.gson
-        gson.registerTypeAdapter(VisualComponent.Adapter())
         gson.registerTypeAdapter(Weapon::class.java, ClientWeapon.Adapter())
         gson.registerTypeAdapter(Command::class.java, ClientCommand.Adapter())
     }

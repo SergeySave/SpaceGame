@@ -6,12 +6,13 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Cursor;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.math.Vector3;
-import com.sergey.spacegame.client.ecs.component.VisualComponent;
+import com.sergey.spacegame.client.data.ClientVisualData;
 import com.sergey.spacegame.client.gl.DrawingBatch;
 import com.sergey.spacegame.common.ecs.component.PlanetComponent;
 import com.sergey.spacegame.common.ecs.component.PositionComponent;
 import com.sergey.spacegame.common.ecs.component.RotationComponent;
 import com.sergey.spacegame.common.ecs.component.SizeComponent;
+import com.sergey.spacegame.common.ecs.component.VisualComponent;
 import com.sergey.spacegame.common.ecs.system.BuildingSystem;
 import com.sergey.spacegame.common.ecs.system.PlanetSystem;
 import com.sergey.spacegame.common.game.Level;
@@ -79,6 +80,7 @@ public final class BuildingConstructionCursorOverride implements CursorOverride 
                     PositionComponent posVar;
                     SizeComponent     sizeVar;
                     VisualComponent   visVar;
+                    ClientVisualData  visualData;
                     
                     RotationComponent rotVar;
                     
@@ -91,24 +93,29 @@ public final class BuildingConstructionCursorOverride implements CursorOverride 
                     sizeVar = SizeComponent.MAPPER.get(building);
                     visVar = VisualComponent.MAPPER.get(building);
     
-                    if (validPlacement && posVar.getX() < limits.getMinX() || posVar.getX() > limits.getMaxX() ||
-                        posVar.getY() < limits.getMinY() || posVar.getY() > limits.getMaxY()) {
-                        validPlacement = false;
-                    }
-                    
-                    batch.setMultTint(MULT);
-                    batch.setAddTint(validPlacement ? GREEN : RED);
-                    
-                    if (RotationComponent.MAPPER.has(building)) {
-                        rotVar = RotationComponent.MAPPER.get(building);
-                        float oX = rotVar.originX * sizeVar.w;
-                        float oY = rotVar.originY * sizeVar.h;
-                        batch.draw(visVar.getRegion(),
-                                   posVar.getX() - oX,
-                                   posVar.getY() - oY, oX, oY, sizeVar.w, sizeVar.h, 1, 1, rotVar.r);
-                    } else {
-                        batch.draw(visVar.getRegion(),
-                                   posVar.getX() - sizeVar.w / 2, posVar.getY() - sizeVar.h / 2, sizeVar.w, sizeVar.h);
+                    if (visVar.getVisualData() instanceof ClientVisualData) {
+                        visualData = (ClientVisualData) visVar.getVisualData();
+        
+                        if (validPlacement && posVar.getX() < limits.getMinX() || posVar.getX() > limits.getMaxX() ||
+                            posVar.getY() < limits.getMinY() || posVar.getY() > limits.getMaxY()) {
+                            validPlacement = false;
+                        }
+        
+                        batch.setMultTint(MULT);
+                        batch.setAddTint(validPlacement ? GREEN : RED);
+        
+                        if (RotationComponent.MAPPER.has(building)) {
+                            rotVar = RotationComponent.MAPPER.get(building);
+                            float oX = rotVar.originX * sizeVar.w;
+                            float oY = rotVar.originY * sizeVar.h;
+                            batch.draw(visualData.getRegion(),
+                                       posVar.getX() - oX,
+                                       posVar.getY() - oY, oX, oY, sizeVar.w, sizeVar.h, 1, 1, rotVar.r);
+                        } else {
+                            batch.draw(visualData.getRegion(),
+                                       posVar.getX() - sizeVar.w / 2,
+                                       posVar.getY() - sizeVar.h / 2, sizeVar.w, sizeVar.h);
+                        }
                     }
                 });
     }

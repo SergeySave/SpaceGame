@@ -12,6 +12,7 @@ import com.badlogic.gdx.graphics.g2d.TextureAtlas
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator
 import com.badlogic.gdx.scenes.scene2d.ui.Skin
+import com.sergey.spacegame.client.data.ClientVisualData
 import com.sergey.spacegame.client.event.AtlasRegistryEvent
 import com.sergey.spacegame.client.event.BaseClientEventHandler
 import com.sergey.spacegame.client.event.LocalizationRegistryEvent
@@ -21,6 +22,7 @@ import com.sergey.spacegame.client.ui.screen.LoadingScreen
 import com.sergey.spacegame.client.ui.screen.MainMenuScreen
 import com.sergey.spacegame.common.SpaceGame
 import com.sergey.spacegame.common.SpaceGameContext
+import com.sergey.spacegame.common.data.VisualData
 import java.nio.file.FileSystem
 import java.util.HashMap
 
@@ -126,6 +128,8 @@ object SpaceGameClient : SpaceGameContext {
         val region = atlas!!.findRegion(name)
         return region ?: atlas!!.findRegion("missingTexture")
     }
+    
+    override fun createVisualData(name: String): VisualData = ClientVisualData(name)
     
     private fun generateFonts() {
         val fontGenerator = fontGenerator!!

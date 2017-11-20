@@ -7,6 +7,7 @@ import com.sergey.spacegame.common.ecs.EntityPrototype
 import com.sergey.spacegame.common.ecs.component.ControllableComponent
 import com.sergey.spacegame.common.ecs.component.Team1Component
 import com.sergey.spacegame.common.ecs.component.Team2Component
+import com.sergey.spacegame.common.ecs.component.VisualComponent
 import com.sergey.spacegame.common.ecs.component.WeaponComponent
 import com.sergey.spacegame.common.game.Level
 import com.sergey.spacegame.common.game.weapon.Weapon
@@ -17,6 +18,7 @@ class BaseCommonEventHandler {
     @EventHandle
     fun onGsonRegister(event: GsonRegisterEvent) {
         val gson = event.gson
+        gson.registerTypeAdapter(VisualComponent.Adapter())
         gson.registerTypeAdapter(EntityPrototype.Adapter())
         gson.registerTypeAdapter(ControllableComponent.Adapter())
         gson.registerTypeAdapter(Level.Adapter())

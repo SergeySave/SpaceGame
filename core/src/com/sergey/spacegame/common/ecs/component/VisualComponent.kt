@@ -9,12 +9,26 @@ import com.google.gson.JsonObject
 import com.google.gson.JsonParseException
 import com.google.gson.JsonSerializationContext
 import com.google.gson.JsonSerializer
+import com.sergey.spacegame.common.SpaceGame
+import com.sergey.spacegame.common.data.VisualData
 import java.lang.reflect.Type
 
 /**
  * @author sergeys
  */
-class VisualComponent(var regionName: String) : ClonableComponent {
+class VisualComponent(regionName: String) : ClonableComponent {
+    
+    var regionName: String = ""
+        set(value) {
+            visualData = SpaceGame.getInstance().context.createVisualData(value)
+            field = value
+        }
+    var visualData: VisualData? = null
+        private set
+    
+    init {
+        this.regionName = regionName
+    }
     
     override fun copy(): Component {
         return VisualComponent(regionName)

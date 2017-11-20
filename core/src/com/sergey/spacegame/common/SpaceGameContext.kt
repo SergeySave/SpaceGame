@@ -1,6 +1,7 @@
 package com.sergey.spacegame.common
 
 import com.badlogic.gdx.graphics.g2d.TextureAtlas
+import com.sergey.spacegame.common.data.VisualData
 import java.nio.file.FileSystem
 
 /**
@@ -19,4 +20,5 @@ interface SpaceGameContext {
     fun dispose()
     
     fun getRegion(name: String): TextureAtlas.AtlasRegion?
+    fun createVisualData(name: String): VisualData
 }
