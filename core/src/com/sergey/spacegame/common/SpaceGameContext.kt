@@ -20,5 +20,5 @@ interface SpaceGameContext {
     fun dispose()
     
     fun getRegion(name: String): TextureAtlas.AtlasRegion?
-    fun createVisualData(name: String): VisualData
+    fun createVisualData(name: String): VisualData?
 }
