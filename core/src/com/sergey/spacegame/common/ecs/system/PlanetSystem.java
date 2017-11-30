@@ -8,6 +8,7 @@ import com.badlogic.ashley.core.Family;
 import com.badlogic.gdx.math.Vector2;
 import com.sergey.spacegame.common.ecs.component.BuildingComponent;
 import com.sergey.spacegame.common.ecs.component.PlanetComponent;
+import com.sergey.spacegame.common.ecs.component.RotationComponent;
 import com.sergey.spacegame.common.ecs.component.SizeComponent;
 
 /**
@@ -37,19 +38,8 @@ public class PlanetSystem extends EntitySystem implements EntityListener {
         Entity            planet    = buildingC.getPlanet();
         PlanetComponent   planetC   = PlanetComponent.MAPPER.get(planet);
         float[]           minMax    = getMinMax(building, planet, buildingC.getPosition());
-        
-        planetC.addBuildingInRange(minMax[0], minMax[1]);
-    }
     
-    @Override
-    public void entityRemoved(Entity building) {
-        BuildingComponent buildingC = BuildingComponent.MAPPER.get(building);
-        Entity            planet    = buildingC.getPlanet();
-        PlanetComponent   planetC   = PlanetComponent.MAPPER.get(planet);
-        float[]           minMax    = getMinMax(building, planet, buildingC.getPosition());
-        
-        planetC.removeBuilding(minMax[0], minMax[1]);
-        buildingC.reset();
+        planetC.addBuildingInRange(minMax[0], minMax[1], planet);
     }
     
     /**
@@ -66,7 +56,10 @@ public class PlanetSystem extends EntitySystem implements EntityListener {
         
         SizeComponent planetSize = SizeComponent.MAPPER.get(planet);
         //Base building position
-        Vector2 rotatedBuildingVector = new Vector2(1f, 0f).rotate(positionB);
+        RotationComponent planetR   = RotationComponent.MAPPER.get(planet);
+        float             planetRot = planetR != null ? planetR.r % 360 : 0f;
+        Vector2 rotatedBuildingVector = new Vector2(1f, 0f).rotate(positionB +
+                                                                   planetRot);
         
         //Desired building position
         Vector2 position = rotatedBuildingVector.cpy().scl(planetSize.w / 2, planetSize.h / 2);
@@ -74,10 +67,23 @@ public class PlanetSystem extends EntitySystem implements EntityListener {
         Vector2 surface = rotatedBuildingVector.cpy().rotate90(1);
         //Normalize and scale by half of the width
         surface.setLength(size.w / 2);
-        
-        float min = position.cpy().sub(surface).angle();
-        float max = position.cpy().add(surface).angle();
+    
+        float min = position.cpy().sub(surface).angle() - planetRot;
+        if (min < 0) min += 360;
+        float max = position.cpy().add(surface).angle() - planetRot;
+        if (max < 0) max += 360;
         
         return new float[]{min, max};
+    }
+    
+    @Override
+    public void entityRemoved(Entity building) {
+        BuildingComponent buildingC = BuildingComponent.MAPPER.get(building);
+        Entity            planet    = buildingC.getPlanet();
+        PlanetComponent   planetC   = PlanetComponent.MAPPER.get(planet);
+        float[]           minMax    = getMinMax(building, planet, buildingC.getPosition());
+        
+        planetC.removeBuilding(minMax[0], minMax[1], planet);
+        buildingC.reset();
     }
 }

@@ -32,7 +32,7 @@ public final class AngleRange {
         this.max = max;
         
         //Fix the angles so that min is always less than max
-        if (min > max) this.max += (Angle.USE_DEGREES ? 360 : Angle.PI2);
+        while (min > this.max) { this.max += (Angle.USE_DEGREES ? 360 : Angle.PI2); }
     }
     
     /**
@@ -42,7 +42,7 @@ public final class AngleRange {
      */
     public void setMax(double max) {
         this.max = max;
-        if (min > this.max) this.max += (Angle.USE_DEGREES ? 360 : Angle.PI2);
+        while (min > this.max) { this.max += (Angle.USE_DEGREES ? 360 : Angle.PI2); }
     }
     
     /**
@@ -128,8 +128,8 @@ public final class AngleRange {
      */
     public boolean isInRange(double angle) {
         //Fixes angle in case its wrong
-        if (angle < min) angle += (Angle.USE_DEGREES ? 360 : Angle.PI2);
-        if (angle > max) angle -= (Angle.USE_DEGREES ? 360 : Angle.PI2);
+        while (angle < min) { angle += (Angle.USE_DEGREES ? 360 : Angle.PI2); }
+        while (angle > max) { angle -= (Angle.USE_DEGREES ? 360 : Angle.PI2); }
         
         return angle > min && angle < max;
     }

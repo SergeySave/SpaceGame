@@ -90,13 +90,15 @@ public class BuildBuildingOrder implements IOrder, MovingOrder {
             }
     
             planetPos = PositionComponent.MAPPER.get(planet);
-            
-            float buildingPos = planetPos.createVector().sub(x, y).scl(-1).angle();
+            RotationComponent planetR   = RotationComponent.MAPPER.get(planet);
+            float             planetRot = planetR != null ? planetR.r : 0f;
+    
+            float buildingPos = planetPos.createVector().sub(x, y).scl(-1).angle() - planetRot;
             
             float[] minMax = PlanetSystem.getMinMax(building, planet, buildingPos);
     
             //Check if the spot on the planet is not free
-            if (!PlanetComponent.MAPPER.get(planet).isFree(minMax[0], minMax[1])) {
+            if (!PlanetComponent.MAPPER.get(planet).isFree(minMax[0], minMax[1], planet)) {
     
                 //Registered construting buildings will get checked as well as existing buildings
                 //We want a building in the same range that is under construction
@@ -124,8 +126,8 @@ public class BuildBuildingOrder implements IOrder, MovingOrder {
                 }
             } else { //The spot on the planet is free so we should build a new building
                 BuildingComponent buildingC = new BuildingComponent();
-    
-                buildingC.init(planet, buildingPos);
+        
+                buildingC.init(planet, buildingPos + planetRot);
     
                 building.add(buildingC);
                 if (!PositionComponent.MAPPER.has(building)) building.add(new PositionComponent());
@@ -234,6 +236,8 @@ public class BuildBuildingOrder implements IOrder, MovingOrder {
                             }
                     
                             rotationVelocityComponent.vr = Math.signum(dr) * ship.rotateSpeed;
+                            vel.vx = 0;
+                            vel.vy = 0;
                         } else {
                             if (RotationVelocityComponent.MAPPER.has(e)) e.remove(RotationVelocityComponent.class);
                             rotationComponent.r = desiredAngle;
@@ -260,21 +264,20 @@ public class BuildBuildingOrder implements IOrder, MovingOrder {
         }
     
         //If we have finished building the building
+        //This will only run for the first entity that finished constructing
         if (inContructionComponent.timeRemaining < 0) {
-            //Post that the building has been constructed if we are the last ship that was building it
-            if (--inContructionComponent.building == 0) {
-                SpaceGame.getInstance()
-                        .getEventBus()
-                        .post(buildingConstructedEvent.get(building, inContructionComponent.entityID));
-        
-                //Also update its health
-                if (healthComponent != null) {
-                    healthComponent.setHealth(inContructionComponent.finalHealth);
-                }
-        
-                //And remove it from under construction
-                building.remove(InContructionComponent.class);
+            SpaceGame.getInstance()
+                    .getEventBus()
+                    .post(buildingConstructedEvent.get(building, inContructionComponent.entityID));
+    
+            //And remove it from under construction
+            building.remove(InContructionComponent.class);
+    
+            //Also update its health
+            if (healthComponent != null) {
+                healthComponent.setHealth(inContructionComponent.finalHealth);
             }
+
             isDone = true;
         }
     }

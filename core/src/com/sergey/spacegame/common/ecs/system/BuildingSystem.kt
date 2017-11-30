@@ -28,11 +28,11 @@ class BuildingSystem : IteratingSystem((Family.all(BuildingComponent::class.java
         fun doSetBuildingPosition(entity: Entity, planet: Entity, position: Float) {
             val pos = PositionComponent.MAPPER.get(entity) ?: PositionComponent().apply { entity.add(this) }
             val size = SizeComponent.MAPPER.get(entity)
-            val rot = if (RotationComponent.MAPPER.has(entity)) RotationComponent.MAPPER.get(entity) else null
+            val rot = RotationComponent.MAPPER.get(entity)
             
             val planetPos = PositionComponent.MAPPER.get(planet)
             val planetSize = SizeComponent.MAPPER.get(planet)
-            val rotatedBuildingVector = Vector2(1f, 0f).rotate(position)
+            val rotatedBuildingVector = Vector2(1f, 0f).rotate(position + (RotationComponent.MAPPER.get(planet)?.r ?: 0f))
             pos.setFrom(planetPos.createVector().add(rotatedBuildingVector.cpy().scl(planetSize.w / 2 + size.w / 3, planetSize.h / 2 + size.w / 3)))
             rot?.r = rotatedBuildingVector.scl(planetSize.h, planetSize.w).angle() //Don't care about modifying rotatedBuildingVector here
         }

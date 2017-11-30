@@ -25,7 +25,8 @@ public class BuildingComponent implements Component {
     public void init(Entity planet, float position) {
         if (planet == null) throw new NullPointerException("Planet must not be null");
         this.planet = planet;
-        this.position = position;
+        RotationComponent planetR = RotationComponent.MAPPER.get(planet);
+        this.position = position - (planetR != null ? planetR.r : 0f);
         //Registration of the building should have occurred right
         //after this when this component was added in the PlanetSystem
     }

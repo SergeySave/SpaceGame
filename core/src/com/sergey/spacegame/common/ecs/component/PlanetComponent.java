@@ -2,6 +2,7 @@ package com.sergey.spacegame.common.ecs.component;
 
 import com.badlogic.ashley.core.Component;
 import com.badlogic.ashley.core.ComponentMapper;
+import com.badlogic.ashley.core.Entity;
 import com.sergey.spacegame.common.math.AngleRange;
 
 import java.util.Iterator;
@@ -33,11 +34,13 @@ public class PlanetComponent implements ClonableComponent {
      *
      * @param min - the minimum angle
      * @param max - the maximum angle
+     * @param planet - the parent planet
      *
      * @return is the range described by this angle free
      */
-    public boolean isFree(float min, float max) {
+    public boolean isFree(float min, float max, Entity planet) {
         if (freeSpaces.isEmpty()) return true;
+    
         return freeSpaces.stream()
                 .filter((ar) -> ar.isInRange(min))
                 .findFirst()
@@ -50,16 +53,17 @@ public class PlanetComponent implements ClonableComponent {
      *
      * @param min - the minimum angle
      * @param max - the maximum angle
+     * @param planet - the parent planet
      *
      * @return whether the component changed
      */
-    public boolean addBuildingInRange(float min, float max) {
+    public boolean addBuildingInRange(float min, float max, Entity planet) {
         if (freeSpaces.isEmpty()) {
             //If no ranges add a range representing the open space
             freeSpaces.add(new AngleRange(max, min));
             return true;
         }
-        
+
         ListIterator<AngleRange> iterator = freeSpaces.listIterator();
         while (iterator.hasNext()) {
             AngleRange curr = iterator.next();
@@ -92,11 +96,13 @@ public class PlanetComponent implements ClonableComponent {
      *
      * @param min - the minimum angle
      * @param max - the maximum angle
+     * @param planet - the parent planet
+     *
      * @return whether the component changed
      */
-    public boolean removeBuilding(float min, float max) {
+    public boolean removeBuilding(float min, float max, Entity planet) {
         if (freeSpaces.isEmpty()) return false;
-        
+    
         Iterator<AngleRange> iterator = freeSpaces.iterator();
         while (iterator.hasNext()) {
             AngleRange range = iterator.next();

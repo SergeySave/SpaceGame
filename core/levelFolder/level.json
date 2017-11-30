@@ -282,14 +282,25 @@
     }
 	},
 	"state": [
-		{
+    {
       "com.sergey.spacegame.common.ecs.component.VisualComponent": {
         "image": "planets/1"
       },
-			"com.sergey.spacegame.common.ecs.component.PositionComponent": { "x": 250, "y": 250 },
-			"com.sergey.spacegame.common.ecs.component.SizeComponent": { "w": 200, "h": 200 },
-      "com.sergey.spacegame.common.ecs.component.PlanetComponent": {}
-		},
+      "com.sergey.spacegame.common.ecs.component.PositionComponent": {
+        "x": 250,
+        "y": 250
+      },
+      "com.sergey.spacegame.common.ecs.component.SizeComponent": {
+        "w": 200,
+        "h": 200
+      },
+      "com.sergey.spacegame.common.ecs.component.PlanetComponent": {},
+      "com.sergey.spacegame.common.ecs.component.RotationComponent": {
+        "originX": 0.5,
+        "originY": 0.5,
+        "r": 0
+      }
+    },
 		{
       "com.sergey.spacegame.common.ecs.component.VisualComponent": {
         "image": "ships/builder"

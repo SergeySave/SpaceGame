@@ -92,7 +92,9 @@ public final class BuildingConstructionCursorOverride implements CursorOverride 
                     PositionComponent planetPos = PositionComponent.MAPPER.get(planet);
                     
                     //Get the angle relative to the planet
-                    float angle = planetPos.createVector().sub(vec.x, vec.y).scl(-1).angle();
+                    RotationComponent planetR = RotationComponent.MAPPER.get(planet);
+                    float angle = planetPos.createVector().sub(vec.x, vec.y).scl(-1).angle()
+                                  - (planetR != null ? planetR.r : 0f);
                     
                     //Calculate the building's position
                     BuildingSystem.doSetBuildingPosition(building, planet, angle);
@@ -108,7 +110,7 @@ public final class BuildingConstructionCursorOverride implements CursorOverride 
                     float[] minMax = PlanetSystem.getMinMax(building, planet, angle);
                     
                     //Determine if it is a valid placement
-                    boolean validPlacement = PlanetComponent.MAPPER.get(planet).isFree(minMax[0], minMax[1]) &&
+                    boolean validPlacement = PlanetComponent.MAPPER.get(planet).isFree(minMax[0], minMax[1], planet) &&
                                              enabled;
                     
                     posVar = PositionComponent.MAPPER.get(building);
