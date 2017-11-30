@@ -3,6 +3,7 @@ package com.sergey.spacegame.common.lua
 import com.badlogic.ashley.core.Component
 import com.badlogic.ashley.core.ComponentMapper
 import com.badlogic.ashley.core.Entity
+import com.badlogic.gdx.graphics.Color
 import com.sergey.spacegame.common.SpaceGame
 import com.sergey.spacegame.common.ecs.component.HealthComponent
 import com.sergey.spacegame.common.ecs.component.MessageComponent
@@ -71,6 +72,7 @@ object SpaceGameLuaLib : TwoArgFunction() {
         COMPONENTS.add(Quadruple("ship", ShipComponent.MAPPER, { ShipComponent() }, listOf()))
         COMPONENTS.add(Quadruple("health", HealthComponent.MAPPER, { HealthComponent() }, listOf("h")))
         COMPONENTS.add(Quadruple("particle", PositionComponent.MAPPER, { ParticleComponent(System.currentTimeMillis()) }, listOf("prtl")))
+        COMPONENTS.add(Quadruple("visual", VisualComponent.MAPPER, { VisualComponent("") }, listOf("vis")))
     }
     
     override fun call(modName: LuaValue, env: LuaValue): LuaValue {
@@ -144,7 +146,6 @@ object SpaceGameLuaLib : TwoArgFunction() {
                     entity.add(ParticleComponent(System.currentTimeMillis() + life))
             
                     currLevel.ecs.addEntity(entity)
-                    println("added")
                     return CoerceJavaToLua.coerce(entity)
                 }
             })
@@ -284,6 +285,21 @@ object SpaceGameLuaLib : TwoArgFunction() {
                             currLevel.viewport.setLevel(newLevel)
                         }
                     }
+                }
+            })
+    
+            set("colorToFloat", object : VarArgFunction() {
+                override fun invoke(args: Varargs): Varargs {
+                    if (args == LuaValue.NONE || (args.narg() != 3 && args.narg() != 4)) {
+                        return argerror("colorToFloat needs 3 or 4 arguments")
+                    }
+            
+                    val r = args.arg(1).checkint()
+                    val g = args.arg(2).checkint()
+                    val b = args.arg(3).checkint()
+                    val a = if (args.narg() == 4) args.arg(4).checkint() else 255
+            
+                    return LuaValue.valueOf(Color.toFloatBits(r, g, b, a).toDouble())
                 }
             })
         }

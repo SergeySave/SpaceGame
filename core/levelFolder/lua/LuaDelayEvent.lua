@@ -41,6 +41,39 @@ elseif id == 3 then
     local centerY = 1000 - h / 2
     local bottomY = 1000 - h
 
+    local function particles(ship)
+        local pos = component.pos.get(ship)
+        local facing = component.rot.get(ship).r
+
+        local size = component.size.get(ship)
+
+        local cos = math.cos(facing * math.pi / 180)
+        local sin = math.sin(facing * math.pi / 180)
+
+        for i = 1, 50 do
+
+            local trans = math.random(127)
+            local velMult = 127 / 127.0 * 0.5 + 0.5
+
+            local particle = spawnParticle("whitePixel", pos:getX() + (math.random() * size.w - size.w / 2) - 10 * cos, pos:getY() + (math.random() * size.h - size.h / 2) - 10 * sin, 15, 0.75, 25 * cos * velMult, 25 * sin * velMult, 3000 - 22 * trans)
+
+            local newFacing = component.rot.new()
+            newFacing.r = facing
+
+            local visual = component.vis.get(particle)
+
+            if (not (visual:getVisualData() == NIL)) then
+                local vData = visual:getVisualData()
+
+                local whiteness = math.random(127)
+
+                vData:setMultColor(colorToFloat(whiteness, whiteness, 255, trans + 64))
+            end
+
+            particle:add(newFacing)
+        end
+    end
+
     local function spawnEnemy(x, y)
         local enemy = spawnEntity("enemy1")
 
@@ -50,6 +83,8 @@ elseif id == 3 then
 
         local rotation = component.r.get(enemy)
         rotation.r = 180 / math.pi * math.atan2(centerY - y, centerX - x)
+
+        particles(enemy)
 
         addOrder(enemy, orders.TimeMoveOrder.new(centerX, centerY, 60), orders.TimeMoveOrder)
     end

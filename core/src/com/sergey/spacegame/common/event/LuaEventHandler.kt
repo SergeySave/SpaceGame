@@ -16,6 +16,12 @@ import org.luaj.vm2.lib.jse.CoerceJavaToLua
 class LuaEventHandler(lua: String, original: String) {
     
     private var code: LuaValue
+    private val LUA_GLOBALS: Globals = LuaUtils.newStandard()
+    
+    init {
+        //Each event handler needs its own set of globals
+        LUA_GLOBALS.load(SpaceGameLuaLib)
+    }
     
     /**
      * The original JSON string that produced the lua
@@ -41,13 +47,5 @@ class LuaEventHandler(lua: String, original: String) {
     fun execute(event: Event) {
         LUA_GLOBALS.set("event", CoerceJavaToLua.coerce(event))
         code.call()
-    }
-    
-    private companion object {
-        private val LUA_GLOBALS: Globals = LuaUtils.newStandard()
-        
-        init {
-            LUA_GLOBALS.load(SpaceGameLuaLib)
-        }
     }
 }
