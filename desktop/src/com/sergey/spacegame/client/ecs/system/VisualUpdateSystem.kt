@@ -11,12 +11,21 @@ import com.sergey.spacegame.client.ecs.component.SelectedComponent
 import com.sergey.spacegame.common.ecs.component.InContructionComponent
 import com.sergey.spacegame.common.ecs.component.VisualComponent
 
+/**
+ * Represents the system that updates visual data
+ *
+ * @author sergeys
+ *
+ * @constructor Creates a new VisualUpdateSystem
+ */
 class VisualUpdateSystem : EntitySystem(2) {
     
+    //The entity listeners for efficient colorization
     lateinit var selectedListener: EntityListener
     lateinit var inConstructionListener: EntityListener
     
     init {
+        //This system doesnt need to do any processing
         setProcessing(false)
     }
     

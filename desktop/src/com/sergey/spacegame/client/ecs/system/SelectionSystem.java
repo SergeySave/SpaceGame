@@ -27,8 +27,14 @@ import com.sergey.spacegame.common.math.SpatialQuadtree;
 import java.util.LinkedList;
 import java.util.List;
 
+/**
+ * Represents the system for controlling the player selection
+ *
+ * @author sergeys
+ */
 public class SelectionSystem extends EntitySystem implements InputProcessor {
     
+    //The color for the selection rectangle
     private static final float SELECTION_COLOR = Color.toFloatBits(0.4f, 0.4f, 1f, 0.5f);
     
     private OrthographicCamera camera;
@@ -38,12 +44,19 @@ public class SelectionSystem extends EntitySystem implements InputProcessor {
     
     private ImmutableArray<Entity>  selectedEntities;
     private SpatialQuadtree<Entity> quadtree;
-    //private ImmutableArray<Entity> controllableEntities;
     
     private CommandUISystem cmdUI;
     
     private SelectionChangeEvent.Builder eventBuilder = new SelectionChangeEvent.Builder();
     
+    /**
+     * Create a new SelectionSystem object
+     *
+     * @param camera    - the world camera
+     * @param batch     - the batch to draw to
+     * @param commandUI - the command ui system used to remove set commands
+     * @param quadtree  - the quadtree containign all selectable entities
+     */
     public SelectionSystem(OrthographicCamera camera, DrawingBatch batch, CommandUISystem commandUI,
                            SpatialQuadtree<Entity> quadtree) {
         super(4);
@@ -56,33 +69,35 @@ public class SelectionSystem extends EntitySystem implements InputProcessor {
     @Override
     public void addedToEngine(Engine engine) {
         selectedEntities = engine.getEntitiesFor(Family.all(SelectedComponent.class).get());
-        //controllableEntities = engine.getEntitiesFor(Family.all(ControllableComponent.class, PositionComponent.class)
-        //                                                     .exclude(InContructionComponent.class)
-        //                                                     .get());
-    
+        
         SpaceGameClient.INSTANCE.getInputMultiplexer().addProcessor(this);
     }
     
     @Override
     public void removedFromEngine(Engine engine) {
         selectedEntities = null;
-        //controllableEntities = null;
-    
+        
         SpaceGameClient.INSTANCE.getInputMultiplexer().removeProcessor(this);
     }
     
     @Override
     public void update(float deltaTime) {
         if (selectionBegin != null) {
+            
+            //If we have a selection area draw the rectangle
             Vector3 vec = camera.unproject(new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0));
             batch.enableBlending();
             batch.setForceColor(SELECTION_COLOR);
             batch.rect(selectionBegin.x, selectionBegin.y, vec.x, vec.y);
+            
+            //Once we let go and we have an end position
             if (selectionEnd != null) {
+                //Clear the selected entities
                 selectedEntities.forEach((e) -> e.remove(SelectedComponent.class));
-    
+                
                 List<Entity> changedSelected = new LinkedList<>();
-    
+                
+                //Get all entities in the area
                 quadtree.queryArea(selectionBegin, selectionEnd).forEachRemaining((e) -> {
                     Entity entity = e.getKey();
                     if (ControllableComponent.MAPPER.has(entity)) {
@@ -90,14 +105,15 @@ public class SelectionSystem extends EntitySystem implements InputProcessor {
                         entity.add(new SelectedComponent());
                     }
                 });
-    
+                
+                //If nothing found get the nearest entity that overlaps
                 if (changedSelected.size() == 0) {
                     Entity nearest = quadtree.getSingleNearest(selectionEnd);
-    
+                    
                     if (nearest != null && ControllableComponent.MAPPER.has(nearest)) {
                         Rectangle rect = new Rectangle(Math.min(selectionEnd.x, selectionBegin.x), Math.min(selectionEnd.y, selectionBegin.y), Math
                                 .abs(selectionEnd.x - selectionBegin.x), Math.abs(selectionEnd.y - selectionBegin.y));
-            
+                        
                         PositionComponent pos = PositionComponent.MAPPER.get(nearest);
                         if (SizeComponent.MAPPER.has(nearest)) {
                             SizeComponent size = SizeComponent.MAPPER.get(nearest);
@@ -125,8 +141,10 @@ public class SelectionSystem extends EntitySystem implements InputProcessor {
                     }
                 }
                 
+                //Post a selection changed event
                 SpaceGame.getInstance().getEventBus().post(eventBuilder.get(changedSelected));
                 
+                //Reset
                 cmdUI.setCommand(null);
                 selectionBegin = null;
                 selectionEnd = null;

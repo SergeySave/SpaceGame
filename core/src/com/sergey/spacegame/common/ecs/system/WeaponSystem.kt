@@ -14,8 +14,16 @@ import com.sergey.spacegame.common.game.Level
 import com.sergey.spacegame.common.math.SpatialQuadtree
 import com.sergey.spacegame.common.util.first //KotlinUtils
 
+/**
+ * This system is in charge of the firing of weapons
+ *
+ * @author sergeys
+ */
 class WeaponSystem(
-        val level: Level) : IteratingSystem((Family.all(WeaponComponent::class.java, PositionComponent::class.java).one(Team1Component::class.java, Team2Component::class.java).exclude(InContructionComponent::class.java).get())) {
+        val level: Level) : IteratingSystem((Family
+        .all(WeaponComponent::class.java, PositionComponent::class.java)
+        .one(Team1Component::class.java, Team2Component::class.java)
+        .exclude(InContructionComponent::class.java).get())) {
     
     val TMP = Vector2()
     
@@ -25,27 +33,32 @@ class WeaponSystem(
         //Since it has to have one of Team1 or Team2 components if it doesnt have Team1 that means it must have Team2
         val quadtree = if (Team1Component.MAPPER.has(entity)) level.player2.team else level.player1.team
         
+        //If the target has gone out of range remove the target
         if (weaponComponent.target != null && PositionComponent.MAPPER.get(weaponComponent.target).setVector(TMP).dst2(positionComponent.x, positionComponent.y) > weaponComponent.maxRange2) {
             weaponComponent.target = null
         }
         
         for (i in weaponComponent.timers.indices) {
+            //Decrement the timer for each weapon
             if (weaponComponent.timers[i] > 0) {
                 weaponComponent.timers[i] -= deltaTime
             }
+            //If there is no target find a target
             if (weaponComponent.target == null) {
                 weaponComponent.target = quadtree.nearestHealthy(positionComponent.setVector(TMP), weaponComponent.maxRange)
                 //If no targets skip the rest of the weapon system
                 if (weaponComponent.target == null) return
             }
+            //While we can still fire at a target
             while (weaponComponent.timers[i] <= 0 && weaponComponent.target != null) {
+                //If our target is alive
                 if (HealthComponent.MAPPER.get(weaponComponent.target).health > 0) {
                     //Check if in range
                     if (PositionComponent.MAPPER.get(weaponComponent.target).setVector(TMP).dst2(positionComponent.x, positionComponent.y) <= weaponComponent.weapons[i].range2) {
                         //Fire
                         weaponComponent.timers[i] += weaponComponent.weapons[i].reloadTime
                         weaponComponent.weapons[i].fire(positionComponent.x, positionComponent.y, weaponComponent.target!!, level)
-                
+                        
                         if (HealthComponent.MAPPER.get(weaponComponent.target).health <= 0) {
                             level.ecs.removeEntity(weaponComponent.target)
                             weaponComponent.target = quadtree.nearestHealthy(positionComponent.setVector(TMP), weaponComponent.maxRange)
@@ -61,13 +74,14 @@ class WeaponSystem(
                         }
                     }
                 } else {
+                    //If we need a new target get a new target
                     weaponComponent.target = quadtree.nearestHealthy(positionComponent.setVector(TMP), weaponComponent.maxRange)
                 }
             }
         }
     }
     
-    /**
+    /*
      * This is inlined because i do not want to have the overhead of calling this function but i wanted to make it easy to edit
      */
     @Suppress("NOTHING_TO_INLINE")

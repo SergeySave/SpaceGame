@@ -6,13 +6,25 @@ import com.sergey.spacegame.common.ecs.component.ShipComponent;
 import com.sergey.spacegame.common.ecs.component.VelocityComponent;
 import com.sergey.spacegame.common.game.Level;
 
-public class TimeMoveOrder implements IOrder {
+/**
+ * Represents a move order that is supposed to complete in a given amount of time
+ *
+ * @author sergeys
+ */
+public class TimeMoveOrder implements MovingOrder {
     
     private double  x;
     private double  y;
     private float   time;
     private boolean done;
     
+    /**
+     * Create a time move order
+     *
+     * @param x    - the x coordinate to move to
+     * @param y    - the y coordinate to move to
+     * @param time - the time to take to move to those coordinates
+     */
     public TimeMoveOrder(double x, double y, float time) {
         this.x = x;
         this.y = y;
@@ -31,7 +43,6 @@ public class TimeMoveOrder implements IOrder {
             vel = new VelocityComponent();
             e.add(vel);
         }
-        //ShipComponent ship = ShipComponent.MAPPER.get(e);
     
         double dx = x - pos.getX();
         double dy = y - pos.getY();
@@ -53,14 +64,34 @@ public class TimeMoveOrder implements IOrder {
     }
     
     @Override
-    public boolean completed() {
+    public boolean completed(Entity e) {
         return done;
     }
     
+    @Override
+    public float getPositionX() {
+        return ((float) getX());
+    }
+    
+    /**
+     * Get the destination x coordinate
+     *
+     * @return the destination x coordinate
+     */
     public double getX() {
         return x;
     }
     
+    @Override
+    public float getPositionY() {
+        return ((float) getY());
+    }
+    
+    /**
+     * Get the destination y coordinate
+     *
+     * @return the destination y coordinate
+     */
     public double getY() {
         return y;
     }

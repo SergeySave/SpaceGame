@@ -26,6 +26,13 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
+/**
+ * Represents the system used for dealing with command UI stuff
+ *
+ * As this is a desktop client class it expects all commands to be ClientCommands
+ *
+ * @author sergeys
+ */
 public class CommandUISystem extends EntitySystem {
     
     private static final float LINE_COLOR = Color.WHITE.toFloatBits();
@@ -41,6 +48,13 @@ public class CommandUISystem extends EntitySystem {
     
     private Level level;
     
+    /**
+     * Create a new CommandUISystem object
+     *
+     * @param camera - the world camera
+     * @param batch  - the batch to draw to
+     * @param level  - the level to represent
+     */
     public CommandUISystem(OrthographicCamera camera, DrawingBatch batch, Level level) {
         super(5);
         this.camera = camera;
@@ -61,6 +75,7 @@ public class CommandUISystem extends EntitySystem {
     
     @Override
     public void update(float deltaTime) {
+        //If we have no command set the command to the default command
         if (command == null) {
             if (!(level.getCommands().get("default") instanceof ClientCommand)) {
                 System.err.println("ERROR: Command not a ClientCommand on Client side");
@@ -71,12 +86,16 @@ public class CommandUISystem extends EntitySystem {
                 return;
             }
         }
+        //If our command doesnt require input
         if (!command.getRequiresInput()) {
+            //Get all selected entities that are controllable and have the command
             List<Entity> entities = StreamSupport.stream(selectedEntities.spliterator(), true)
                     .filter((e) -> ControllableComponent.MAPPER.get(e).commands.contains(command))
                     .collect(Collectors.toList());
             boolean allEnabled = true;
+            //If it has requirements
             if (command.getReq() != null) {
+                //Check that they are all met
                 for (LuaPredicate predicate : command.getReq().values()) {
                     if (!predicate.test()) {
                         allEnabled = false;
@@ -84,7 +103,10 @@ public class CommandUISystem extends EntitySystem {
                     }
                 }
             }
+            //If all requirements are met
             if (allEnabled) {
+                //Execute the command
+                //Since no input needed 0 is given as the input
                 SpaceGame.getInstance()
                         .getCommandExecutor()
                         .executeCommand(command, entities, entities.size(), Vector2.Zero, Vector2.Zero, level);
@@ -92,18 +114,21 @@ public class CommandUISystem extends EntitySystem {
             command = null;
             return;
         }
-    
+        
         LevelLimits limits = level.getLimits();
-    
+        
         if (Gdx.input.justTouched() && Gdx.input.isButtonPressed(Buttons.RIGHT)) {
+            //Get the input for the command
             Vector3 vec = camera.unproject(new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0));
-    
+            
             if (vec.x < limits.getMinX() || vec.x > limits.getMaxX() || vec.y < limits.getMinY() ||
                 vec.y > limits.getMaxY()) {
                 return;
             }
             
+            //If that is the only needed input
             if (!command.getRequiresTwoInput()) {
+                //Apply the command
                 List<Entity> entities = StreamSupport.stream(selectedEntities.spliterator(), true)
                         .filter((e) -> ControllableComponent.MAPPER.get(e).commands.contains(command))
                         .collect(Collectors.toList());
@@ -126,9 +151,10 @@ public class CommandUISystem extends EntitySystem {
             orderCenter = new Vector2(vec.x, vec.y);
         }
         
+        //Do the second input stuff
         if (orderCenter != null) {
             Vector3 vec = camera.unproject(new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0));
-    
+            
             vec.x = Utils.clamp(vec.x, limits.getMinX(), limits.getMaxX());
             vec.y = Utils.clamp(vec.y, limits.getMinY(), limits.getMaxY());
             
@@ -157,6 +183,7 @@ public class CommandUISystem extends EntitySystem {
             }
         }
         
+        //If there is a cursor override apply it
         if (command != null && command.getCursor() != null) {
             if (command.getCursor().needsInitialization()) command.getCursor().init();
             boolean allEnabled = true;

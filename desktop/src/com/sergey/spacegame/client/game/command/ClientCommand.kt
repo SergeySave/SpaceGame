@@ -18,14 +18,29 @@ import java.io.IOException
 import java.lang.reflect.Type
 
 /**
+ * Represents a Command for the desktop client side
+ * Unlike other the common commands it has the client cursor overrides
+ *
  * @author sergeys
+ *
+ * @constructor Creates a new ClientCommand
+ *
+ * @param executable - the command's executable
+ * @param allowMulti - does this command allow multiple targets
+ * @param requiresInput - does this command require an input position
+ * @param requiresTwoInput - does this command require a secondary input position
+ * @param id - the id of this command
+ * @param drawableName - the name of the image to use for drawing the command's icon button
+ * @param req - the requirements of this command to be enabled
+ * @param drawableCheckedName - the name of the image to use for drawing the command's pressed icon button
+ * @property cursor - the cursor override used for this command when it is selected or null
+ * @param orderTag - the tag to use to determine the order count
  */
 class ClientCommand(executable: CommandExecutable, allowMulti: Boolean, requiresInput: Boolean,
                     requiresTwoInput: Boolean, id: String, drawableName: String, req: Map<String, LuaPredicate>?,
                     drawableCheckedName: String?, val cursor: CursorOverride?,
                     orderTag: String?) : Command(executable, allowMulti, requiresInput, requiresTwoInput, id,
                                                  drawableName, req, drawableCheckedName, orderTag) {
-    
     
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
@@ -46,7 +61,8 @@ class ClientCommand(executable: CommandExecutable, allowMulti: Boolean, requires
     class Adapter : JsonSerializer<Command>, JsonDeserializer<Command> {
         override fun deserialize(json: JsonElement, typeOfT: Type, context: JsonDeserializationContext): Command {
             val obj = json.asJsonObject
-            
+    
+            //Create the command's executable
             val executable = when (obj["type"].asString) {
                 "lua" -> {
                     val original = obj["lua"].asString
@@ -76,6 +92,7 @@ class ClientCommand(executable: CommandExecutable, allowMulti: Boolean, requires
                     }
                 }
             }
+    
             val allowMulti = obj["allowsMulti"]?.asBoolean ?: true
             val requiresInput = obj["requiresInput"]?.asBoolean ?: false
             val requiresTwoInput = obj["requiresTwoInput"]?.asBoolean ?: false

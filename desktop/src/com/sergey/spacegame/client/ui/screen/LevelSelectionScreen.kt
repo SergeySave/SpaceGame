@@ -16,7 +16,13 @@ import com.sergey.spacegame.common.SpaceGame
 import com.sergey.spacegame.common.game.Level
 
 /**
+ * Represents the level celection screen
+ *
  * @author sergeys
+ *
+ * @constructor Creates a new LevelSelectionScreen
+ * @property parent - The parent screen to this screen
+ * @property levels - Pairs of level names to Level generators used both to display and create the levels
  */
 class LevelSelectionScreen(private val parent: Screen,
                            private vararg val levels: Pair<String, () -> Level>) : BaseScreen() {
@@ -25,21 +31,21 @@ class LevelSelectionScreen(private val parent: Screen,
     
     override fun show() {
         stage = Stage(ScreenViewport())
-    
         SpaceGameClient.inputMultiplexer.addProcessor(stage)
     
         val skin = SpaceGameClient.skin
-        
+    
+        //Add the root table to the stage
         stage.addActor(Table().apply {
             val mainTable = this
             
             setFillParent(true)
-            
             defaults().padTop(Value.percentHeight(0.005f, this))
             defaults().padBottom(Value.percentHeight(0.005f, this))
             defaults().padLeft(Value.percentWidth(0.005f, this))
             defaults().padRight(Value.percentWidth(0.005f, this))
-            
+    
+            //Add the title to the screen
             add(Label("levelselect.name".localize(), skin, "big")).apply {
                 align(Align.center)
                 expandX()
@@ -47,15 +53,16 @@ class LevelSelectionScreen(private val parent: Screen,
                 padTop(Value.percentHeight(0.05f, mainTable))
                 padBottom(Value.percentHeight(0.05f, mainTable))
             }
-            
             row()
-            
+    
+            //Add a scroll pane containing a table
             add(ScrollPane(Table().apply {
                 align(Align.left)
                 
                 defaults().padTop(Value.percentHeight(0.005f, mainTable))
                 defaults().padBottom(Value.percentHeight(0.005f, mainTable))
-                
+    
+                //Each item in the table is given by the level name
                 for ((levelName, generatorFunc) in levels) {
                     
                     add(TextButton(levelName.localize(), skin, "noBackground")).apply {
@@ -66,6 +73,7 @@ class LevelSelectionScreen(private val parent: Screen,
                         addListener(object : ChangeListener() {
                             override fun changed(event: ChangeEvent, actor: Actor) {
                                 if (actor == button) {
+                                    //When clicked we change the screen and dispose the main menu and level selection screens
                                     this@LevelSelectionScreen.parent.dispose()
                                     SpaceGame.getInstance().setScreenAndDisposeOld(GameScreen(generatorFunc()))
                                 }
@@ -83,7 +91,8 @@ class LevelSelectionScreen(private val parent: Screen,
             }
             
             row()
-            
+    
+            //Add a back button
             add(TextButton("common.button.back".localize(), skin, "noBackground")).apply {
                 val button = this.actor
     
@@ -99,8 +108,6 @@ class LevelSelectionScreen(private val parent: Screen,
                 })
             }
         })
-        
-        //stage.setDebugAll(true)
     }
     
     override fun render(delta: Float) {

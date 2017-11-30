@@ -14,6 +14,11 @@ import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector2;
 import com.sergey.spacegame.client.SpaceGameClient;
 
+/**
+ * This class represents a custom drawing batch that can apply a multiplicative and an additive tint
+ *
+ * @author sergeys
+ */
 public class DrawingBatch {
     
     private static final float ZERO = Color.toFloatBits(0f, 0f, 0f, 0f);
@@ -42,7 +47,13 @@ public class DrawingBatch {
     private ShaderProgram shader;
     private boolean       disposeShader;
     
-    
+    /**
+     * Create a new DrawingBatch
+     *
+     * @param size          - the size of the batch
+     * @param shader        - the shader program to use
+     * @param disposeShader - should the batch dispose the shader when it disposes
+     */
     public DrawingBatch(int size, ShaderProgram shader, boolean disposeShader) {
         //8191 max size
         if (size > 8191) throw new IllegalArgumentException("Can't have more than 8191 sprites per batch: " + size);

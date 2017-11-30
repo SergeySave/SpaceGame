@@ -9,10 +9,25 @@ import org.luaj.vm2.LuaValue
 //-------------------------------------------
 //Simple events
 
+/**
+ * An event to register things to the Gson before it is built
+ *
+ * @author sergeys
+ */
 class GsonRegisterEvent(val gson: GsonBuilder) : Event()
 
+/**
+ * An event that is called when a level is begun
+ *
+ * @author sergeys
+ */
 class BeginLevelEvent(val level: Level) : Event()
 
+/**
+ * An event that is called after lua posted a delay event with a given id and value
+ *
+ * @author sergeys
+ */
 class LuaDelayEvent(val id: LuaValue, val parameter: LuaValue) : Event()
 
 //-------------------------------------------
@@ -20,6 +35,8 @@ class LuaDelayEvent(val id: LuaValue, val parameter: LuaValue) : Event()
 
 /**
  * Selection Change Event done in a way that the event is created through a builder that uses a single instance
+ *
+ * @author sergeys
  */
 class SelectionChangeEvent : Event() {
     
@@ -37,7 +54,9 @@ class SelectionChangeEvent : Event() {
 }
 
 /**
- * Selection Change Event done in a way that the event is created through a builder that uses a single instance
+ * Command Issued Event done in a way that the event is created through a builder that uses a single instance
+ *
+ * @author sergeys
  */
 class CommandIssuedEvent : Event() {
     lateinit var targets: Iterator<Entity>
@@ -59,6 +78,8 @@ class CommandIssuedEvent : Event() {
 
 /**
  * Order Initialized Event done in a way that the event is created through a builder that uses a single instance
+ *
+ * @author sergeys
  */
 class OrderInitializedEvent : Event() {
     

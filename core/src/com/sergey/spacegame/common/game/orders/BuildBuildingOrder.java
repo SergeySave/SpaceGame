@@ -32,7 +32,7 @@ import java.util.stream.StreamSupport;
  *
  * @author sergeys
  */
-public class BuildBuildingOrder implements IOrder {
+public class BuildBuildingOrder implements IOrder, MovingOrder {
     
     private static final float                            EPSILON                  = 1e-2f;
     private static final Vector2                          TMP                      = new Vector2();
@@ -60,6 +60,7 @@ public class BuildBuildingOrder implements IOrder {
     
     @Override
     public void init(Entity e, Level level, OrderSystem orderSystem) {
+        //Find the closest planet to the given coordinates
         Optional<Entity> closestPlanet = StreamSupport.stream(level.getPlanets().spliterator(), false)
                 .filter(PositionComponent.MAPPER::has)
                 .map((p) -> new Object[]{p, PositionComponent.MAPPER.get(p)})
@@ -70,9 +71,11 @@ public class BuildBuildingOrder implements IOrder {
                 .min((l, r) -> Float.compare((Float) l[1], (Float) r[1]))
                 .map((c) -> (Entity) c[0]);
     
+        //If the planet exists
         if (closestPlanet.isPresent()) {
             Entity planet = closestPlanet.get();
-            
+    
+            //Create the building entity
             Entity                 building               = level.getEntities().get(entity).createEntity(level); //Copy of building
             InContructionComponent inContructionComponent = new InContructionComponent(entity, price);
             HealthComponent        healthComponent        = HealthComponent.MAPPER.get(building);
@@ -81,6 +84,7 @@ public class BuildBuildingOrder implements IOrder {
             inContructionComponent.timeRemaining = time;
             building.add(inContructionComponent);
     
+            //If it has health it should start at 0 and increase as it is built
             if (healthComponent != null) {
                 healthComponent.setHealth(0);
             }
@@ -90,10 +94,12 @@ public class BuildBuildingOrder implements IOrder {
             float buildingPos = planetPos.createVector().sub(x, y).scl(-1).angle();
             
             float[] minMax = PlanetSystem.getMinMax(building, planet, buildingPos);
-            
+    
+            //Check if the spot on the planet is not free
             if (!PlanetComponent.MAPPER.get(planet).isFree(minMax[0], minMax[1])) {
     
                 //Registered construting buildings will get checked as well as existing buildings
+                //We want a building in the same range that is under construction
                 Optional<Entity> sameSpotBuilding = Stream.concat(orderSystem.getConstructingBuildings()
                                                                           .stream(), StreamSupport.stream(level.getBuildingsInConstruction()
                                                                                                                   .spliterator(), false))
@@ -105,50 +111,48 @@ public class BuildBuildingOrder implements IOrder {
                         })
                         .findAny();
     
+                //If we found said building
                 if (sameSpotBuilding.isPresent()) {
+                    //Set that to our building
                     this.building = sameSpotBuilding.get();
     
                     ++InContructionComponent.MAPPER.get(this.building).building;
-                    
-                    return;
-                    //time = InContructionComponent.MAPPER.get(building).timeRemaining;
                 } else {
-                    //If placement is invalid
+                    //If we didnt find a building
                     isDone = true;
                     //Fail to build
+                }
+            } else { //The spot on the planet is free so we should build a new building
+                BuildingComponent buildingC = new BuildingComponent();
+    
+                buildingC.init(planet, buildingPos);
+    
+                building.add(buildingC);
+                if (!PositionComponent.MAPPER.has(building)) building.add(new PositionComponent());
+                BuildingSystem.doSetBuildingPosition(building, planet, buildingPos);
+    
+                PositionComponent posVar = PositionComponent.MAPPER.get(building);
+                LevelLimits       limits = level.getLimits();
+    
+                if (posVar.getX() < limits.getMinX() || posVar.getX() > limits.getMaxX() ||
+                    posVar.getY() < limits.getMinY() || posVar.getY() > limits.getMaxY()) {
+                    //Invalid placement
+                    isDone = true;
                     return;
                 }
+    
+                level.getECS().addEntity(building);
+                orderSystem.registerNewInConstruction(building);
+    
+                if (Team1Component.MAPPER.has(building)) {
+                    level.getPlayer1().setMoney(level.getPlayer1().getMoney() - price);
+                } else if (Team2Component.MAPPER.has(building)) {
+                    level.getPlayer2().setMoney(level.getPlayer2().getMoney() - price);
+                }
+    
+                this.building = building;
+                ++inContructionComponent.building;
             }
-            
-            BuildingComponent buildingC = new BuildingComponent();
-    
-            buildingC.init(planet, buildingPos, building);
-            
-            building.add(buildingC);
-            if (!PositionComponent.MAPPER.has(building)) building.add(new PositionComponent());
-            BuildingSystem.doSetBuildingPosition(building, planet, buildingPos);
-    
-            PositionComponent posVar = PositionComponent.MAPPER.get(building);
-            LevelLimits       limits = level.getLimits();
-    
-            if (posVar.getX() < limits.getMinX() || posVar.getX() > limits.getMaxX() ||
-                posVar.getY() < limits.getMinY() || posVar.getY() > limits.getMaxY()) {
-                //Invalid placement
-                isDone = true;
-                return;
-            }
-    
-            level.getECS().addEntity(building);
-            orderSystem.registerNewInConstruction(building);
-    
-            if (Team1Component.MAPPER.has(building)) {
-                level.getPlayer1().setMoney(level.getPlayer1().getMoney() - price);
-            } else if (Team2Component.MAPPER.has(building)) {
-                level.getPlayer2().setMoney(level.getPlayer2().getMoney() - price);
-            }
-            
-            this.building = building;
-            ++inContructionComponent.building;
         } else {
             //No planet fail to build
             isDone = true;
@@ -165,7 +169,8 @@ public class BuildBuildingOrder implements IOrder {
     
         InContructionComponent inContructionComponent = InContructionComponent.MAPPER.get(building);
         HealthComponent        healthComponent        = HealthComponent.MAPPER.get(building);
-        
+    
+        //If the constructing entity is a ship and has a position
         if (ShipComponent.MAPPER.has(e) && PositionComponent.MAPPER.has(e)) {
             PositionComponent pos = PositionComponent.MAPPER.get(e);
             VelocityComponent vel = VelocityComponent.MAPPER.get(e);
@@ -186,17 +191,23 @@ public class BuildBuildingOrder implements IOrder {
             double dy              = desired.y - pos.getY();
             double dist            = Math.hypot(dx, dy);
             double timePerUnitDist = dist / speed;
+            //Check if it can move into position in the amount of time that has elapsed
             if (timePerUnitDist < deltaTime) {
+                //Set it's position and clear its velocity
                 pos.setX(desired.x);
                 pos.setY(desired.y);
                 e.remove(VelocityComponent.class);
+                //Decrement the amount of time remaining
                 inContructionComponent.timeRemaining -= deltaTime;
+                //Update the health if needed
                 if (healthComponent != null) {
                     healthComponent.setHealth(
                             inContructionComponent.finalHealth * (1 - inContructionComponent.timeRemaining /
                                                                       inContructionComponent.originalTimeRemaining));
                 }
             } else {
+                //If we cant move into position in the given time
+                //Basically do a move order
                 if (RotationComponent.MAPPER.has(e)) {
                     RotationComponent rotationComponent = RotationComponent.MAPPER.get(e);
                     float             desiredAngle      = TMP.set((float) dx, (float) dy).angle();
@@ -238,6 +249,8 @@ public class BuildBuildingOrder implements IOrder {
                 
             }
         } else {
+            //If we are in position
+            //Build the building
             inContructionComponent.timeRemaining -= deltaTime;
             if (healthComponent != null) {
                 healthComponent.setHealth(
@@ -246,14 +259,22 @@ public class BuildBuildingOrder implements IOrder {
             }
         }
     
+        //If we have finished building the building
         if (inContructionComponent.timeRemaining < 0) {
-            SpaceGame.getInstance()
-                    .getEventBus()
-                    .post(buildingConstructedEvent.get(building, inContructionComponent.entityID));
-            if (healthComponent != null) {
-                healthComponent.setHealth(inContructionComponent.finalHealth);
+            //Post that the building has been constructed if we are the last ship that was building it
+            if (--inContructionComponent.building == 0) {
+                SpaceGame.getInstance()
+                        .getEventBus()
+                        .post(buildingConstructedEvent.get(building, inContructionComponent.entityID));
+        
+                //Also update its health
+                if (healthComponent != null) {
+                    healthComponent.setHealth(inContructionComponent.finalHealth);
+                }
+        
+                //And remove it from under construction
+                building.remove(InContructionComponent.class);
             }
-            building.remove(InContructionComponent.class);
             isDone = true;
         }
     }
@@ -264,7 +285,7 @@ public class BuildBuildingOrder implements IOrder {
     }
     
     @Override
-    public boolean completed() {
+    public boolean completed(Entity e) {
         return isDone;
     }
     
@@ -286,8 +307,28 @@ public class BuildBuildingOrder implements IOrder {
         }
     }
     
+    /**
+     * Get the position that the order is trying to move the ship to
+     *
+     * @return an position if it currently exists
+     */
     public Optional<Vector2> getPosition() {
         if (building == null || desired == null) return Optional.empty();
         return Optional.of(desired);
+    }
+    
+    @Override
+    public float getPositionX() {
+        return desired.x;
+    }
+    
+    @Override
+    public float getPositionY() {
+        return desired.y;
+    }
+    
+    @Override
+    public boolean doDraw() {
+        return building != null && desired != null;
     }
 }

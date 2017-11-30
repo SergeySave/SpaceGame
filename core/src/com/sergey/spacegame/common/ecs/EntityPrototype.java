@@ -19,11 +19,25 @@ import java.util.ArrayList;
 import java.util.Map.Entry;
 import java.util.Set;
 
+/**
+ * Represents an prototype for an entity
+ *
+ * @author sergeys
+ */
 public final class EntityPrototype {
     
     private ClonableComponent[] components;
     private ClonableComponent   team;
     
+    private EntityPrototype() {}
+    
+    /**
+     * Create an entity for a given entity
+     *
+     * @param level - the level that the entity should be made in
+     *
+     * @return a new entity made from this prototype
+     */
     public Entity createEntity(Level level) {
         Entity e = level.getECS().newEntity();
         
@@ -34,6 +48,11 @@ public final class EntityPrototype {
         return e;
     }
     
+    /**
+     * Get the team component for this prototype
+     *
+     * @return the team component
+     */
     public ClonableComponent getTeam() {
         return team;
     }
@@ -47,7 +66,7 @@ public final class EntityPrototype {
             ArrayList<ClonableComponent> components = new ArrayList<>();
             
             Set<Entry<String, JsonElement>> entries = obj.entrySet();
-    
+            
             boolean           hasHealth = false;
             ClonableComponent team      = null;
             
@@ -57,7 +76,7 @@ public final class EntityPrototype {
                     Class<?>          clazz     = ClassLoader.getSystemClassLoader().loadClass(className);
                     ClonableComponent component = context.deserialize(entry.getValue(), clazz);
                     components.add(component);
-    
+                    
                     if (component instanceof HealthComponent) hasHealth = true;
                     if (component instanceof Team1Component || component instanceof Team2Component) {
                         team = component;
@@ -66,7 +85,7 @@ public final class EntityPrototype {
                     throw new JsonParseException("Class " + className + " not found. ", e);
                 }
             }
-    
+            
             if ((team == null) == hasHealth) { //xor on if it has a team and it has a health
                 System.err.println("Entity has only one of HealthComponent and TeamComponent");
             }

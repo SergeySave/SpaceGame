@@ -1,4 +1,3 @@
 package com.sergey.spacegame.common.event;
 
-public abstract class Event {
-}
+public abstract class Event {}

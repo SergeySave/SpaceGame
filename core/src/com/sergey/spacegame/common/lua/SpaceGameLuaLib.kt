@@ -41,9 +41,37 @@ import org.luaj.vm2.lib.jse.CoerceJavaToLua
 import org.luaj.vm2.lib.jse.CoerceLuaToJava
 import java.util.HashSet
 
-class SpaceGameLuaLib private constructor() : TwoArgFunction() {
+/**
+ * A singleton object representing the LUA library for the game
+ *
+ * @author sergeys
+ */
+object SpaceGameLuaLib : TwoArgFunction() {
     
     private lateinit var currLevel: Level
+    
+    //All the order classes accessable to LUA
+    private val ORDERS = HashSet<Class<out IOrder>>()
+    //All of the components accessable to LUA
+    private val COMPONENTS = HashSet<Quadruple<String, ComponentMapper<*>, () -> Component, List<String>>>()
+    
+    init {
+        ORDERS.add(BuildShipOrder::class.java)
+        ORDERS.add(BuildBuildingOrder::class.java)
+        ORDERS.add(FaceOrder::class.java)
+        ORDERS.add(MoveOrder::class.java)
+        ORDERS.add(TimeMoveOrder::class.java)
+        ORDERS.add(StopOrder::class.java)
+        
+        COMPONENTS.add(Quadruple("position", PositionComponent.MAPPER, { PositionComponent() }, listOf("pos", "p")))
+        COMPONENTS.add(Quadruple("rotation", RotationComponent.MAPPER, { RotationComponent() }, listOf("rot", "r")))
+        COMPONENTS.add(Quadruple("rotationVelocity", RotationVelocityComponent.MAPPER, { RotationVelocityComponent() }, listOf("rotVel", "rotV", "rV")))
+        COMPONENTS.add(Quadruple("size", SizeComponent.MAPPER, { SizeComponent() }, listOf("s")))
+        COMPONENTS.add(Quadruple("velocity", VelocityComponent.MAPPER, { VelocityComponent() }, listOf("vel", "v")))
+        COMPONENTS.add(Quadruple("ship", ShipComponent.MAPPER, { ShipComponent() }, listOf()))
+        COMPONENTS.add(Quadruple("health", HealthComponent.MAPPER, { HealthComponent() }, listOf("h")))
+        COMPONENTS.add(Quadruple("particle", PositionComponent.MAPPER, { ParticleComponent(System.currentTimeMillis()) }, listOf("prtl")))
+    }
     
     override fun call(modName: LuaValue, env: LuaValue): LuaValue {
         env.apply {
@@ -191,34 +219,34 @@ class SpaceGameLuaLib private constructor() : TwoArgFunction() {
             //Viewport
             val viewport = LuaTable().apply {
                 set("setControllable", lFuncU { isControllable ->
-                    currLevel.viewport.setViewportControllable(isControllable.checkboolean())
+                    currLevel.viewport.viewportControllable = isControllable.checkboolean()
                 })
                 set("isControllable", lFunc { ->
-                    LuaValue.valueOf(currLevel.viewport.isViewportControllable())
+                    LuaValue.valueOf(currLevel.viewport.viewportControllable)
                 })
                 set("setX", lFuncU { x ->
-                    currLevel.viewport.setViewportX(x.checkdouble().toFloat())
+                    currLevel.viewport.viewportX = x.checkdouble().toFloat()
                 })
                 set("getX", lFunc { ->
-                    LuaValue.valueOf(currLevel.viewport.getViewportX().toDouble())
+                    LuaValue.valueOf(currLevel.viewport.viewportX.toDouble())
                 })
                 set("setY", lFuncU { y ->
-                    currLevel.viewport.setViewportY(y.checkdouble().toFloat())
+                    currLevel.viewport.viewportY = y.checkdouble().toFloat()
                 })
                 set("getY", lFunc { ->
-                    LuaValue.valueOf(currLevel.viewport.getViewportY().toDouble())
+                    LuaValue.valueOf(currLevel.viewport.viewportY.toDouble())
                 })
                 set("setWidth", lFuncU { w ->
-                    currLevel.viewport.setViewportWidth(w.checkdouble().toFloat())
+                    currLevel.viewport.viewportWidth = w.checkdouble().toFloat()
                 })
                 set("getWidth", lFunc { ->
-                    LuaValue.valueOf(currLevel.viewport.getViewportWidth().toDouble())
+                    LuaValue.valueOf(currLevel.viewport.viewportWidth.toDouble())
                 })
                 set("setHeight", lFuncU { h ->
-                    currLevel.viewport.setViewportHeight(h.checkdouble().toFloat())
+                    currLevel.viewport.viewportHeight = h.checkdouble().toFloat()
                 })
                 set("getHeight", lFunc { ->
-                    LuaValue.valueOf(currLevel.viewport.getViewportHeight().toDouble())
+                    LuaValue.valueOf(currLevel.viewport.viewportHeight.toDouble())
                 })
             }
             set("viewport", viewport)
@@ -307,32 +335,5 @@ class SpaceGameLuaLib private constructor() : TwoArgFunction() {
     private inline fun lFunc(
             crossinline body: (LuaValue, LuaValue, LuaValue) -> LuaValue) = object : ThreeArgFunction() {
         override fun call(v1: LuaValue, v2: LuaValue, v3: LuaValue): LuaValue = body(v1, v2, v3)
-    }
-    
-    companion object {
-        
-        @JvmField
-        val INSTANCE = SpaceGameLuaLib()
-        
-        private val ORDERS = HashSet<Class<out IOrder>>()
-        private val COMPONENTS = HashSet<Quadruple<String, ComponentMapper<*>, () -> Component, List<String>>>()
-        
-        init {
-            ORDERS.add(BuildShipOrder::class.java)
-            ORDERS.add(BuildBuildingOrder::class.java)
-            ORDERS.add(FaceOrder::class.java)
-            ORDERS.add(MoveOrder::class.java)
-            ORDERS.add(TimeMoveOrder::class.java)
-            ORDERS.add(StopOrder::class.java)
-            
-            COMPONENTS.add(Quadruple("position", PositionComponent.MAPPER, { PositionComponent() }, listOf("pos", "p")))
-            COMPONENTS.add(Quadruple("rotation", RotationComponent.MAPPER, { RotationComponent() }, listOf("rot", "r")))
-            COMPONENTS.add(Quadruple("rotationVelocity", RotationVelocityComponent.MAPPER, { RotationVelocityComponent() }, listOf("rotVel", "rotV", "rV")))
-            COMPONENTS.add(Quadruple("size", SizeComponent.MAPPER, { SizeComponent() }, listOf("s")))
-            COMPONENTS.add(Quadruple("velocity", VelocityComponent.MAPPER, { VelocityComponent() }, listOf("vel", "v")))
-            COMPONENTS.add(Quadruple("ship", ShipComponent.MAPPER, { ShipComponent() }, listOf()))
-            COMPONENTS.add(Quadruple("health", HealthComponent.MAPPER, { HealthComponent() }, listOf("h")))
-            COMPONENTS.add(Quadruple("particle", PositionComponent.MAPPER, { ParticleComponent(System.currentTimeMillis()) }, listOf("prtl")))
-        }
     }
 }

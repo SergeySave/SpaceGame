@@ -6,43 +6,33 @@ import com.google.gson.InstanceCreator
 import java.lang.reflect.Type
 
 /**
- * @author sergeys
- *
  * The Team1Component is a singleton json loaded component
+ *
+ * @author sergeys
  */
-class Team1Component : ClonableComponent {
-    override fun copy(): Component = INSTANCE
+object Team1Component : ClonableComponent {
+    override fun copy(): Component = Team1Component
     
-    companion object {
-        @JvmField
-        val INSTANCE = Team1Component()
-    
-        @JvmField
-        val MAPPER = ComponentMapper.getFor(Team1Component::class.java)!!
-    }
+    @JvmField
+    val MAPPER = ComponentMapper.getFor(Team1Component::class.java)!!
     
     class Adapter : InstanceCreator<Team1Component> {
-        override fun createInstance(type: Type): Team1Component = INSTANCE
+        override fun createInstance(type: Type): Team1Component = Team1Component
     }
 }
 
 /**
- * @author sergeys
- *
  * The Team2Component is a singleton json loaded component
+ *
+ * @author sergeys
  */
-class Team2Component : ClonableComponent {
-    override fun copy(): Component = INSTANCE
+object Team2Component : ClonableComponent {
+    override fun copy(): Component = Team2Component
     
-    companion object {
-        @JvmField
-        val INSTANCE = Team2Component()
-    
-        @JvmField
-        val MAPPER = ComponentMapper.getFor(Team2Component::class.java)!!
-    }
+    @JvmField
+    val MAPPER = ComponentMapper.getFor(Team2Component::class.java)!!
     
     class Adapter : InstanceCreator<Team2Component> {
-        override fun createInstance(type: Type): Team2Component = INSTANCE
+        override fun createInstance(type: Type): Team2Component = Team2Component
     }
 }

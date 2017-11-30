@@ -6,19 +6,37 @@ import com.sergey.spacegame.common.ecs.component.ShipComponent;
 import com.sergey.spacegame.common.ecs.component.VelocityComponent;
 import com.sergey.spacegame.common.game.Level;
 
-public class MoveOrder implements IOrder {
+/**
+ * Represents a move order that is supposed to travel at a given speed
+ *
+ * @author sergeys
+ */
+public class MoveOrder implements MovingOrder {
     
     private double  x;
     private double  y;
     private float   speed;
     private boolean done;
     
+    /**
+     * Create a move order
+     *
+     * @param x - the destination x coordinate
+     * @param y - the destination y coordinate
+     */
     public MoveOrder(double x, double y) {
         this.x = x;
         this.y = y;
         this.speed = -1;
     }
     
+    /**
+     * Create a MoveOrder with a given speed
+     *
+     * @param x     - the destination x coordinate
+     * @param y     - the destination y coordinate
+     * @param speed - the speed that should be moved at
+     */
     public MoveOrder(double x, double y, float speed) {
         this.x = x;
         this.y = y;
@@ -58,14 +76,34 @@ public class MoveOrder implements IOrder {
     }
     
     @Override
-    public boolean completed() {
+    public boolean completed(Entity e) {
         return done;
     }
     
+    @Override
+    public float getPositionX() {
+        return ((float) getX());
+    }
+    
+    /**
+     * Get the destination x coordinate
+     *
+     * @return the destination x coordinate
+     */
     public double getX() {
         return x;
     }
     
+    @Override
+    public float getPositionY() {
+        return ((float) getY());
+    }
+    
+    /**
+     * Get the destination y coordinate
+     *
+     * @return the destination y coordinate
+     */
     public double getY() {
         return y;
     }

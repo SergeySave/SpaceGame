@@ -11,6 +11,15 @@ import com.sergey.spacegame.common.ecs.component.Team1Component
 import com.sergey.spacegame.common.ecs.component.Team2Component
 import com.sergey.spacegame.common.game.Level
 
+/**
+ * This system is in charge of updating the amount of money each player has
+ *
+ * @author sergeys
+ *
+ * @constructor Create a new MoneyProducerSystem
+ *
+ * @property level - the level
+ */
 class MoneyProducerSystem(val level: Level) : IntervalSystem(deltaTime.toFloat()) {
     
     private var perUpdatePlayer1: Double = 0.0
@@ -31,19 +40,19 @@ class MoneyProducerSystem(val level: Level) : IntervalSystem(deltaTime.toFloat()
             override fun entityAdded(entity: Entity) {
                 perUpdatePlayer1 += MoneyProducerComponent.MAPPER.get(entity).amount * deltaTime
             }
-        
+            
             override fun entityRemoved(entity: Entity) {
                 perUpdatePlayer1 -= MoneyProducerComponent.MAPPER.get(entity).amount * deltaTime
             }
         }.also { listener -> player1Listener = listener })
-    
+        
         val player2Family = Family.all(MoneyProducerComponent::class.java, Team2Component::class.java).exclude(InContructionComponent::class.java).get()
         perUpdatePlayer2 = engine.getEntitiesFor(player2Family).sumByDouble { e -> MoneyProducerComponent.MAPPER.get(e).amount } * deltaTime
         engine.addEntityListener(player2Family, object : EntityListener {
             override fun entityAdded(entity: Entity) {
                 perUpdatePlayer2 += MoneyProducerComponent.MAPPER.get(entity).amount * deltaTime
             }
-        
+            
             override fun entityRemoved(entity: Entity) {
                 perUpdatePlayer2 -= MoneyProducerComponent.MAPPER.get(entity).amount * deltaTime
             }

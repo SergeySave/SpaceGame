@@ -9,6 +9,13 @@ import com.sergey.spacegame.common.ecs.component.PositionComponent
 import com.sergey.spacegame.common.ecs.component.RotationComponent
 import com.sergey.spacegame.common.ecs.component.SizeComponent
 
+/**
+ * This system is in charge of updating building positions
+ *
+ * @author sergeys
+ *
+ * @constructor Creates a new BuildingSystem
+ */
 class BuildingSystem : IteratingSystem((Family.all(BuildingComponent::class.java, PositionComponent::class.java, SizeComponent::class.java).get())) {
     
     override fun processEntity(entity: Entity, deltaTime: Float) {

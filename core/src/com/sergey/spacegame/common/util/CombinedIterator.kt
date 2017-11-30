@@ -1,6 +1,17 @@
 package com.sergey.spacegame.common.util
 
-class CombinedIterator<E>(vararg iterators: Iterator<E>) : Iterator<E> {
+/**
+ * An iterator that acts as a combination of other iterators
+ *
+ * @param E - the type of object returned by this iterator
+ *
+ * @author sergeys
+ *
+ * @constructor Creates a new CombinedIterator from a set of iterators
+ *
+ * @param iterators - an array of iterators
+ */
+class CombinedIterator<out E>(vararg iterators: Iterator<E>) : Iterator<E> {
     
     private var iters: Array<out Iterator<E>> = iterators
     private var index = 0

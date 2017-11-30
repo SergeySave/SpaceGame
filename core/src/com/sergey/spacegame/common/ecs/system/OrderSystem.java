@@ -11,13 +11,23 @@ import com.sergey.spacegame.common.game.Level;
 import java.util.ArrayList;
 import java.util.List;
 
-public class OrderSystem extends EntitySystem {
+/**
+ * This system is in charge of running orders
+ *
+ * @author sergeys
+ */
+public final class OrderSystem extends EntitySystem {
     
     
     private Level                  level;
     private ImmutableArray<Entity> entities;
     private List<Entity>           newlyConstructingBuildings;
     
+    /**
+     * Create a new OrderSystem
+     *
+     * @param level - the level on which the order system operates
+     */
     public OrderSystem(Level level) {
         this.level = level;
         newlyConstructingBuildings = new ArrayList<>();
@@ -42,7 +52,7 @@ public class OrderSystem extends EntitySystem {
         newlyConstructingBuildings.clear();
     }
     
-    protected void processEntity(Entity entity, float deltaTime) {
+    private void processEntity(Entity entity, float deltaTime) {
         OrderComponent order = OrderComponent.MAPPER.get(entity);
         
         if (order.size() == 0) {
@@ -62,7 +72,7 @@ public class OrderSystem extends EntitySystem {
         }
         
         order.peek().update(entity, deltaTime, level);
-        if (order.peek().completed()) {
+        if (order.peek().completed(entity)) {
             order.pop();
         }
         if (order.size() == 0) {
@@ -70,10 +80,20 @@ public class OrderSystem extends EntitySystem {
         }
     }
     
+    /**
+     * Register a newly in construction entity
+     *
+     * @param e - the new entity
+     */
     public void registerNewInConstruction(Entity e) {
         newlyConstructingBuildings.add(e);
     }
     
+    /**
+     * Get all currently under construction buildings
+     *
+     * @return a list of all entities currently under construction
+     */
     public List<Entity> getConstructingBuildings() {
         return newlyConstructingBuildings;
     }

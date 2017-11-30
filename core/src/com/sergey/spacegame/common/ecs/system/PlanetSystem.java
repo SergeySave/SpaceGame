@@ -10,29 +10,27 @@ import com.sergey.spacegame.common.ecs.component.BuildingComponent;
 import com.sergey.spacegame.common.ecs.component.PlanetComponent;
 import com.sergey.spacegame.common.ecs.component.SizeComponent;
 
+/**
+ * This system is in charge of managing what spaces on planets are empty
+ *
+ * @author sergeys
+ */
 public class PlanetSystem extends EntitySystem implements EntityListener {
-    
-    //private ImmutableArray<Entity> planets;
-    
-    public PlanetSystem() {
-        super();
-    }
     
     @Override
     public void addedToEngine(Engine engine) {
-        //planets = engine.getEntitiesFor(Family.all(PlanetComponent.class).get());
         engine.addEntityListener(Family.all(BuildingComponent.class).get(), this);
     }
     
     @Override
     public void removedFromEngine(Engine engine) {
         engine.removeEntityListener(this);
-        //planets = null;
     }
     
     @Override
     public void update(float deltaTime) {
     }
+    
     @Override
     public void entityAdded(Entity building) {
         BuildingComponent buildingC = BuildingComponent.MAPPER.get(building);
@@ -54,6 +52,15 @@ public class PlanetSystem extends EntitySystem implements EntityListener {
         buildingC.reset();
     }
     
+    /**
+     * Get the minimum and maximum angles that are ocuppied by a building
+     *
+     * @param building  - the building
+     * @param planet    - the planet the building is on
+     * @param positionB - the angle on the planet that the building is on
+     *
+     * @return an array of floats where the first float is the minimum angle and the second is the maximum angle
+     */
     public static float[] getMinMax(Entity building, Entity planet, float positionB) {
         SizeComponent size = SizeComponent.MAPPER.get(building);
         

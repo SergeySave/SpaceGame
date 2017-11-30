@@ -9,16 +9,33 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
 
+/**
+ * This component represents a planet
+ * It stores a list of free angle ranges where buildingsg can go
+ *
+ * @author sergeys
+ */
 public class PlanetComponent implements ClonableComponent {
     
     public static final ComponentMapper<PlanetComponent> MAPPER = ComponentMapper.getFor(PlanetComponent.class);
     
     private List<AngleRange> freeSpaces;
     
+    /**
+     * Create a new PlanetComponent
+     */
     public PlanetComponent() {
         freeSpaces = new LinkedList<>();
     }
     
+    /**
+     * Check if a given range is free
+     *
+     * @param min - the minimum angle
+     * @param max - the maximum angle
+     *
+     * @return is the range described by this angle free
+     */
     public boolean isFree(float min, float max) {
         if (freeSpaces.isEmpty()) return true;
         return freeSpaces.stream()
@@ -28,6 +45,14 @@ public class PlanetComponent implements ClonableComponent {
                 .orElse(false);
     }
     
+    /**
+     * Mark a given range as not free
+     *
+     * @param min - the minimum angle
+     * @param max - the maximum angle
+     *
+     * @return whether the component changed
+     */
     public boolean addBuildingInRange(float min, float max) {
         if (freeSpaces.isEmpty()) {
             //If no ranges add a range representing the open space
@@ -61,6 +86,14 @@ public class PlanetComponent implements ClonableComponent {
         return false;
     }
     
+    /**
+     * Mark a given filled range as free
+     * The same range must be in the planet already
+     *
+     * @param min - the minimum angle
+     * @param max - the maximum angle
+     * @return whether the component changed
+     */
     public boolean removeBuilding(float min, float max) {
         if (freeSpaces.isEmpty()) return false;
         

@@ -18,14 +18,18 @@ import java.nio.file.Path
 typealias NFiles = java.nio.file.Files
 
 /**
- * @author sergeys
  *
  * This does not support file navigation. It is a read-only FileHandle wrapper for a java nio path.
  *
  * The list methods will return empty arrays.
  * Any write methods will throw unsupported operation exceptions unless they can safely fail (ie. return false).
  *
+ * @author sergeys
  *
+ * @constructor Creates a new PathFileHandle
+ *
+ * @property name - the name of the file
+ * @property path - the Java NIO path to the file
  */
 class PathFileHandle(val name: String, val path: Path) : FileHandle() {
     

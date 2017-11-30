@@ -15,6 +15,15 @@ import com.sergey.spacegame.common.math.Angle;
 
 import java.util.stream.StreamSupport;
 
+/**
+ * A command executable responsible for the fleet move command
+ *
+ * Since a single ship is a fleet of one it has special logic for single ships
+ *
+ * All MoveCommandExecutables are equal
+ *
+ * @author sergeys
+ */
 public final class MoveCommandExecutable implements CommandExecutable {
     
     private Vector2 TMP = new Vector2();
@@ -87,7 +96,7 @@ public final class MoveCommandExecutable implements CommandExecutable {
                         //Turn time 2
                         times[2] =
                                 (doesTurn ? Angle.getThroughRotateDistance(ang, fleetMoveDir) / ship.rotateSpeed : 0) +
-                                   deltaPos.len() / ship.moveSpeed +
+                                deltaPos.len() / ship.moveSpeed +
                                 (doesTurn ? Angle.getThroughRotateDistance(dr, ang) / ship.rotateSpeed : 0);
                         
                         return times;
@@ -116,8 +125,8 @@ public final class MoveCommandExecutable implements CommandExecutable {
                     endPos = startPos.cpy().sub(center).rotate(dr1).add(center);
                     deltaPos = endPos.cpy().sub(startPos);
                     ang = deltaPos.angle();
-    
-                    ord.addOrder(new StopOrder());
+                    
+                    ord.addOrder(StopOrder.INSTANCE);
                     
                     //Fleet rotate 1
                     ord.addOrder(new FaceOrder(ang, ship.rotateSpeed));
@@ -171,7 +180,7 @@ public final class MoveCommandExecutable implements CommandExecutable {
                     .getAsDouble();
             entitySource.forEach((e) -> {
                 OrderComponent ord = new OrderComponent(
-                        new StopOrder(),
+                        StopOrder.INSTANCE,
                         new FaceOrder(fleetMoveDir, 45),
                         new MoveOrder(
                                 PositionComponent.MAPPER.get(e).getX() + dx,

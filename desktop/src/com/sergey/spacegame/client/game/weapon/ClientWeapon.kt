@@ -15,7 +15,20 @@ import com.sergey.spacegame.common.util.test
 import java.lang.reflect.Type
 
 /**
+ * Represents a weapon needed on the client side
+ * It produces visual effects when fired
+ *
  * @author sergeys
+ *
+ * @constructor Creates a new ClientWeapon
+ *
+ * @param color - the rgba8888 color integer
+ * @param thickness - the thickness of the line created by the weapon
+ * @param reloadTime - the reload time of this weapon in seconds
+ * @param range - the range of this weapon
+ * @param damage - the damage of this weapon
+ * @param accuracy - the accuracy of this weapon in the range [0,1]
+ * @param life - the time that the line remains on screen in seconds
  */
 class ClientWeapon(color: Int, thickness: Float, reloadTime: Float, range: Float, damage: Float, accuracy: Float,
                    life: Float,
@@ -24,7 +37,8 @@ class ClientWeapon(color: Int, thickness: Float, reloadTime: Float, range: Float
         val positionComponent = PositionComponent.MAPPER.get(target)
         
         val entity = level.ecs.newEntity()
-        
+    
+        //Test against the accuracy
         level.random.test(accuracy) { success ->
             if (success) {
                 HealthComponent.MAPPER.get(target).health -= damage
@@ -34,10 +48,15 @@ class ClientWeapon(color: Int, thickness: Float, reloadTime: Float, range: Float
             }
             level.playSound(firingSound)
         }
+    
+        level.playSound(firingSound)
         
         level.ecs.addEntity(entity)
     }
     
+    /**
+     * Represents the client's deserializer. It creates ClientWeapons to represent all uses of Weapon
+     */
     class Adapter : JsonDeserializer<Weapon> {
         override fun deserialize(json: JsonElement, typeOfT: Type, context: JsonDeserializationContext): Weapon {
             return json.asJsonObject.run {

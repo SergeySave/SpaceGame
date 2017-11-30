@@ -61,6 +61,12 @@ import java.util.Random;
 import java.util.Set;
 import java.util.function.BiConsumer;
 
+/**
+ * Represents a single level
+ * This is a main hub for all things related to the level as well as the loader and unloader for the level
+ *
+ * @author sergeys
+ */
 public class Level {
     
     private static Level      _deserializing;
@@ -90,14 +96,14 @@ public class Level {
     
     private Level() {
         _deserializing = this;
-    
+        
         random = new Random();
         
         luaStores = new LuaValue[10];
         for (int i = 0; i < luaStores.length; i++) {
             luaStores[i] = LuaValue.NIL;
         }
-    
+        
         objectives = new ArrayList<>();
         
         ecsManager = new ECSManager();
@@ -117,31 +123,33 @@ public class Level {
                                                                     .get());
     }
     
+    /**
+     * A factory method for creating levels from internal path strings
+     *
+     * @param internalPath - the internal path string
+     *
+     * @return a new Level for the given level file
+     */
     public static Level getLevelFromInternalPath(String internalPath) {
+        //Get the level path
         Path levelZip = SpaceGame.getInstance().getAsset(internalPath);
-    
+        
         try {
+            //Create a temporary file
             Path tempFile = Files.createTempFile("tmp.", ".sgl");
-    
+            
             System.out.println("Temporary file created for internal sgl: " + tempFile);
-    
+            
+            //Copy it over to the new file
             Files.copy(levelZip, Files.newOutputStream(tempFile));
-    
+            
+            //Deserialize the level
             Level level = deserialize(tempFile);
-    
+            
+            //Clean up
             Files.delete(tempFile);
             
             return level;
-        } catch (IOException e) {
-            e.printStackTrace();
-            Gdx.app.exit();
-        }
-        return null;
-    }
-    
-    public static Level getLevelFromAbsolutePath(String absolutePath) {
-        try {
-            return deserialize((new File(absolutePath)).toPath());
         } catch (IOException e) {
             e.printStackTrace();
             Gdx.app.exit();
@@ -158,7 +166,7 @@ public class Level {
         EventBus eventBus = SpaceGame.getInstance().getEventBus();
         Object   ler      = SpaceGame.getInstance().getContext().createLevelEventHandler(fileSystem);
         eventBus.registerAnnotated(ler);
-    
+        
         SpaceGame.getInstance().getContext().reload();
         
         Level level = SpaceGame.getInstance().getGson().fromJson(Files.newBufferedReader(jsonPath), Level.class);
@@ -168,124 +176,281 @@ public class Level {
         return level;
     }
     
-    public void init(Object ler) {
+    private void init(Object ler) {
         levelEventRegistry = ler;
     }
     
+    /**
+     * A factory method for creating levels from absolute path strings
+     *
+     * @param absolutePath - the absolute path string
+     *
+     * @return a new level for the given level file
+     */
+    public static Level getLevelFromAbsolutePath(String absolutePath) {
+        try {
+            return deserialize((new File(absolutePath)).toPath());
+        } catch (IOException e) {
+            e.printStackTrace();
+            Gdx.app.exit();
+        }
+        return null;
+    }
+    
+    /**
+     * Get the currently deserializing level or null if no level is deserializing
+     * This is used by things that need to access data from the level in order to deserialize
+     *
+     * @return the currently deserializing level
+     */
     public static Level deserializing() {
         return _deserializing;
     }
     
+    /**
+     * Get the filesystem of the currently deserializing level or null if no level is deserializing
+     * This is used by things that need to access data from the filesystem in order to deserialize
+     *
+     * @return the currently deserializing level's filesystem
+     */
     public static FileSystem deserializingFileSystem() {
         return levelFile;
     }
     
+    /**
+     * Clean up any resources used by this level
+     */
     public void deinit() {
         ecsManager.removeAllSystems();
-    
+        
         EventBus eventBus = SpaceGame.getInstance().getEventBus();
-    
+        
         eventBus.unregisterAll(levelEventRegistry);
-    
+        
         //Lua events are registered under this level as the handler
         eventBus.unregisterAll(this);
         
         for (Sound sound : soundEffects.values()) {
             sound.dispose();
         }
-    
+        
     }
     
+    /**
+     * Get a map of all commands
+     *
+     * @return a map of command ids to their respective commands
+     */
     public HashMap<String, Command> getCommands() {
         return commands;
     }
     
+    /**
+     * Get a map of all defined entity types
+     *
+     * @return a map of prototype ids to their respective prototypes
+     */
     public HashMap<String, EntityPrototype> getEntities() {
         return entities;
     }
     
+    /**
+     * Get the ECS manager for the level
+     *
+     * @return the ecs manager
+     */
     public ECSManager getECS() {
         return ecsManager;
     }
     
+    /**
+     * Get all of the planets in the level
+     *
+     * @return all planets in the level
+     */
     public ImmutableArray<Entity> getPlanets() {
         return planets;
     }
     
+    /**
+     * Get all of the buildings that are currently in construction
+     *
+     * @return all buildings that are in construction
+     */
     public ImmutableArray<Entity> getBuildingsInConstruction() {
         return buildingsInConstruction;
     }
     
+    /**
+     * Get a list of all objectives for the current level
+     *
+     * @return the objectives for the current level
+     */
     public List<Objective> getObjectives() {
         return objectives;
     }
     
+    /**
+     * Get the lua data storage array
+     *
+     * @return the lua data storage array
+     */
     public LuaValue[] getLuaStores() {
         return luaStores;
     }
     
+    /**
+     * Get the limits of the level
+     *
+     * @return the limits of the level
+     */
     public LevelLimits getLimits() {
         return limits;
     }
     
+    /**
+     * Get the level's random object
+     *
+     * @return the level's random object
+     */
     public Random getRandom() {
         return random;
     }
     
+    /**
+     * Get the level's background
+     *
+     * @return the level's background
+     */
     public Background getBackground() {
         return background;
     }
     
+    /**
+     * Play a sound given an AudioPlayData object
+     *
+     * @param audio - the AudioPlayData object
+     * @return the sound's currently playing id
+     */
     public long playSound(AudioPlayData audio) {
         return soundEffects.get(audio.getFileName())
                 .play(audio.getVolume(), audio.getPitch(), audio.getPan()); //If NPE allow it to propogate
     }
     
+    /**
+     * Play a sound given a file name
+     *
+     * @param fileName - the name of the sound file to play
+     * @return the sound's currently playing id
+     */
     public long playSound(String fileName) {
         return soundEffects.get(fileName).play(1, 1, 0); //If NPE allow it to propogate
     }
     
+    /**
+     * Play a sound given a file name and a volume
+     *
+     * @param fileName - the name of the sound file to play
+     * @param volume - the volume to play the sound at
+     * @return the sound's currently playing id
+     */
     public long playSound(String fileName, float volume) {
         return soundEffects.get(fileName).play(volume, 1, 0); //If NPE allow it to propogate
     }
     
+    /**
+     * Play a sound given a file name, volume, and pitch
+     *
+     * @param fileName - the name of the sound file to play
+     * @param volume - the volume to play the sound at
+     * @param pitch - the pitch to play the sound at
+     * @return the sound's currently playing id
+     */
     public long playSound(String fileName, float volume, float pitch) {
         return soundEffects.get(fileName).play(volume, pitch, 0); //If NPE allow it to propogate
     }
     
+    /**
+     * Play a sound given a file name, volume, pitch, and pan
+     *
+     * @param fileName - the name of the sound file to play
+     * @param volume - the volume to play the sound at
+     * @param pitch - the pitch to play the sound at
+     * @param pan - the pan to play the sound with
+     * @return the sound's currently playing id
+     */
     public long playSound(String fileName, float volume, float pitch, float pan) {
         return soundEffects.get(fileName).play(volume, pitch, pan); //If NPE allow it to propogate
     }
     
+    /**
+     * Is this level currently controllable by the player
+     *
+     * @return is this level currently controllable by the player
+     */
     public boolean isControllable() {
         return isControllable;
     }
     
+    /**
+     * Set whether this level is currently controllable by the player
+     *
+     * @param controllable - should this level be controllable
+     */
     public void setControllable(boolean controllable) {
         isControllable = controllable;
     }
     
+    /**
+     * Get the viewport displaying this level
+     *
+     * @return the viewport displaying this level
+     */
     public IViewport getViewport() {
         return viewport;
     }
     
+    /**
+     * Set the viewport that is displaying this level
+     *
+     * @param viewport - the viewport that should display this level
+     */
     public void setViewport(IViewport viewport) {
         this.viewport = viewport;
     }
     
+    /**
+     * Get the parent directory of the level
+     *
+     * @return the parent directory of the level
+     */
     public String getParentDirectory() {
         return parentDirectory;
     }
     
+    /**
+     * Get the first player
+     *
+     * @return the first player
+     */
     public Player getPlayer1() {
         return player1;
     }
     
+    /**
+     * Get the second player
+     *
+     * @return the second player
+     */
     public Player getPlayer2() {
         return player2;
     }
     
-    
+    /**
+     * This class acts as the JSON serializer and deserializer for level objects
+     *
+     * @author sergeys
+     */
     public static class Adapter implements JsonSerializer<Level>, JsonDeserializer<Level> {
         
         @Override
@@ -297,7 +462,7 @@ public class Level {
             
             level.soundEffects = new HashMap<>();
             try {
-    
+                
                 Path sounds = levelFile.getPath("sounds");
                 if (Files.exists(sounds)) {
                     Files.walkFileTree(sounds, new SoundFileWalker(level.soundEffects::put));
@@ -308,7 +473,7 @@ public class Level {
             
             level.limits = context.deserialize(obj.get("levelLimits"), LevelLimits.class);
             level.background = context.deserialize(obj.get("background"), Background.class);
-    
+            
             level.player1 = new Player(0, new SpatialQuadtree<>(level.limits.getMinX(), level.limits.getMinY(), level.limits
                     .getMaxX(), level.limits.getMaxY(), 9));
             level.player2 = new Player(0, new SpatialQuadtree<>(level.limits.getMinX(), level.limits.getMinY(), level.limits

@@ -17,7 +17,7 @@ import com.sergey.spacegame.client.ecs.system.OrderRenderSystem;
 import com.sergey.spacegame.client.ecs.system.SelectionSystem;
 import com.sergey.spacegame.client.ecs.system.VisualUpdateSystem;
 import com.sergey.spacegame.client.gl.DrawingBatch;
-import com.sergey.spacegame.client.ui.UIUtil;
+import com.sergey.spacegame.client.ui.ShaderUtil;
 import com.sergey.spacegame.common.SpaceGame;
 import com.sergey.spacegame.common.ecs.ECSManager;
 import com.sergey.spacegame.common.ecs.system.OrderSystem;
@@ -27,14 +27,22 @@ import com.sergey.spacegame.common.game.LevelLimits;
 import com.sergey.spacegame.common.ui.IViewport;
 import org.jetbrains.annotations.NotNull;
 
+/**
+ * Represents the game screen for the desktop client
+ *
+ * @author sergeys
+ */
 public class GameScreen extends BaseScreen implements IViewport {
     
     private static final float DEF_MULT = Color.toFloatBits(1f, 1f, 1f, 1f);
     private static final float DEF_ADD  = Color.toFloatBits(0f, 0f, 0f, 0f);
     
+    //The world camera
     private OrthographicCamera camera;
+    //The background camera
     private OrthographicCamera screenCamera;
     
+    //All of the various systems
     private OrderSystem        orderSystem;
     private MainRenderSystem   mainRenderSystem;
     private LineRenderSystem   lineSystem;
@@ -44,37 +52,109 @@ public class GameScreen extends BaseScreen implements IViewport {
     private CommandUISystem    commandUISystem;
     private HUDSystem          hudSystem;
     
+    //The ecs manager
     private ECSManager ecsManager;
     
+    //The current level
     private Level        level;
+    //The drawing batch
     private DrawingBatch batch;
     
+    //The screen rectangle
     private Rectangle screen = new Rectangle();
     
+    //The input adapter used to allow scrolling
     private InputAdapter gameInputAdapter;
+    
+    //Was the game controllable last frame
     private boolean lastControllable = true;
     
+    //Was the viewport controllable last frame
     private boolean viewportControllable = true;
     
+    /**
+     * Create a new GameScreen for a given level
+     *
+     * @param level - the level for this GameScreen to represent
+     */
     public GameScreen(Level level) {
         this.level = level;
     }
     
     @Override
     public void show() {
+        //Initialize everything
         screenCamera = new OrthographicCamera(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         
         camera = new OrthographicCamera(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         camera.position.x = 0;
         camera.position.y = 0;
-        batch = new DrawingBatch(1000, UIUtil.compileShader(Gdx.files.internal("shaders/basic.vertex.glsl"), Gdx.files.internal("shaders/basic.fragment.glsl")), true);
+        batch = new DrawingBatch(1000, ShaderUtil.compileShader(Gdx.files.internal("shaders/basic.vertex.glsl"), Gdx.files
+                .internal("shaders/basic.fragment.glsl")), true);
         batch.setBlendFunction(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
-    
+        
         setLevel(level);
     }
     
     @Override
+    public void setLevel(
+            @NotNull
+                    Level level) {
+        if (this.ecsManager != null) {
+            ecsManager.removeSystem(orderSystem);
+            ecsManager.removeSystem(mainRenderSystem);
+            ecsManager.removeSystem(lineSystem);
+            ecsManager.removeSystem(orderRenderSystem);
+            ecsManager.removeSystem(visualUpdateSystem);
+            ecsManager.removeSystem(selectionControlSystem);
+            ecsManager.removeSystem(commandUISystem);
+            ecsManager.removeSystem(hudSystem);
+        }
+        
+        this.level = level;
+        
+        camera.position.x = 0;
+        camera.position.y = 0;
+        
+        level.setViewport(this);
+        ecsManager = level.getECS();
+        ecsManager.addSystem(orderSystem = new OrderSystem(level));
+        
+        ecsManager.addSystem(mainRenderSystem = new MainRenderSystem(batch));
+        ecsManager.addSystem(lineSystem = new LineRenderSystem(batch));
+        ecsManager.addSystem(orderRenderSystem = new OrderRenderSystem(batch));
+        ecsManager.addSystem(visualUpdateSystem = new VisualUpdateSystem());
+        ecsManager.addSystem(commandUISystem = new CommandUISystem(camera, batch, level));
+        ecsManager.addSystem(selectionControlSystem = new SelectionSystem(camera, batch, commandUISystem, level.getPlayer1()
+                .getTeam()));
+        ecsManager.addSystem(hudSystem = new HUDSystem(batch, commandUISystem, level, screen));
+        
+        SpaceGame.getInstance().getEventBus().post(new BeginLevelEvent(level));
+        
+        if (gameInputAdapter != null) {
+            SpaceGameClient.INSTANCE.getInputMultiplexer().removeProcessor(gameInputAdapter);
+        }
+        
+        SpaceGameClient.INSTANCE.getInputMultiplexer().addProcessor(gameInputAdapter = new InputAdapter() {
+            private final float STRENGTH = 0.95f;
+            
+            @Override
+            public boolean scrolled(int amount) {
+                if (viewportControllable) {
+                    if (amount > 0) {
+                        camera.zoom *= STRENGTH;
+                    } else if (amount < 0) {
+                        camera.zoom /= STRENGTH;
+                    }
+                }
+                return false;
+            }
+        });
+    }
+    
+    @Override
     public void render(float delta) {
+        //If the controllable status has changed enable/disable systems that are used for control
         if (lastControllable != level.isControllable()) {
             lastControllable = level.isControllable();
             selectionControlSystem.setProcessing(lastControllable);
@@ -83,18 +163,18 @@ public class GameScreen extends BaseScreen implements IViewport {
         }
         
         LevelLimits limits = level.getLimits();
-    
+        
         //In case foreign code updated camera position
         camera.position.x = screen.x;// + screen.width / 2;
         camera.position.y = screen.y;// + screen.height / 2;
-    
+        
         //Zoom limits
         if (camera.zoom * camera.viewportWidth > limits.getWidth() ||
             camera.zoom * camera.viewportHeight > limits.getHeight()) {
             camera.zoom = Math.min(
                     limits.getWidth() / camera.viewportWidth, limits.getHeight() / camera.viewportHeight);
         }
-    
+        
         if (viewportControllable) {
             //Translate controls
             if (Gdx.input.isKeyPressed(Keys.W)) {
@@ -110,7 +190,7 @@ public class GameScreen extends BaseScreen implements IViewport {
                 camera.position.x -= camera.zoom * camera.viewportWidth * 0.01;
             }
         }
-    
+        
         //Translate limits
         if (camera.position.x + camera.zoom * camera.viewportWidth / 2 > limits.getMaxX()) {
             camera.position.x = limits.getMaxX() - camera.zoom * camera.viewportWidth / 2;
@@ -125,18 +205,23 @@ public class GameScreen extends BaseScreen implements IViewport {
             camera.position.y = limits.getMinY() + camera.zoom * camera.viewportHeight / 2;
         }
         
+        //Update the camera with these new positions
         camera.update();
-    
+        
+        //Update the screen rectangle
         screen.width = camera.zoom * camera.viewportWidth;
         screen.height = camera.zoom * camera.viewportHeight;
         screen.x = camera.position.x;// - screen.width / 2;
         screen.y = camera.position.y;// - screen.height / 2;
-    
+        
+        //Update the drawing batch
         batch.setProjectionMatrix(screenCamera.combined);
         batch.setMultTint(DEF_MULT);
         batch.setAddTint(DEF_ADD);
+        //Begin drawing
         batch.begin();
-    
+        
+        //Draw the background image
         TextureRegion region = SpaceGameClient.INSTANCE.getRegion(level.getBackground().getImage());
         float         width  = screenCamera.viewportWidth;
         float         height = screenCamera.viewportHeight;
@@ -145,22 +230,15 @@ public class GameScreen extends BaseScreen implements IViewport {
         } else if (height < region.getRegionHeight() / region.getRegionWidth() * width) {
             height = region.getRegionHeight() / region.getRegionWidth() * width;
         }
-    
+        
         batch.draw(region, screenCamera.position.x - height / 2, screenCamera.position.y - width / 2, width, height);
-    
+        
+        //Update the drawing batch
         batch.setProjectionMatrix(camera.combined);
         
+        //Update the ECS systems
         ecsManager.update(Gdx.graphics.getDeltaTime());
         batch.end();
-    }
-    
-    @Override
-    public void resize(int width, int height) {
-        camera.viewportWidth = width;
-        camera.viewportHeight = height;
-    
-        screenCamera.setToOrtho(false, width, height);
-        //camera.setToOrtho(false, camera.viewportWidth, camera.viewportWidth * height/width);
     }
     
     @Override
@@ -191,8 +269,12 @@ public class GameScreen extends BaseScreen implements IViewport {
     public void dispose() {}
     
     @Override
-    public boolean isViewportControllable() {
-        return viewportControllable;
+    public void resize(int width, int height) {
+        camera.viewportWidth = width;
+        camera.viewportHeight = height;
+        
+        screenCamera.setToOrtho(false, width, height);
+        //camera.setToOrtho(false, camera.viewportWidth, camera.viewportWidth * height/width);
     }
     
     @Override
@@ -226,59 +308,8 @@ public class GameScreen extends BaseScreen implements IViewport {
     }
     
     @Override
-    public void setLevel(
-            @NotNull
-                    Level level) {
-        if (this.ecsManager != null) {
-            ecsManager.removeSystem(orderSystem);
-            ecsManager.removeSystem(mainRenderSystem);
-            ecsManager.removeSystem(lineSystem);
-            ecsManager.removeSystem(orderRenderSystem);
-            ecsManager.removeSystem(visualUpdateSystem);
-            ecsManager.removeSystem(selectionControlSystem);
-            ecsManager.removeSystem(commandUISystem);
-            ecsManager.removeSystem(hudSystem);
-        }
-    
-        this.level = level;
-    
-        camera.position.x = 0;
-        camera.position.y = 0;
-    
-        level.setViewport(this);
-        ecsManager = level.getECS();
-        ecsManager.addSystem(orderSystem = new OrderSystem(level));
-    
-        ecsManager.addSystem(mainRenderSystem = new MainRenderSystem(batch));
-        ecsManager.addSystem(lineSystem = new LineRenderSystem(batch));
-        ecsManager.addSystem(orderRenderSystem = new OrderRenderSystem(batch));
-        ecsManager.addSystem(visualUpdateSystem = new VisualUpdateSystem());
-        ecsManager.addSystem(commandUISystem = new CommandUISystem(camera, batch, level));
-        ecsManager.addSystem(selectionControlSystem = new SelectionSystem(camera, batch, commandUISystem, level.getPlayer1()
-                .getTeam()));
-        ecsManager.addSystem(hudSystem = new HUDSystem(batch, commandUISystem, level, screen));
-    
-        SpaceGame.getInstance().getEventBus().post(new BeginLevelEvent(level));
-    
-        if (gameInputAdapter != null) {
-            SpaceGameClient.INSTANCE.getInputMultiplexer().removeProcessor(gameInputAdapter);
-        }
-    
-        SpaceGameClient.INSTANCE.getInputMultiplexer().addProcessor(gameInputAdapter = new InputAdapter() {
-            private final float STRENGTH = 0.95f;
-        
-            @Override
-            public boolean scrolled(int amount) {
-                if (viewportControllable) {
-                    if (amount > 0) {
-                        camera.zoom *= STRENGTH;
-                    } else if (amount < 0) {
-                        camera.zoom /= STRENGTH;
-                    }
-                }
-                return false;
-            }
-        });
+    public boolean getViewportControllable() {
+        return viewportControllable;
     }
     
     @Override

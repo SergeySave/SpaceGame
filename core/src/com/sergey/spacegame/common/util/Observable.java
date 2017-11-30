@@ -3,6 +3,15 @@ package com.sergey.spacegame.common.util;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Like java.util.Observable, but using generics
+ *
+ * @param <T> the type of the object being observed
+ *
+ * @author sergeys
+ * @see java.util.Observable
+ * @see com.sergey.spacegame.common.util.Observer<T>
+ */
 public class Observable<T> {
     
     private List<Observer<T>> observers;

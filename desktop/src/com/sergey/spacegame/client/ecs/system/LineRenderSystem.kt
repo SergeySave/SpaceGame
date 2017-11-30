@@ -8,6 +8,15 @@ import com.badlogic.ashley.utils.ImmutableArray
 import com.sergey.spacegame.client.ecs.component.LineVisualComponent
 import com.sergey.spacegame.client.gl.DrawingBatch
 
+/**
+ * Represents the system for lines such as weapon fire
+ *
+ * @author sergeys
+ *
+ * @constructor Creates a new LineRenderSystem
+ *
+ * @property batch - the batch that this system will draw to
+ */
 class LineRenderSystem(private val batch: DrawingBatch) : EntitySystem(2) {
     
     private var entities: ImmutableArray<Entity>? = null

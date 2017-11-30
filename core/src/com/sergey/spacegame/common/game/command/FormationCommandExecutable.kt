@@ -14,6 +14,13 @@ import com.sergey.spacegame.common.game.orders.MoveOrder
 import com.sergey.spacegame.common.util.ceil //KotlinUtils
 import com.sergey.spacegame.common.util.floor //KotlinUtils
 
+/**
+ * Represents a command executable that puts the entities into a formation
+ *
+ * @author sergeys
+ *
+ * @constructor Creates a new FormationCommandExecutable
+ */
 abstract class FormationCommandExecutable : CommandExecutable {
     
     override fun issue(entitySource: Iterable<Entity>, numEntities: Int, start: Vector2, end: Vector2, level: Level) {
@@ -27,6 +34,7 @@ abstract class FormationCommandExecutable : CommandExecutable {
         var length = 0f
         var width = 0f
         
+        //Compute the center position and the average facing direction
         entitySource.forEach { e ->
             center.add(PositionComponent.MAPPER.get(e).setVector(VEC))
             if (RotationComponent.MAPPER.has(e)) {
@@ -44,11 +52,12 @@ abstract class FormationCommandExecutable : CommandExecutable {
         if (width == 0f) length = 1f
         
         val angle = facingVector.angle().toDouble()
-    
+        
         MTX.setToTranslation(center)
         MTX.rotate(angle.toFloat())
         MTX.scale(length, width)
         
+        //Match up each entity with a position
         val entityIterator = entitySource.iterator()
         getDeltaPositions(numEntities).forEach { v ->
             v.mul(MTX) //Apply transformation
@@ -77,9 +86,15 @@ abstract class FormationCommandExecutable : CommandExecutable {
      * +Y is 90˚ counterclockwise from +X
      *
      * A single unit on the X or Y axis is the maximum length along that axis
+     *
+     * @param count - the amount of positions to generate
+     *
+     * @return an iterable of vectors representing the positions
      */
     protected abstract fun getDeltaPositions(count: Int): Iterable<Vector2>
     
+    //The point of overriding equals here and calling testEquals is to make it so that subclasses dont have to define
+    //hashCode
     override fun equals(other: Any?): Boolean = testEquals(other)
     
     protected abstract fun testEquals(other: Any?): Boolean
@@ -92,6 +107,11 @@ abstract class FormationCommandExecutable : CommandExecutable {
     }
 }
 
+/**
+ * A command executable that puts the ships into a square formation by spiraling
+ *
+ * @author sergeys
+ */
 class SquareFormationCommandExecutable : FormationCommandExecutable() {
     override fun getDeltaPositions(count: Int): Iterable<Vector2> {
         val positions = ArrayList<Vector2>()
@@ -128,6 +148,11 @@ class SquareFormationCommandExecutable : FormationCommandExecutable() {
     override fun testEquals(other: Any?): Boolean = other is SquareFormationCommandExecutable
 }
 
+/**
+ * A command executable that puts the ships into a triangle formation
+ *
+ * @author sergeys
+ */
 class TriangleFormationCommandExecutable : FormationCommandExecutable() {
     override fun getDeltaPositions(count: Int): Iterable<Vector2> {
         val positions = ArrayList<Vector2>()

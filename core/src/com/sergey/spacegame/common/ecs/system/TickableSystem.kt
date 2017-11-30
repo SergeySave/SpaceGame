@@ -10,6 +10,13 @@ import com.sergey.spacegame.common.ecs.component.InContructionComponent
 import com.sergey.spacegame.common.ecs.component.TickableComponent
 import com.sergey.spacegame.common.event.EntityTickEvent
 
+/**
+ * This system applies ticks to tickable entities
+ *
+ * @author sergeys
+ *
+ * @constructor Create a new TickableSystem
+ */
 class TickableSystem : IntervalSystem(0.05f) {
     
     private var entities: ImmutableArray<Entity>? = null
@@ -33,7 +40,7 @@ class TickableSystem : IntervalSystem(0.05f) {
         ++tickNum
     }
     
-    fun processEntity(entity: Entity) {
+    private fun processEntity(entity: Entity) {
         SpaceGame.getInstance().eventBus.post(tickBuilder.get(entity, TickableComponent.MAPPER.get(entity), tickNum))
     }
 }

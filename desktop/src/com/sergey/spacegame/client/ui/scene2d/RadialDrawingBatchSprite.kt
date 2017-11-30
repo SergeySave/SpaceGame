@@ -5,9 +5,21 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.math.MathUtils
 import com.sergey.spacegame.client.gl.DrawingBatch
 
-
+/**
+ * Represents a sprite that is drawn such that only a certain angle of it is visible using my custom drawing batch
+ *
+ * @see RadialDrawingBatchSprite
+ *
+ * @author sergeys
+ *
+ * @constructor Creates a new RadialDrawingBatchSprite
+ * @param textureRegion - the texture region that this sprite will use
+ */
 class RadialDrawingBatchSprite(textureRegion: TextureRegion) {
     
+    /**
+     * The texture that the sprite uses to draw
+     */
     var texture: Texture? = null
         private set
     
@@ -16,6 +28,9 @@ class RadialDrawingBatchSprite(textureRegion: TextureRegion) {
     
     private var x: Float = 0f
     private var y: Float = 0f
+    /**
+     * The angle that the sprite should be draw to
+     */
     var angle: Float = 0f
         set(value) {
             if (field == value)
@@ -59,6 +74,12 @@ class RadialDrawingBatchSprite(textureRegion: TextureRegion) {
         this.height = textureRegion.regionHeight.toFloat()
     }
     
+    /**
+     * Set the multiplicative and additive color of the batch
+     *
+     * @param mult - the multiplicative color in packed float form
+     * @param add - the additive color in packed float form
+     */
     fun setColor(mult: Float, add: Float) {
         if (mult != lastMult) {
             lastMult = mult
@@ -169,6 +190,16 @@ class RadialDrawingBatchSprite(textureRegion: TextureRegion) {
         this.dirty = false
     }
     
+    /**
+     * Draw this sprite at a given angle and size
+     *
+     * @param batch - the batch to draw the sprite to
+     * @param x - the x coordinate to draw the sprite at
+     * @param y - the y coordinate to draw the sprite at
+     * @param width_ - the width of the sprite
+     * @param height_ - the height of the sprite
+     * @param angle - the angle to draw the sprite at
+     */
     fun draw(batch: DrawingBatch, x: Float, y: Float, width_: Float, height_: Float, angle: Float) {
         var width = width_
         var height = height_
@@ -185,6 +216,14 @@ class RadialDrawingBatchSprite(textureRegion: TextureRegion) {
         batch.draw(texture, verts, 0, 24 * draw)
     }
     
+    /**
+     * Draw this sprite at a given angle
+     *
+     * @param batch - the batch to draw the sprite to
+     * @param x - the x coordinate to draw the sprite at
+     * @param y - the y coordinate to draw the sprite at
+     * @param angle - the angle to draw the sprite at
+     */
     fun draw(batch: DrawingBatch, x: Float, y: Float, angle: Float) {
         draw(batch, x, y, width, height, angle)
     }

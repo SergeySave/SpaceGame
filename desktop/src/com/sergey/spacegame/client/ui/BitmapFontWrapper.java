@@ -8,6 +8,9 @@ import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.Array;
 
+/**
+ * @author sergeys
+ */
 public class BitmapFontWrapper extends BitmapFont {
     
     private BitmapFont wrapped;

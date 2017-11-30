@@ -288,7 +288,7 @@
       },
 			"com.sergey.spacegame.common.ecs.component.PositionComponent": { "x": 250, "y": 250 },
 			"com.sergey.spacegame.common.ecs.component.SizeComponent": { "w": 200, "h": 200 },
-			"com.sergey.spacegame.common.ecs.component.PlanetComponent": {}
+      "com.sergey.spacegame.common.ecs.component.PlanetComponent": {}
 		},
 		{
       "com.sergey.spacegame.common.ecs.component.VisualComponent": {

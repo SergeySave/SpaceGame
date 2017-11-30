@@ -23,18 +23,22 @@ import java.nio.file.FileSystem;
 import java.util.Optional;
 import java.util.stream.StreamSupport;
 
+/**
+ * Represents a cursor override for building construction
+ *
+ * @author sergeys
+ */
 public final class BuildingConstructionCursorOverride implements CursorOverride {
     
     private static final float MULT  = Color.toFloatBits(0.5f, 0.5f, 0.5f, 0.5f);
     private static final float RED   = Color.toFloatBits(0.5f, 0f, 0f, 0f);
     private static final float GREEN = Color.toFloatBits(0f, 0.5f, 0f, 0f);
     
+    //The entity that the cursor should be drawing
     private String entity;
     
     private transient boolean entityDirty;
     private transient Entity  building;
-    //private transient ShaderProgram green;
-    //private transient ShaderProgram red;
     
     public BuildingConstructionCursorOverride() {}
     
@@ -49,33 +53,49 @@ public final class BuildingConstructionCursorOverride implements CursorOverride 
     
     @Override
     public void drawExtra(Level level, DrawingBatch batch, OrthographicCamera camera, boolean enabled) {
+        //Get our mouse coordinates in terms of game coordinates
         Vector3     vec    = camera.unproject(new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0));
         LevelLimits limits = level.getLimits();
+        
+        //Stream all of the planets
         StreamSupport.stream(level.getPlanets().spliterator(), false)
+                //That have positions
                 .filter(PositionComponent.MAPPER::has)
+                //Get their positions
                 .map((p) -> new Object[]{p, PositionComponent.MAPPER.get(p)})
-                .map((p) -> new Object[]{
-                        p[0],
-                        (((PositionComponent) p[1]).getX() - vec.x) * (((PositionComponent) p[1]).getX() - vec.x) +
-                        (((PositionComponent) p[1]).getY() - vec.y) * (((PositionComponent) p[1]).getY() - vec.y)
+                //Calculate their distances squared to the mouse position
+                .map((p) -> {
+                    PositionComponent positionComponent = (PositionComponent) p[1];
+                    float             dx                = positionComponent.getX() - vec.x;
+                    float             dy                = positionComponent.getY() - vec.y;
+                    p[1] = dx * dx + dy * dy;
+                    return p;
                 })
+                //Find the closest planet
                 .min((l, r) -> Float.compare((Float) l[1], (Float) r[1]))
+                //Get the planet entity
                 .map((c) -> (Entity) c[0])
+                //And if we found one (which means one existed in the first place)
                 .ifPresent((planet) -> {
+                    //If we need to update our building entity then do that
                     if (entityDirty || building == null) {
                         building = level.getEntities().get(entity).createEntity(level);
                         entityDirty = false;
                         if (building == null) return;
                     }
-    
-                    if (!PositionComponent.MAPPER.has(building)) building.add(new PositionComponent());
+                    
+                    //If the building has no size then we can't do anything about it
                     if (!SizeComponent.MAPPER.has(building)) return;
+                    //If it doesnt have a position we can give it one
+                    if (!PositionComponent.MAPPER.has(building)) building.add(new PositionComponent());
                     
                     PositionComponent planetPos = PositionComponent.MAPPER.get(planet);
-    
-                    float pos = planetPos.createVector().sub(vec.x, vec.y).scl(-1).angle();
                     
-                    BuildingSystem.doSetBuildingPosition(building, planet, pos);
+                    //Get the angle relative to the planet
+                    float angle = planetPos.createVector().sub(vec.x, vec.y).scl(-1).angle();
+                    
+                    //Calculate the building's position
+                    BuildingSystem.doSetBuildingPosition(building, planet, angle);
                     
                     PositionComponent posVar;
                     SizeComponent     sizeVar;
@@ -84,26 +104,31 @@ public final class BuildingConstructionCursorOverride implements CursorOverride 
                     
                     RotationComponent rotVar;
                     
-                    float[] minMax = PlanetSystem.getMinMax(building, planet, pos);
-    
+                    //Get the extent of the building's position around the planet
+                    float[] minMax = PlanetSystem.getMinMax(building, planet, angle);
+                    
+                    //Determine if it is a valid placement
                     boolean validPlacement = PlanetComponent.MAPPER.get(planet).isFree(minMax[0], minMax[1]) &&
                                              enabled;
-    
+                    
                     posVar = PositionComponent.MAPPER.get(building);
                     sizeVar = SizeComponent.MAPPER.get(building);
                     visVar = VisualComponent.MAPPER.get(building);
-    
+                    
+                    //Getting the visual data for the visual component
                     if (visVar.getVisualData() instanceof ClientVisualData) {
                         visualData = (ClientVisualData) visVar.getVisualData();
-        
+                        
                         if (validPlacement && posVar.getX() < limits.getMinX() || posVar.getX() > limits.getMaxX() ||
                             posVar.getY() < limits.getMinY() || posVar.getY() > limits.getMaxY()) {
                             validPlacement = false;
                         }
-        
+                        
                         batch.setMultTint(MULT);
+                        //If it is valid tint it green and if not then red
                         batch.setAddTint(validPlacement ? GREEN : RED);
-        
+                        
+                        //Draw the building
                         if (RotationComponent.MAPPER.has(building)) {
                             rotVar = RotationComponent.MAPPER.get(building);
                             float oX = rotVar.originX * sizeVar.w;

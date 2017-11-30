@@ -9,7 +9,11 @@ import com.sergey.spacegame.common.ecs.component.MessageComponent
 import java.util.PriorityQueue
 
 /**
+ * This system is in charge of updating message entities
+ *
  * @author sergeys
+ *
+ * @constructor Create a new MessageSystem
  */
 class MessageSystem : EntitySystem(), EntityListener {
     

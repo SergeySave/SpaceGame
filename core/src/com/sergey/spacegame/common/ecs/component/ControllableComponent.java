@@ -17,17 +17,33 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
+/**
+ * This component represents a component that is controllable
+ *
+ * @author sergeys
+ */
 public class ControllableComponent implements ClonableComponent {
     
     public static final ComponentMapper<ControllableComponent> MAPPER = ComponentMapper.getFor(ControllableComponent.class);
     
+    /**
+     * The list of commands that this entity has available to it
+     */
     public List<Command> commands;
     
+    /**
+     * Create a ControllableComponent from many Commands
+     *
+     * @param commands - the Commands that the entity that has this component can have applied to it
+     */
     public ControllableComponent(Command... commands) {
         this();
         this.commands.addAll(Arrays.asList(commands));
     }
     
+    /**
+     * Create an empty ControllableComponent
+     */
     public ControllableComponent() {
         this.commands = new LinkedList<>();
     }

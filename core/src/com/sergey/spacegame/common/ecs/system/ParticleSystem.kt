@@ -6,6 +6,16 @@ import com.badlogic.ashley.systems.IteratingSystem
 import com.sergey.spacegame.common.ecs.component.ParticleComponent
 import com.sergey.spacegame.common.game.Level
 
+/**
+ * A system in charge of managing particles
+ *
+ * @author sergeys
+ *
+ * @constructor Creates a new ParticleSystem
+ *
+ *
+ * @property level - the level that the system acts on
+ */
 class ParticleSystem(val level: Level) : IteratingSystem((Family.all(ParticleComponent::class.java).get())) {
     private var time = 0L
     

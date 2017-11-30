@@ -12,7 +12,13 @@ import com.sergey.spacegame.common.ecs.component.WeaponComponent
 import com.sergey.spacegame.common.game.Level
 import com.sergey.spacegame.common.game.weapon.Weapon
 
-
+/**
+ * Represents the event handler for common events
+ *
+ * @author sergeys
+ *
+ * @constructor Creates a new BaseCommonEventHandler
+ */
 class BaseCommonEventHandler {
     
     @EventHandle

@@ -18,6 +18,12 @@ allprojects {
         ashleyVersion = '1.7.3'
     }
 
+    compileKotlin {
+        kotlinOptions {
+            jvmTarget = "1.8"
+        }
+    }
+
     repositories {
         mavenLocal()
         mavenCentral()
@@ -29,7 +35,7 @@ allprojects {
 buildscript {
     dependencies {
     	classpath "com.badlogicgames.gdx:gdx-tools:1.9.7"
-    	classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:1.1.60"
+    	classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:1.2.0"
     }
 }
 

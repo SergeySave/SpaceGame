@@ -5,6 +5,8 @@ import com.sergey.spacegame.common.ecs.component.TickableComponent
 import kotlin.properties.Delegates
 
 /**
+ * An event that took place for a given entity
+ *
  * @author sergeys
  */
 open class EntityEvent : Event() {
@@ -13,6 +15,8 @@ open class EntityEvent : Event() {
 
 /**
  * Entity Added Event done in a way that the event is created through a builder that uses a single instance
+ *
+ * @author sergeys
  */
 class EntityAddedEvent : EntityEvent() {
     class Builder {
@@ -28,6 +32,8 @@ class EntityAddedEvent : EntityEvent() {
 
 /**
  * Building Built Event done in a way that the event is created through a builder that uses a single instance
+ *
+ * @author sergeys
  */
 class BuildingConstructedEvent : EntityEvent() {
     
@@ -47,6 +53,8 @@ class BuildingConstructedEvent : EntityEvent() {
 
 /**
  * Entity Removed Event done in a way that the event is created through a builder that uses a single instance
+ *
+ * @author sergeys
  */
 class EntityRemovedEvent : EntityEvent() {
     class Builder {
@@ -62,6 +70,8 @@ class EntityRemovedEvent : EntityEvent() {
 
 /**
  * Entity Tick Event done in a way that the event is created through a builder that uses a single instance
+ *
+ * @author sergeys
  */
 class EntityTickEvent : EntityEvent() {
     

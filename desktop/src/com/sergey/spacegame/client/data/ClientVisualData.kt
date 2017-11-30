@@ -6,12 +6,27 @@ import com.sergey.spacegame.client.SpaceGameClient
 import com.sergey.spacegame.common.data.VisualData
 
 /**
+ * This class represents the visual data used on the desktop client side
+ *
  * @author sergeys
+ *
+ * @constructor Create a new ClientVisualData object
+ *
+ * @param name - the name of the region used by this visual data
  */
 class ClientVisualData(name: String) : VisualData {
-    var region: TextureRegion? = SpaceGameClient.getRegion(name)
+    /**
+     * The texture region of the thing using this visual data
+     */
+    var region: TextureRegion = SpaceGameClient.getRegion(name)
     
+    /**
+     * The multiplicative tint color
+     */
     var multColor = MULT_DEFAULT
+    /**
+     * The additive tint color
+     */
     var addColor = ADD_DEFAULT
     
     companion object {

@@ -6,12 +6,23 @@ import com.sergey.spacegame.common.ecs.component.RotationVelocityComponent;
 import com.sergey.spacegame.common.ecs.component.ShipComponent;
 import com.sergey.spacegame.common.game.Level;
 
+/**
+ * Represents an order to face in a specific direction at a given speed
+ *
+ * @author sergeys
+ */
 public class FaceOrder implements IOrder {
     
     private double  r;
     private double  rotateSpeed;
     private boolean done;
     
+    /**
+     * Create a new FaceOrder
+     *
+     * @param r     - the direction to face
+     * @param speed - the speed to turn at that direction
+     */
     public FaceOrder(double r, float speed) {
         this.r = r;
         this.rotateSpeed = speed;
@@ -54,7 +65,7 @@ public class FaceOrder implements IOrder {
     }
     
     @Override
-    public boolean completed() {
+    public boolean completed(Entity e) {
         return done;
     }
 }

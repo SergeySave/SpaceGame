@@ -18,6 +18,11 @@ import com.sergey.spacegame.common.ecs.component.Team1Component;
 import com.sergey.spacegame.common.ecs.component.Team2Component;
 import com.sergey.spacegame.common.ecs.component.VisualComponent;
 
+/**
+ * Represents the system for rendering entities
+ *
+ * @author sergeys
+ */
 public class MainRenderSystem extends EntitySystem {
     
     private static final float TEAM1COLOR   = Color.valueOf("1A60FF00").toFloatBits();
@@ -51,7 +56,7 @@ public class MainRenderSystem extends EntitySystem {
     @Override
     public void update(float deltaTime) {
         batch.enableBlending();
-    
+        
         PositionComponent posVar;
         SizeComponent     sizeVar;
         VisualComponent   visVar;
@@ -64,10 +69,10 @@ public class MainRenderSystem extends EntitySystem {
             posVar = PositionComponent.MAPPER.get(entity);
             sizeVar = SizeComponent.MAPPER.get(entity);
             visVar = VisualComponent.MAPPER.get(entity);
-    
+            
             if (visVar.getVisualData() instanceof ClientVisualData) {
                 visualData = (ClientVisualData) visVar.getVisualData();
-        
+                
                 batch.setMultTint(visualData.getMultColor());
                 batch.setAddTint(visualData.getAddColor());
                 if (RotationComponent.MAPPER.has(entity)) {
@@ -80,7 +85,7 @@ public class MainRenderSystem extends EntitySystem {
                     batch.draw(visualData.getRegion(),
                                posVar.getX() - sizeVar.w / 2, posVar.getY() - sizeVar.h / 2, sizeVar.w, sizeVar.h);
                 }
-        
+                
                 if (HealthComponent.MAPPER.has(entity)) {
                     healthComponent = HealthComponent.MAPPER.get(entity);
                     if (healthComponent.getHealth() > 0) {
@@ -88,7 +93,7 @@ public class MainRenderSystem extends EntitySystem {
                         batch.setAddTint(Team1Component.MAPPER.has(entity) ?
                                                  TEAM1COLOR :
                                                  (Team2Component.MAPPER.has(entity) ? TEAM2COLOR : NEUTRALCOLOR));
-        
+                        
                         rdbs.draw(batch,
                                   posVar.getX() - sizeVar.w * 0.75f,
                                   posVar.getY() - sizeVar.h * 0.75f,

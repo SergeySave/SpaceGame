@@ -11,11 +11,14 @@ import com.sergey.spacegame.client.gl.DrawingBatch;
 import com.sergey.spacegame.common.ecs.component.OrderComponent;
 import com.sergey.spacegame.common.ecs.component.PositionComponent;
 import com.sergey.spacegame.common.ecs.component.Team1Component;
-import com.sergey.spacegame.common.game.orders.BuildBuildingOrder;
 import com.sergey.spacegame.common.game.orders.IOrder;
-import com.sergey.spacegame.common.game.orders.MoveOrder;
-import com.sergey.spacegame.common.game.orders.TimeMoveOrder;
+import com.sergey.spacegame.common.game.orders.MovingOrder;
 
+/**
+ * Represents the system for rendering entity orders
+ *
+ * @author sergeys
+ */
 public class OrderRenderSystem extends EntitySystem {
     
     private static final float LINE_COLOR = Color.WHITE.toFloatBits();
@@ -45,25 +48,15 @@ public class OrderRenderSystem extends EntitySystem {
         batch.setLineWidth(1f);
         Vector2 posVar;
         
+        //Draw the order's lines if needed
         for (Entity entity : entities) {
             posVar = PositionComponent.MAPPER.get(entity).createVector();
             for (IOrder order : OrderComponent.MAPPER.get(entity)) {
-                if (order instanceof MoveOrder) {
-                    MoveOrder move = (MoveOrder) order;
-                    batch.line(posVar.x, posVar.y, (float) move.getX(), (float) move.getY());
-                    posVar.set((float) move.getX(), (float) move.getY());
-                    
-                } else if (order instanceof TimeMoveOrder) {
-                    TimeMoveOrder move = (TimeMoveOrder) order;
-                    batch.line(posVar.x, posVar.y, (float) move.getX(), (float) move.getY());
-                    posVar.set((float) move.getX(), (float) move.getY());
-                    
-                } else if (order instanceof BuildBuildingOrder) {
-                    BuildBuildingOrder move = (BuildBuildingOrder) order;
-                    if (move.getPosition().isPresent()) {
-                        Vector2 b = move.getPosition().get();
-                        batch.line(posVar.x, posVar.y, b.x, b.y);
-                        posVar.set(b.x, b.y);
+                if (order instanceof MovingOrder) {
+                    MovingOrder movingOrder = (MovingOrder) order;
+                    if (movingOrder.doDraw()) {
+                        batch.line(posVar.x, posVar.y, movingOrder.getPositionX(), movingOrder.getPositionY());
+                        posVar.set(movingOrder.getPositionX(), movingOrder.getPositionY());
                     }
                 }
             }

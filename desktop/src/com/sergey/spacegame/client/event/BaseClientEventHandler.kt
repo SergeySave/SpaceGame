@@ -11,7 +11,13 @@ import com.sergey.spacegame.common.event.GsonRegisterEvent
 import com.sergey.spacegame.common.game.command.Command
 import com.sergey.spacegame.common.game.weapon.Weapon
 
-
+/**
+ * Represents the event handler for client events
+ *
+ * @author sergeys
+ *
+ * @constructor Creates a new BaseClientEventHandler
+ */
 class BaseClientEventHandler {
     
     @EventHandle

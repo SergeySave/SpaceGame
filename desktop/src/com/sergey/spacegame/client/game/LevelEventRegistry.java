@@ -17,20 +17,33 @@ import java.nio.file.Path;
 import java.nio.file.attribute.BasicFileAttributes;
 
 /**
+ * This class represents the an event listener for registry events needed for a level
+ *
  * @author sergeys
  */
 public class LevelEventRegistry {
     
+    //The filesystem of the level file
     private FileSystem fileSystem;
     
+    /**
+     * Create a new LevelEventRegistry
+     *
+     * @param fileSystem - the filesystem of the level's sgl file
+     */
     public LevelEventRegistry(FileSystem fileSystem) {
         this.fileSystem = fileSystem;
     }
     
+    /**
+     * Register images contained by this level into the atlas
+     *
+     * @param event - the event that caused this handler to fire
+     */
     @EventHandle
     public void onAtlasRegistry(AtlasRegistryEvent event) {
         try {
-            
+            //Walk the images directoy and add all of those images to the registry
             Path images = fileSystem.getPath("images");
             if (Files.exists(images)) {
                 Files.walkFileTree(images, new ImageFileWalker(event.getPacker()));
@@ -40,9 +53,15 @@ public class LevelEventRegistry {
         }
     }
     
+    /**
+     * Register localization information needed for the level
+     *
+     * @param event - the event that caused this handler to fire
+     */
     @EventHandle
     public void onLocalizationRegistry(LocalizationRegistryEvent event) {
         try {
+            //Register each localization for the given locale
             Files.lines(fileSystem.getPath("localization", event.getLocale() + ".loc"))
                     .filter(s -> !s.startsWith("#") && s.matches("([^=]+)\\s*=([^=]+)?"))
                     .forEach(s -> {

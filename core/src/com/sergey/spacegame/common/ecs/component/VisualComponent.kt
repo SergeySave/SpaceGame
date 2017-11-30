@@ -14,21 +14,30 @@ import com.sergey.spacegame.common.data.VisualData
 import java.lang.reflect.Type
 
 /**
+ * This component contains the visual data
+ *
  * @author sergeys
+ *
+ * @constructor Create a new VisualComponent object
+ *
+ * @param regionName - the name of the texture region
  */
 class VisualComponent(regionName: String) : ClonableComponent {
     
-    var regionName: String = ""
+    /**
+     * The texture region's name
+     */
+    var regionName: String = regionName
         set(value) {
             visualData = SpaceGame.getInstance().context.createVisualData(value)
             field = value
         }
-    var visualData: VisualData? = null
-        private set
     
-    init {
-        this.regionName = regionName
-    }
+    /**
+     * The visual data object used for client side rendering
+     */
+    var visualData: VisualData? = SpaceGame.getInstance().context.createVisualData(regionName)
+        private set
     
     override fun copy(): Component {
         return VisualComponent(regionName)

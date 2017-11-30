@@ -13,6 +13,23 @@ import com.sergey.spacegame.common.lua.LuaUtils
 import java.io.IOException
 import java.lang.reflect.Type
 
+/**
+ * Represents a Command for the server side
+ *
+ * @author sergeys
+ *
+ * @constructor Creates a new ServerCommand
+ *
+ * @param executable - the command's executable
+ * @param allowMulti - does this command allow multiple targets
+ * @param requiresInput - does this command require an input position
+ * @param requiresTwoInput - does this command require a secondary input position
+ * @param id - the id of this command
+ * @param drawableName - the name of the image to use for drawing the command's icon button
+ * @param req - the requirements of this command to be enabled
+ * @param drawableCheckedName - the name of the image to use for drawing the command's pressed icon button
+ * @param orderTag - the tag to use to determine the order count
+ */
 class ServerCommand(executable: CommandExecutable, allowMulti: Boolean, requiresInput: Boolean,
                     requiresTwoInput: Boolean, id: String, drawableName: String, req: Map<String, LuaPredicate>?,
                     drawableCheckedName: String?,
@@ -114,5 +131,6 @@ class ServerCommand(executable: CommandExecutable, allowMulti: Boolean, requires
         return super.equals(other)
     }
     
+    //Unfortunately this is required for IntelliJ not to annoy me
     override fun hashCode(): Int = super.hashCode() * 31 + javaClass.hashCode()
 }

@@ -19,7 +19,17 @@ import com.sergey.spacegame.common.ecs.component.VisualComponent
 import com.sergey.spacegame.common.game.Level
 
 /**
+ * A class that represents a drawable for a minimap
+ *
  * @author sergeys
+ *
+ * @constructor Creates a new MinimapDrawable
+ * @property team1 - the texture region used to represent something from team 1
+ * @property team2 - the texture region used to represent something from team 2
+ * @property neutral - the texture region used to represent something not on a team
+ * @property white - a texture region representing a white pixel
+ * @property level - the level that this minimap should represent
+ * @property screen - a rectangle representing the area of the world that the screen covers
  */
 class MinimapDrawable(val team1: TextureRegion, val team2: TextureRegion, val neutral: TextureRegion,
                       val white: TextureRegion,
@@ -46,19 +56,22 @@ class MinimapDrawable(val team1: TextureRegion, val team2: TextureRegion, val ne
     private var dragging: Boolean = false
     
     override fun draw(batch: Batch, x: Float, y: Float, width: Float, height: Float) {
+        //Create our projection matrix
         projection.setToTranslation(x - level.limits.minX, y - level.limits.minY)
         scaleX = width / level.limits.width
         scaleY = height / level.limits.height
         projection.scale(scaleX, scaleY)
     
+        //Create the inverse of the projection matrix
         invProjection.set(projection).inv()
     
-        //Render the position of the camera as of this frame
+        //Calculate the position of the camera as of this frame
         val x1 = VEC.set(screen.x - screen.width / 2, screen.y - screen.height / 2).mul(projection).x
         val y1 = VEC.y
         val x2 = VEC.set(screen.x + screen.width / 2, screen.y + screen.height / 2).mul(projection).x
         val y2 = VEC.y
     
+        //Render the camera's position
         batch.draw(white, x1, y1, x2 - x1, 1f) //Bottom
         batch.draw(white, x1, y1, 1f, y2 - y1) //Left
         batch.draw(white, x1, y2, x2 - x1, 1f) //Top
@@ -70,7 +83,8 @@ class MinimapDrawable(val team1: TextureRegion, val team2: TextureRegion, val ne
         batch.draw(white, x, y + height, width, 1f) //Top
         batch.draw(white, x + width, y, 1f, height) //Right
     
-        if (level.viewport.isViewportControllable()) {
+        //If it is controllable then allow the user to click to move the camera
+        if (level.viewport.viewportControllable) {
             if (Gdx.input.justTouched() && Gdx.input.isTouched && Gdx.input.x in x..(x + width) && (Gdx.graphics.height - Gdx.input.y) in y..(y + height)) {
                 dragging = true
             }
@@ -87,15 +101,19 @@ class MinimapDrawable(val team1: TextureRegion, val team2: TextureRegion, val ne
             dragging = false
         }
     
-        //Draw the entities with clipping
+        //Draw the previous things with clipping
         batch.flush()
+        //Enable clipping
         val pushed = ScissorStack.pushScissors(Rectangle(x, y, width, height))
     
+        //Draw all of the entities
         drawEntities(neutralEntities, batch, neutral, scaleX, scaleY)
         drawEntities(team2Entities, batch, team2, scaleX, scaleY)
         drawEntities(team1Entities, batch, team1, scaleX, scaleY)
     
+        //Push it to the screen
         batch.flush()
+        //Remove the clipping
         if (pushed) ScissorStack.popScissors()
     }
     
@@ -150,11 +168,6 @@ class MinimapDrawable(val team1: TextureRegion, val team2: TextureRegion, val ne
     }
     
     override fun getMinHeight(): Float = _minHeight
-    
-    fun onClick(x: Float, y: Float) {
-        screen.x = x / scaleX + level.limits.minX - screen.width / 2
-        screen.y = y / scaleY + level.limits.minY - screen.height / 2
-    }
     
     private companion object {
         val defaultWidth = 10f

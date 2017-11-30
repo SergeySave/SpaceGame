@@ -4,7 +4,13 @@ import com.badlogic.ashley.core.Component
 import com.badlogic.ashley.core.ComponentMapper
 
 /**
+ * This component represents an entity with a tag
+ *
  * @author sergeys
+ *
+ * @constructor Create a new TagComponent
+ *
+ * @property tag - the tag given to the entity
  */
 class TagComponent @JvmOverloads constructor(var tag: String = "") : ClonableComponent {
     

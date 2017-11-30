@@ -16,11 +16,21 @@ import java.nio.file.FileSystem;
 import java.nio.file.Files;
 import java.util.stream.Collectors;
 
+/**
+ * This class contains LUA utility methods
+ *
+ * @author sergeys
+ */
 public class LuaUtils {
     
     private static final String FILE = "file://";
     private static final String RAW  = "lua://";
     
+    /**
+     * Create a new lua Globals object representing the standard one used in this game
+     *
+     * @return a new Globals instance
+     */
     public static Globals newStandard() {
         Globals globals = new Globals();
         globals.load(new JseBaseLib());
@@ -35,13 +45,23 @@ public class LuaUtils {
         return globals;
     }
     
+    /**
+     * Get a string containing the actual LUA code from the value recieved during loading
+     *
+     * @param rawValue - the raw string from JSON
+     * @param fs       - the filesystem that the loading is occuring in
+     *
+     * @return - a converted form of the raw code
+     *
+     * @throws IOException - If it is unable to load the LUA for IO reasons
+     */
     public static String getLUACode(String rawValue, FileSystem fs) throws IOException {
         if (rawValue.startsWith(FILE)) {
             String fileName = rawValue.substring(FILE.length());
             try {
                 return Files.readAllLines(fs.getPath(fileName)).stream().collect(Collectors.joining("\n"));
             } catch (IOException e) {
-                throw new IOException("Unable to load lua file " + fileName);
+                throw new IOException("Unable to load lua file " + fileName, e);
             }
         }
         if (rawValue.startsWith(RAW)) {

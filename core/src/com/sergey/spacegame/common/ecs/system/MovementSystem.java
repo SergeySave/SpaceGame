@@ -7,10 +7,18 @@ import com.badlogic.gdx.math.Vector2;
 import com.sergey.spacegame.common.ecs.component.PositionComponent;
 import com.sergey.spacegame.common.ecs.component.VelocityComponent;
 
+/**
+ * This system is in charge of updating positions by velocities
+ *
+ * @author sergeys
+ */
 public class MovementSystem extends IteratingSystem {
     
     private Vector2 TMP = new Vector2();
     
+    /**
+     * Create a new MovementSystem
+     */
     public MovementSystem() {
         super(Family.all(PositionComponent.class, VelocityComponent.class).get());
     }

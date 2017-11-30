@@ -16,6 +16,13 @@ import com.sergey.spacegame.common.game.Level
 import java.lang.reflect.Type
 import java.util.ArrayList
 
+/**
+ * This class is a JSON serializer and deserializer for entities
+ *
+ * @author
+ *
+ * @constructor Create a new EntityJsonAdapter
+ */
 class EntityJsonAdapter : JsonSerializer<Entity>, JsonDeserializer<Entity> {
     
     @Throws(JsonParseException::class)
@@ -24,7 +31,7 @@ class EntityJsonAdapter : JsonSerializer<Entity>, JsonDeserializer<Entity> {
         val components = ArrayList<Component>()
         
         val entries = obj.entrySet()
-    
+        
         var hasTeam = false
         var hasHealth = false
         
@@ -32,20 +39,20 @@ class EntityJsonAdapter : JsonSerializer<Entity>, JsonDeserializer<Entity> {
             try {
                 val clazz = ClassLoader.getSystemClassLoader().loadClass(className)
                 val component = context.deserialize<Component>(value, clazz)
-    
+                
                 when (component) {
                     is HealthComponent -> hasHealth = true
                     is Team1Component  -> hasTeam = true
                     is Team2Component  -> hasTeam = true
                 }
-    
+                
                 components.add(component)
             } catch (e: ClassNotFoundException) {
                 throw JsonParseException("Class $className not found. ", e)
             }
             
         }
-    
+        
         if (hasHealth xor hasTeam) {
             System.err.println("Entity has only one of HealthComponent and TeamComponent")
         }

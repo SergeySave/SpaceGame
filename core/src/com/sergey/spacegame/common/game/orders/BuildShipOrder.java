@@ -10,6 +10,11 @@ import com.sergey.spacegame.common.ecs.system.OrderSystem;
 import com.sergey.spacegame.common.game.Level;
 import com.sergey.spacegame.common.game.Player;
 
+/**
+ * Represents an order to build a ship
+ *
+ * @author sergeys
+ */
 public class BuildShipOrder implements IOrder {
     
     private String entity;
@@ -19,6 +24,13 @@ public class BuildShipOrder implements IOrder {
     private double price;
     private Player player;
     
+    /**
+     * Create a new BuildShipOrder
+     *
+     * @param entityName - the ship entity that should be built
+     * @param time       - the time that building the entity should take
+     * @param price      - the price of building this ship
+     */
     public BuildShipOrder(String entityName, float time, double price) {
         this.entity = entityName;
         this.tag = "BuildShipOrder:" + entityName;
@@ -43,19 +55,19 @@ public class BuildShipOrder implements IOrder {
     @Override
     public void update(Entity e, float deltaTime, Level level) {
         if (time >= totalTime) return;
-    
+        
         time += deltaTime;
-    
+        
         if (time >= totalTime) {
             Entity newEntity = level.getEntities().get(entity).createEntity(level);
             if (PositionComponent.MAPPER.has(newEntity) && PositionComponent.MAPPER.has(e)) {
                 PositionComponent pos  = PositionComponent.MAPPER.get(newEntity);
                 PositionComponent curr = PositionComponent.MAPPER.get(e);
-    
+                
                 if (BuildingComponent.MAPPER.has(e)) {
                     Vector2 planetPosition = PositionComponent.MAPPER.get(BuildingComponent.MAPPER.get(e)
                                                                                   .getPlanet()).createVector();
-        
+                    
                     pos.setFrom(curr.createVector()
                                         .sub(planetPosition)
                                         .scl(1.5f)
@@ -85,7 +97,7 @@ public class BuildShipOrder implements IOrder {
     }
     
     @Override
-    public boolean completed() {
+    public boolean completed(Entity e) {
         return time >= totalTime;
     }
     

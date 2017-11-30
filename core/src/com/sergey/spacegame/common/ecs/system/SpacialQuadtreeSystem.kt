@@ -13,19 +13,21 @@ import com.sergey.spacegame.common.ecs.component.Team2Component
 import com.sergey.spacegame.common.game.Level
 
 /**
+ * This system is in charge of updating the spatial quadtrees of entities with dirty positions
+ * AKA. PositionSystem
+ *
  * @author sergeys
  *
- * AKA. PositionStstem
+ * @constructor Create a new SpatialQuadtreeSystem
  *
+ * @property level - the level that this quadtree system comes from
  */
 class SpacialQuadtreeSystem(private val level: Level) : EntitySystem(), EntityListener {
     override fun entityAdded(entity: Entity) {
         PositionComponent.MAPPER.get(entity).setDirty()
     }
     
-    override fun entityRemoved(entity: Entity) {
-        //PositionComponent.MAPPER.get(entity).setDirty()
-    }
+    override fun entityRemoved(entity: Entity) {}
     
     private val TMP = Vector2()
     private var team1: ImmutableArray<Entity>? = null
