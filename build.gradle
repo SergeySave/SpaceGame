@@ -18,12 +18,6 @@ allprojects {
         ashleyVersion = '1.7.3'
     }
 
-    compileKotlin {
-        kotlinOptions {
-            jvmTarget = "1.8"
-        }
-    }
-
     repositories {
         mavenLocal()
         mavenCentral()

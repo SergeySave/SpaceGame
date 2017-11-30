@@ -20,6 +20,12 @@ dependencies {
     compile "com.google.code.gson:gson:2.6.2:sources"
 }
 
+compileKotlin {
+    kotlinOptions {
+        jvmTarget = "1.8"
+    }
+}
+
 eclipse.project {
     name = appName + "-core"
 }
