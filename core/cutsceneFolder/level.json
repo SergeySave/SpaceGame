@@ -9,8 +9,71 @@
     "image": "background"
   },
   "commands": {},
-  "entities": {},
-  "state": [],
+  "entities": {
+    "enemy1": {
+      "com.sergey.spacegame.common.ecs.component.VisualComponent": {
+        "image": "ships/enepew"
+      },
+      "com.sergey.spacegame.common.ecs.component.PositionComponent": {},
+      "com.sergey.spacegame.common.ecs.component.SizeComponent": {
+        "w": 30,
+        "h": 30
+      },
+      "com.sergey.spacegame.common.ecs.component.RotationComponent": {
+        "originX": 0.5,
+        "originY": 0.5
+      },
+      "com.sergey.spacegame.common.ecs.component.ShipComponent": {
+        "moveSpeed": 250,
+        "rotateSpeed": 45
+      },
+      "com.sergey.spacegame.common.ecs.component.HealthComponent": {
+        "health": 50,
+        "maxHealth": 50
+      },
+      "com.sergey.spacegame.common.ecs.component.TagComponent": {
+        "tag": "enemy"
+      },
+      "com.sergey.spacegame.common.ecs.component.Team2Component": {},
+      "com.sergey.spacegame.common.ecs.component.WeaponComponent": [
+        {
+          "color": "FF0000FF",
+          "thickness": 1.6,
+          "reloadTime": 3.5,
+          "range": 400,
+          "damage": 8,
+          "accuracy": 0.9,
+          "life": 0.4,
+          "sound": {
+            "fileName": "pew1.wav",
+            "volume": 0.75,
+            "pitch": 1
+          }
+        }
+      ]
+    }
+  },
+  "state": [
+    {
+      "com.sergey.spacegame.common.ecs.component.VisualComponent": {
+        "image": "planets/1"
+      },
+      "com.sergey.spacegame.common.ecs.component.PositionComponent": {
+        "x": 250,
+        "y": 250
+      },
+      "com.sergey.spacegame.common.ecs.component.SizeComponent": {
+        "w": 200,
+        "h": 200
+      },
+      "com.sergey.spacegame.common.ecs.component.PlanetComponent": {},
+      "com.sergey.spacegame.common.ecs.component.RotationComponent": {
+        "originX": 0.5,
+        "originY": 0.5,
+        "r": 0
+      }
+    }
+  ],
   "events": {
     "com.sergey.spacegame.common.event.BeginLevelEvent": "file://lua/BeginLevelEvent.lua"
   }

@@ -35,6 +35,11 @@ interface IViewport {
     var viewportHeight: Float
     
     /**
+     * Is the UI of the viewport hidden
+     */
+    var hiddenUI: Boolean
+    
+    /**
      * Change the level that this viewport is displaying
      *
      * @param level - the new level to display

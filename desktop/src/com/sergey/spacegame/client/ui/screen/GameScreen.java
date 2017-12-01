@@ -235,7 +235,7 @@ public class GameScreen extends BaseScreen implements IViewport {
         
         //Update the drawing batch
         batch.setProjectionMatrix(camera.combined);
-        
+    
         //Update the ECS systems
         ecsManager.update(Gdx.graphics.getDeltaTime());
         batch.end();
@@ -334,5 +334,15 @@ public class GameScreen extends BaseScreen implements IViewport {
     @Override
     public void close() {
         SpaceGame.getInstance().setScreenAndDisposeOld(new MainMenuScreen());
+    }
+    
+    @Override
+    public boolean getHiddenUI() {
+        return !hudSystem.checkProcessing();
+    }
+    
+    @Override
+    public void setHiddenUI(boolean b) {
+        hudSystem.setProcessing(!b);
     }
 }

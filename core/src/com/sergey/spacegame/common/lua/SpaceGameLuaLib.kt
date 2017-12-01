@@ -249,6 +249,12 @@ object SpaceGameLuaLib : TwoArgFunction() {
                 set("getHeight", lFunc { ->
                     LuaValue.valueOf(currLevel.viewport.viewportHeight.toDouble())
                 })
+                set("setHiddenUI", lFuncU { isHidden ->
+                    currLevel.viewport.hiddenUI = isHidden.checkboolean()
+                })
+                set("getHiddenUI", lFunc { ->
+                    LuaValue.valueOf(currLevel.viewport.hiddenUI)
+                })
             }
             set("viewport", viewport)
     
