@@ -86,15 +86,10 @@ elseif id == 3 then
 
         particles(enemy)
 
-        addOrder(enemy, orders.TimeMoveOrder.new(centerX, centerY, 60), orders.TimeMoveOrder)
+        addOrder(enemy, orders.TimeMoveOrder.new((centerX + x) / 2, (centerY + y) / 2, 60), orders.TimeMoveOrder)
     end
 
-    for i = 1, 34, 1 do
-        spawnEnemy(i * w / 35, 1000)
-        spawnEnemy(i * w / 35, bottomY)
-    end
-    for i = 1, 24, 1 do
-        spawnEnemy(0, 1000 - i * h / 25)
-        spawnEnemy(1000, 1000 - i * h / 25)
+    for i = 0, 350, 10 do
+        spawnEnemy(centerX + h / 2.1 * math.cos(i * math.pi / 180), centerY + h / 2.1 * math.sin(i * math.pi / 180))
     end
 end

@@ -7,7 +7,7 @@ package com.sergey.spacegame.common.util;
  *
  * @author sergeys
  * @see java.util.Observer
- * @see com.sergey.spacegame.common.util.Observable<T>
+ * @see com.sergey.spacegame.common.util.Observable
  */
 public interface Observer<T> {
     

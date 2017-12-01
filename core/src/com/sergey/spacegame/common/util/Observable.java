@@ -10,7 +10,7 @@ import java.util.List;
  *
  * @author sergeys
  * @see java.util.Observable
- * @see com.sergey.spacegame.common.util.Observer<T>
+ * @see com.sergey.spacegame.common.util.Observer
  */
 public class Observable<T> {
     

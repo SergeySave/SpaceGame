@@ -134,6 +134,11 @@ public class DrawingBatch {
     
     /**
      * ADVANCED METHOD
+     *
+     * @param texture - the texture to use
+     * @param sprite - the sprite vertex array
+     * @param offset - the offset to use in the vertex array
+     * @param count - the number of verticies to use
      */
     public void draw(Texture texture, float[] sprite, int offset, int count) {
         if (!drawing) throw new IllegalStateException("SpriteBatch.begin must be called before draw.");
