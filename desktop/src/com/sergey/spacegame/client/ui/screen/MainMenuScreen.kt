@@ -59,7 +59,9 @@ class MainMenuScreen : BaseScreen() {
                 addListener(object : ChangeListener() {
                     override fun changed(event: ChangeEvent, actor: Actor) {
                         SpaceGame.getInstance().screen = LevelSelectionScreen(
-                                this@MainMenuScreen, "level.tutorial.name" to { Level.getLevelFromInternalPath("level.sgl") })
+                                this@MainMenuScreen,
+                                "level.tutorial.name" to { Level.getLevelFromInternalPath("level.sgl") },
+                                "level.cutscene.name" to { Level.getLevelFromInternalPath("cutscene.sgl") })
                     }
                 })
             }).expandX().fillX()

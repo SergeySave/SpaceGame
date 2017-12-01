@@ -10,14 +10,70 @@
   },
   "commands": {},
   "entities": {
+    "ship1": {
+      "com.sergey.spacegame.common.ecs.component.VisualComponent": {
+        "image": "ships/pew"
+      },
+      "com.sergey.spacegame.common.ecs.component.PositionComponent": {},
+      "com.sergey.spacegame.common.ecs.component.SizeComponent": {
+        "w": 50,
+        "h": 50
+      },
+      "com.sergey.spacegame.common.ecs.component.RotationComponent": {
+        "originX": 0.5,
+        "originY": 0.5
+      },
+      "com.sergey.spacegame.common.ecs.component.ShipComponent": {
+        "moveSpeed": 250,
+        "rotateSpeed": 45
+      },
+      "com.sergey.spacegame.common.ecs.component.TagComponent": {
+        "tag": "ship"
+      },
+      "com.sergey.spacegame.common.ecs.component.HealthComponent": {
+        "health": 2000,
+        "maxHealth": 2000
+      },
+      "com.sergey.spacegame.common.ecs.component.Team1Component": {},
+      "com.sergey.spacegame.common.ecs.component.WeaponComponent": [
+        {
+          "color": "FF0000FF",
+          "thickness": 1.5,
+          "reloadTime": 2,
+          "range": 250,
+          "damage": 5,
+          "accuracy": 0.8,
+          "life": 0.25,
+          "sound": {
+            "fileName": "pew1.wav",
+            "volume": 0.5,
+            "pitch": 1.75
+          }
+        },
+        {
+          "color": "FFFFFFFF",
+          "thickness": 2.5,
+          "reloadTime": 5,
+          "range": 350,
+          "damage": 10,
+          "accuracy": 0.95,
+          "life": 0.5,
+          "sound": {
+            "fileName": "pew1.wav",
+            "volume": 0.75,
+            "pitch": 1
+          }
+        }
+      ]
+    },
     "enemy1": {
       "com.sergey.spacegame.common.ecs.component.VisualComponent": {
         "image": "ships/enepew"
       },
       "com.sergey.spacegame.common.ecs.component.PositionComponent": {},
       "com.sergey.spacegame.common.ecs.component.SizeComponent": {
-        "w": 30,
-        "h": 30
+        "w": 22,
+        "h": 22
       },
       "com.sergey.spacegame.common.ecs.component.RotationComponent": {
         "originX": 0.5,
@@ -38,16 +94,58 @@
       "com.sergey.spacegame.common.ecs.component.WeaponComponent": [
         {
           "color": "FF0000FF",
-          "thickness": 1.6,
-          "reloadTime": 3.5,
+          "thickness": 0.5,
+          "reloadTime": 0.25,
           "range": 400,
-          "damage": 8,
+          "damage": 1,
           "accuracy": 0.9,
-          "life": 0.4,
+          "life": 0.1,
           "sound": {
             "fileName": "pew1.wav",
-            "volume": 0.75,
+            "volume": 0.25,
             "pitch": 1
+          }
+        }
+      ]
+    },
+    "boss1": {
+      "com.sergey.spacegame.common.ecs.component.VisualComponent": {
+        "image": "ships/enepew"
+      },
+      "com.sergey.spacegame.common.ecs.component.PositionComponent": {},
+      "com.sergey.spacegame.common.ecs.component.SizeComponent": {
+        "w": 100,
+        "h": 100
+      },
+      "com.sergey.spacegame.common.ecs.component.RotationComponent": {
+        "originX": 0.5,
+        "originY": 0.5
+      },
+      "com.sergey.spacegame.common.ecs.component.ShipComponent": {
+        "moveSpeed": 250,
+        "rotateSpeed": 45
+      },
+      "com.sergey.spacegame.common.ecs.component.HealthComponent": {
+        "health": 50,
+        "maxHealth": 50
+      },
+      "com.sergey.spacegame.common.ecs.component.TagComponent": {
+        "tag": "enemy"
+      },
+      "com.sergey.spacegame.common.ecs.component.Team2Component": {},
+      "com.sergey.spacegame.common.ecs.component.WeaponComponent": [
+        {
+          "color": "FF6600FF",
+          "thickness": 8,
+          "reloadTime": 10,
+          "range": 1000,
+          "damage": 500,
+          "accuracy": 1,
+          "life": 3,
+          "sound": {
+            "fileName": "pew1.wav",
+            "volume": 1,
+            "pitch": 0.5
           }
         }
       ]
@@ -75,6 +173,7 @@
     }
   ],
   "events": {
-    "com.sergey.spacegame.common.event.BeginLevelEvent": "file://lua/BeginLevelEvent.lua"
+    "com.sergey.spacegame.common.event.BeginLevelEvent": "file://lua/BeginLevelEvent.lua",
+    "com.sergey.spacegame.common.event.LuaDelayEvent": "file://lua/LuaDelayEvent.lua"
   }
 }

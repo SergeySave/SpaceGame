@@ -1,23 +1,5 @@
 -- @author sergeys
 
--- You have no power here
-viewport.setControllable(false)
-viewport.setHiddenUI(true)
-setControllable(false)
-
--- Center along X axis and fill the entire width of the screen
-viewport.setWidth(1000)
-viewport.setX(1000)
--- Top of level
-viewport.setY(1000)
-
-local w = 1000
-local h = viewport.getHeight()
-
-local centerX = 500
-local centerY = 1000 - h / 2
-local bottomY = 1000 - h
-
 local function particles(ship)
     local pos = component.pos.get(ship)
     local facing = component.rot.get(ship).r
@@ -51,8 +33,13 @@ local function particles(ship)
     end
 end
 
-local function spawnEnemy(x, y)
-    local enemy = spawnEntity("enemy1")
+local h = viewport.getHeight()
+
+local centerX = 500
+local centerY = 1000 - h / 2
+
+local function spawnBoss(x, y)
+    local enemy = spawnEntity("boss1")
 
     local position = component.p.get(enemy)
     position:setX(x)
@@ -62,24 +49,25 @@ local function spawnEnemy(x, y)
     rotation.r = 180 / math.pi * math.atan2(centerY - y, centerX - x)
 
     particles(enemy)
-    randomizeWeaponTimers(enemy, 1)
-
-    addOrder(enemy, orders.TimeMoveOrder.new((centerX + x) / 2, (centerY + y) / 2, 60), orders.TimeMoveOrder)
 end
 
-for i = 0, 355, 5 do
-    spawnEnemy(centerX + h / 2.1 * math.cos(i * math.pi / 180), centerY + h / 2.1 * math.sin(i * math.pi / 180))
+if (event:getId() == 0) then
+    sendMessage('faces/guy', 'msg.prepare-emergency-warp', 2.5) --image, message, seconds
+    playSound('voices/prepare-emergency-warp.wav') -- file
+    postDelayEvent(1500, 1, 0)
+elseif event:getId() == 1 then
+    sendMessage('faces/computer', 'msg.emergency-warp', 2.5) --image, message, seconds
+    playSound('voices/emergency-warp.wav') -- file
+
+    spawnBoss(centerX / 3, centerY)
+
+    postDelayEvent(250, 2, 0)
+elseif event:getId() == 2 then
+    sendMessage('faces/computer', 'msg.critical-damage-sustained', 2.5) --image, message, seconds
+    playSound('voices/critical-damage-sustained.wav') -- file
+
+    particles(data.get0())
+    removeEntity(data.get0())
+elseif event:getId() == -1 then
+    component.health.get(data.get0()):setHealth(2000)
 end
-
-local capitalShip = spawnEntity("ship1")
-
-local position = component.p.get(capitalShip)
-position:setX(centerX)
-position:setY(centerY)
-
-data.set0(capitalShip)
-
-sendMessage('faces/computer', 'msg.enemies-detected', 1.5) --image, message, seconds
-playSound('voices/enemies-detected.wav') -- file
-postDelayEvent(10, -1, 0)
-postDelayEvent(500, 0, 0)

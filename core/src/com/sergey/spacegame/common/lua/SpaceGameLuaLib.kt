@@ -17,6 +17,7 @@ import com.sergey.spacegame.common.ecs.component.SizeComponent
 import com.sergey.spacegame.common.ecs.component.TagComponent
 import com.sergey.spacegame.common.ecs.component.VelocityComponent
 import com.sergey.spacegame.common.ecs.component.VisualComponent
+import com.sergey.spacegame.common.ecs.component.WeaponComponent
 import com.sergey.spacegame.common.event.BeginLevelEvent
 import com.sergey.spacegame.common.event.EventHandle
 import com.sergey.spacegame.common.event.LuaDelayEvent
@@ -109,6 +110,14 @@ object SpaceGameLuaLib : TwoArgFunction() {
                 val entity = currLevel.entities[entityName.checkjstring()]!!.createEntity(currLevel)
                 currLevel.ecs.addEntity(entity)
                 CoerceJavaToLua.coerce(entity)
+            })
+            set("removeEntity", lFuncU { entity ->
+                val jEntity = CoerceLuaToJava.coerce(entity, Entity::class.java) as Entity
+                currLevel.ecs.removeEntity(jEntity)
+                if (HealthComponent.MAPPER.has(jEntity)) {
+                    //Deregister it as a target
+                    HealthComponent.MAPPER.get(jEntity).health = 0.0
+                }
             })
             set("addOrder", lFuncU { entityLua, order, className ->
                 val entity = CoerceLuaToJava.coerce(entityLua, Entity::class.java) as Entity
@@ -306,6 +315,17 @@ object SpaceGameLuaLib : TwoArgFunction() {
                     val a = if (args.narg() == 4) args.arg(4).checkint() else 255
             
                     return LuaValue.valueOf(Color.toFloatBits(r, g, b, a).toDouble())
+                }
+            })
+    
+            set("randomizeWeaponTimers", lFuncU { e, mtv ->
+                val entity = CoerceLuaToJava.coerce(e, Entity::class.java) as Entity
+                val maxTimerVal = mtv.checkdouble().toFloat()
+        
+                WeaponComponent.MAPPER.get(entity)?.let { weaponComp ->
+                    for (i in 0 until weaponComp.timers.size) {
+                        weaponComp.timers[i] = currLevel.random.nextFloat() * maxTimerVal
+                    }
                 }
             })
         }

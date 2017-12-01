@@ -4,7 +4,6 @@
 local id = event:getId()
 
 if id == 0 then
-    --switchLevel("internal://cutscene.sgl")
     sendMessage('faces/guy', 'msg.welcome', 5) --image, message, seconds
     playSound('voices/welcome.wav') -- file
     postDelayEvent(3500, 1, 0)

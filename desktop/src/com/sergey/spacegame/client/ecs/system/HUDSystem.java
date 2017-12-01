@@ -88,7 +88,10 @@ public class HUDSystem extends EntitySystem implements EntityListener {
     private VerticalGroup messageGroup;
     
     private List<CommandButton> buttons;
-    
+    private boolean isVisible = true;
+    private Table rightTable;
+    private Table bottomTable;
+    private Table leftTable;
     
     /**
      * Creates a new HUDSystem object
@@ -135,79 +138,12 @@ public class HUDSystem extends EntitySystem implements EntityListener {
     }
     
     /**
-     * Called to recalculate the UI and make changes if the backing data has been modified
+     * Is the HUD currently visible
+     *
+     * @return is the HUD visible
      */
-    private void recalculateUI() {
-        //All commands that are in all selected entities
-        //Commands only need to be checked if they are in the first entity
-        LinkedHashSet<Command> commands = null;
-        for (Entity e : selectedEntities) {
-            //If this is the first entity then we make a new set of the commands in the entity
-            if (commands == null) {
-                commands = new LinkedHashSet<>();
-                commands.addAll(ControllableComponent.MAPPER.get(e).commands);
-            } else {
-                //If it is a later entity remove the command if it doesnt allow multi selection and it isnt also
-                //In the other entity
-                commands.removeIf(command -> !command.getAllowMulti() ||
-                                             !ControllableComponent.MAPPER.get(e).commands.contains(command));
-            }
-        }
-        
-        //If we have commands
-        if (commands != null) {
-            //If we dont have enough buttons
-            if (commands.size() >= buttons.size()) {
-                Iterator<Command> iterator = commands.iterator();
-                int               i        = 0;
-                //Iterate over all of the commands
-                while (iterator.hasNext()) {
-                    CommandButton button;
-                    if (i >= buttons.size()) {
-                        //If we need a new button make a new button
-                        buttons.add(button = newCommandButton());
-                        
-                        //Add it to the screen
-                        actionBar.add(button.stack)
-                                .expandY()
-                                .fillY()
-                                .width(Value.percentHeight(1f, button.stack))
-                                .align(Align.left)
-                                .pad(0, 5, 5, 5);
-                    } else {
-                        //If we dont need a new button get the current button in the list
-                        button = buttons.get(i);
-                    }
-                    
-                    //Show the button and update its contents
-                    setVisible(button, iterator.next());
-                    
-                    ++i;
-                }
-            } else {
-                //We have enough buttons
-                Iterator<Command> iterator = commands.iterator();
-                
-                for (int i = 0; i < buttons.size(); i++) {
-                    CommandButton button = buttons.get(i);
-                    //If we dont need the button
-                    if (i >= commands.size()) {
-                        //hide the button and remove its command
-                        button.stack.setVisible(false);
-                        button.command = null;
-                    } else {
-                        //If we do need it
-                        //Show it and update its contents
-                        setVisible(button, iterator.next());
-                    }
-                }
-            }
-        } else {
-            //If we have no commands hide all of the buttons
-            for (CommandButton button : buttons) {
-                button.stack.setVisible(false);
-            }
-        }
+    public boolean isVisible() {
+        return isVisible;
     }
     
     /**
@@ -437,6 +373,17 @@ public class HUDSystem extends EntitySystem implements EntityListener {
         stage.dispose();
     }
     
+    /**
+     * Set whether the HUD should be visible
+     *
+     * @param visible should the HUD be visible
+     */
+    public void setVisible(boolean visible) {
+        isVisible = visible;
+        unsetup();
+        setup();
+    }
+    
     private void setup() {
         stage = new Stage(new ScreenViewport());
         SpaceGameClient.INSTANCE.getInputMultiplexer().addProcessor(0, stage);
@@ -455,8 +402,8 @@ public class HUDSystem extends EntitySystem implements EntityListener {
         downArrow.imageUp = skin.getDrawable("downArrow");
         downArrow.imageUp.setMinHeight(1f);
         downArrow.imageUp.setMinWidth(1f);
-        
-        { //Top
+    
+        if (isVisible) { //Top
             topTable = new Table();
             table.add(topTable)
                     .fillX()
@@ -491,8 +438,8 @@ public class HUDSystem extends EntitySystem implements EntityListener {
             topTable.add().expand();
         }
         table.row();
-        {  //Left
-            Table leftTable = new Table();
+        if (isVisible) {  //Left
+            leftTable = new Table();
             table.add(leftTable).fillY().expandY().width(Value.percentWidth(0.20f, table)).align(Align.topLeft);
             
             objectivesTable = new Table();
@@ -508,8 +455,8 @@ public class HUDSystem extends EntitySystem implements EntityListener {
             messageGroup.fill();
             table.add(messageGroup).grow();
         }
-        { //Right
-            Table rightTable = new Table();
+        if (isVisible) { //Right
+            rightTable = new Table();
             
             MinimapDrawable minimapDrawable = new MinimapDrawable(SpaceGameClient.INSTANCE
                                                                           .getRegion("team1"), SpaceGameClient.INSTANCE
@@ -541,8 +488,8 @@ public class HUDSystem extends EntitySystem implements EntityListener {
                     .align(Align.bottomRight);
         }
         table.row();
-        { //Bottom
-            Table bottomTable = new Table();
+        if (isVisible) { //Bottom
+            bottomTable = new Table();
             table.add(bottomTable)
                     .fillX()
                     .expandX()
@@ -572,6 +519,81 @@ public class HUDSystem extends EntitySystem implements EntityListener {
         //table.setDebug(true); // This is optional, but enables debug lines for tables.
         
         recalculateUI();
+    }
+    
+    /**
+     * Called to recalculate the UI and make changes if the backing data has been modified
+     */
+    private void recalculateUI() {
+        //All commands that are in all selected entities
+        //Commands only need to be checked if they are in the first entity
+        LinkedHashSet<Command> commands = null;
+        for (Entity e : selectedEntities) {
+            //If this is the first entity then we make a new set of the commands in the entity
+            if (commands == null) {
+                commands = new LinkedHashSet<>(ControllableComponent.MAPPER.get(e).commands);
+            } else {
+                //If it is a later entity remove the command if it doesnt allow multi selection and it isnt also
+                //In the other entity
+                commands.removeIf(command -> !command.getAllowMulti() ||
+                                             !ControllableComponent.MAPPER.get(e).commands.contains(command));
+            }
+        }
+        
+        //If we have commands
+        if (commands != null) {
+            //If we dont have enough buttons
+            if (commands.size() >= buttons.size()) {
+                Iterator<Command> iterator = commands.iterator();
+                int               i        = 0;
+                //Iterate over all of the commands
+                while (iterator.hasNext()) {
+                    CommandButton button;
+                    if (i >= buttons.size()) {
+                        //If we need a new button make a new button
+                        buttons.add(button = newCommandButton());
+                        
+                        //Add it to the screen
+                        actionBar.add(button.stack)
+                                .expandY()
+                                .fillY()
+                                .width(Value.percentHeight(1f, button.stack))
+                                .align(Align.left)
+                                .pad(0, 5, 5, 5);
+                    } else {
+                        //If we dont need a new button get the current button in the list
+                        button = buttons.get(i);
+                    }
+                    
+                    //Show the button and update its contents
+                    setVisible(button, iterator.next());
+                    
+                    ++i;
+                }
+            } else {
+                //We have enough buttons
+                Iterator<Command> iterator = commands.iterator();
+                
+                for (int i = 0; i < buttons.size(); i++) {
+                    CommandButton button = buttons.get(i);
+                    //If we dont need the button
+                    if (i >= commands.size()) {
+                        //hide the button and remove its command
+                        button.stack.setVisible(false);
+                        button.command = null;
+                    } else {
+                        //If we do need it
+                        //Show it and update its contents
+                        setVisible(button, iterator.next());
+                    }
+                }
+            }
+        } else {
+            //If we have no commands hide all of the buttons
+            for (CommandButton button : buttons) {
+                button.stack.setVisible(false);
+            }
+        }
     }
     
     /**

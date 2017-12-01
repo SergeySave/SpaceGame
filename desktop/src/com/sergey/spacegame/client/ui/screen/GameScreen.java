@@ -338,11 +338,11 @@ public class GameScreen extends BaseScreen implements IViewport {
     
     @Override
     public boolean getHiddenUI() {
-        return !hudSystem.checkProcessing();
+        return !hudSystem.isVisible();
     }
     
     @Override
     public void setHiddenUI(boolean b) {
-        hudSystem.setProcessing(!b);
+        hudSystem.setVisible(!b);
     }
 }
